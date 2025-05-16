@@ -1,3 +1,5 @@
+//@autor: aaron
+
 package vista;
 
 import controlador.Controlador;
@@ -26,7 +28,7 @@ public class _01_PGSinLogin extends JFrame {
     private JScrollPane scrollPane;
 
     public _01_PGSinLogin() {
-        setTitle("01 . Página Principal");
+        setTitle("01 . Página Principal sin login" );
         setSize(1200, 900);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

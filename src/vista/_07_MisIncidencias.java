@@ -1,4 +1,4 @@
-// @Autor: Bea - Versión sin iconos
+// @Autor: Bea 
 
 package vista;
 
