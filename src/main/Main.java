@@ -8,6 +8,7 @@ import controlador.Controlador;
 import modelo.Modelo;
 import vista._01_PGSinLogin;
 import vista._02_Login;
+import vista._06_PaginaPrincipal;
 import vista._07_MisIncidencias;
 import vista._08_CrearIncidencia;
 import vista._09_Notificaciones;
