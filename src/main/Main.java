@@ -41,7 +41,7 @@ public class Main {
         Modelo modelo = new Modelo();
         Controlador controlador = new Controlador();
 
-        _07_MisIncidencias vistaInicial = new _07_MisIncidencias();
+        _01_PGSinLogin vistaInicial = new _01_PGSinLogin();
         vistaInicial.setControlador(controlador);
 
         controlador.setModelo(modelo);
