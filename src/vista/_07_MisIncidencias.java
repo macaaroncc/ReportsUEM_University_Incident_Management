@@ -181,7 +181,7 @@ public class _07_MisIncidencias extends JFrame {
 					"Editar Incidencia", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
- 
+
 	private void eliminarIncidencia() {
 		int fila = table.getSelectedRow();
 		if (fila != -1) {
