@@ -1,4 +1,3 @@
-// Vista actualizada: _06_PaginaPrincipal.java
 package vista;
 
 import controlador.BarraNavegacion;
@@ -7,19 +6,18 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class _06_PaginaPrincipal extends JFrame {
     private JPanel contentPane;
     private JTable table;
-    private JComboBox<String> comboBoxEstado;
-    private JComboBox<String> comboBoxOrden;
-    private JComboBox<String> comboBoxFecha;
-    private Controlador controlador;
+    private JComboBox<String> comboBoxEstado, comboBoxOrden, comboBoxFecha;
+    private JTextField campoBusqueda;
+    private JButton botonBuscar, btnCrearIncidenciaInferior, btnAyuda;
     private JScrollPane scrollPane;
-    private JButton btnCrearIncidenciaInferior;
-    private JButton btnAyuda;
+    private Controlador controlador;
 
     public _06_PaginaPrincipal() {
         setTitle("Página Principal - Usuario");
@@ -31,27 +29,27 @@ public class _06_PaginaPrincipal extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(null);
         setContentPane(contentPane);
+        contentPane.setBackground(new Color(255, 255, 252));
 
-        // ✅ Agregamos la barra de navegación reutilizable
+        // ✅ Barra de navegación
         BarraNavegacion barra = new BarraNavegacion(controlador);
         barra.setUsuarioLogueado(true);
         barra.setControlador(controlador);
         barra.setBounds(0, 0, 1200, 59);
-        getContentPane().add(barra);
+        contentPane.add(barra);
 
-
-
-        // --- Filtros ---
+        // --- Filtros y buscador ---
         comboBoxEstado = new JComboBox<>(new String[]{"Estado", "Pendiente", "Resuelta", "En proceso"});
-        comboBoxEstado.setBounds(73, 80, 150, 30);
+        comboBoxEstado.setBounds(40, 70, 150, 30);
         contentPane.add(comboBoxEstado);
 
-        comboBoxOrden = new JComboBox<>(new String[]{"Orden de Relevancia", "Más relevante primero", "Menos relevante primero", "Más reciente primero"});
-        comboBoxOrden.setBounds(250, 80, 200, 30);
+        comboBoxOrden = new JComboBox<>(new String[]{"Orden de Relevancia", "Más relevante primero", 
+            "Menos relevante primero", "Más reciente primero"});
+        comboBoxOrden.setBounds(200, 70, 180, 30);
         contentPane.add(comboBoxOrden);
 
         comboBoxFecha = new JComboBox<>();
-        comboBoxFecha.setBounds(480, 80, 150, 30);
+        comboBoxFecha.setBounds(390, 70, 150, 30);
         comboBoxFecha.addItem("Fecha");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         comboBoxFecha.addItem("Hoy - " + sdf.format(new Date()));
@@ -62,29 +60,65 @@ public class _06_PaginaPrincipal extends JFrame {
         comboBoxFecha.addItem("Personalizado...");
         contentPane.add(comboBoxFecha);
 
+        campoBusqueda = new JTextField();
+        campoBusqueda.setBounds(750, 70, 250, 30);
+        contentPane.add(campoBusqueda);
+
+        botonBuscar = new JButton("Buscar");
+        botonBuscar.setBounds(1010, 70, 100, 30);
+        botonBuscar.setBackground(new Color(128, 0, 0));
+        botonBuscar.setForeground(Color.WHITE);
+        botonBuscar.setFont(new Font("Tahoma", Font.BOLD, 12));
+        botonBuscar.setFocusPainted(false);
+        contentPane.add(botonBuscar);
+
         // --- Tabla de incidencias ---
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Imagen");
-        model.addColumn("Título");
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 6) return Date.class; // Columna de fecha
+                if (columnIndex == 8) return Integer.class; // Columna de ranking
+                return String.class;
+            }
+        };
+
+        // Definir columnas (todas excepto 'foto')
         model.addColumn("Estado");
         model.addColumn("Edificio");
         model.addColumn("Piso");
+        model.addColumn("Descripción");
         model.addColumn("Aula");
+        model.addColumn("Justificación");
         model.addColumn("Fecha");
+        model.addColumn("Campus");
+        model.addColumn("Ranking");
+        model.addColumn("Usuario");
 
-        model.addRow(new Object[]{"Imagen", "Proyector dañado", "Pendiente", "A", "1", "101A", "2025-01-20"});
-        model.addRow(new Object[]{"Imagen", "Silla rota", "Pendiente", "B", "2", "202B", "2025-02-15"});
-        model.addRow(new Object[]{"Imagen", "Fuga de agua", "En proceso", "C", "3", "303C", "2025-03-10"});
-        model.addRow(new Object[]{"Imagen", "Luz no funciona", "Resuelta", "D", "1", "104D", "2025-01-05"});
+        // Cargar datos
+        cargarIncidenciasDesdeBD(model);
 
+        // Configurar tabla
         table = new JTable(model);
-        table.setRowHeight(70);
+        table.setRowHeight(30);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Ajustar anchos de columnas
+        table.getColumnModel().getColumn(3).setPreferredWidth(250); // Descripción
+        table.getColumnModel().getColumn(5).setPreferredWidth(200); // Justificación
+        table.getColumnModel().getColumn(9).setPreferredWidth(100); // Usuario
 
         scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(57, 130, 1080, 600);
+        scrollPane.setBounds(40, 120, 1110, 600);
         contentPane.add(scrollPane);
 
-        // --- Botón inferior "Crear Incidencia" ---
+        // --- Botón Crear Incidencia ---
         btnCrearIncidenciaInferior = new JButton("Crear Incidencia");
         btnCrearIncidenciaInferior.setBounds((1200 - 200) / 2, 740, 200, 40);
         btnCrearIncidenciaInferior.setBackground(new Color(128, 0, 0));
@@ -92,13 +126,12 @@ public class _06_PaginaPrincipal extends JFrame {
         btnCrearIncidenciaInferior.setFont(new Font("Tahoma", Font.BOLD, 14));
         btnCrearIncidenciaInferior.setFocusPainted(false);
         btnCrearIncidenciaInferior.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        contentPane.add(btnCrearIncidenciaInferior);
-
         btnCrearIncidenciaInferior.addActionListener(e -> {
             if (controlador != null) controlador.abrirCrearIncidencia();
         });
+        contentPane.add(btnCrearIncidenciaInferior);
 
-        // --- Botón ayuda ---
+        // --- Botón Ayuda ---
         btnAyuda = new JButton("?");
         btnAyuda.setBounds(1120, 740, 50, 50);
         btnAyuda.setBackground(new Color(128, 0, 0));
@@ -106,17 +139,54 @@ public class _06_PaginaPrincipal extends JFrame {
         btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
         btnAyuda.setFocusPainted(false);
         btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        contentPane.add(btnAyuda);
-
         btnAyuda.addActionListener(e -> {
             if (controlador != null) controlador.abrirAyuda();
         });
+        contentPane.add(btnAyuda);
+    }
+
+    private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
+        String url = "jdbc:mysql://localhost:3306/proyecto_integrador?useSSL=false";
+        String usuario = "root";
+        String contraseña = "";
+
+        try (Connection conexion = DriverManager.getConnection(url, usuario, contraseña);
+             Statement stmt = conexion.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                 "SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR " +
+                 "FROM incidencias ORDER BY fecha DESC")) {
+            
+            model.setRowCount(0); // Limpiar tabla existente
+            
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("estado"),
+                    rs.getString("edificio"),
+                    rs.getString("piso"),
+                    rs.getString("descripcion"),
+                    rs.getString("aula"),
+                    rs.getString("justificacion"),
+                    rs.getDate("fecha"),
+                    rs.getString("campus"),
+                    rs.getInt("ranking"),
+                    rs.getString("USR")
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al cargar incidencias:\n" + e.getMessage(),
+                "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            
+            // Datos de ejemplo en caso de error
+            model.addRow(new Object[]{"Error", "Error", "Error", "No se pudo conectar a la BD", 
+                "Error", "Error", new Date(), "Error", 0, "Error"});
+        }
     }
 
     public void setControlador(Controlador controlador) {
         this.controlador = controlador;
-        Component[] components = getContentPane().getComponents();
-        for (Component c : components) {
+        for (Component c : getContentPane().getComponents()) {
             if (c instanceof BarraNavegacion) {
                 ((BarraNavegacion) c).setControlador(controlador);
             }

@@ -4,9 +4,15 @@ import controlador.Controlador;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import com.mysql.cj.xdevapi.Statement;
+import com.sun.jdi.connect.spi.Connection;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -99,22 +105,47 @@ public class _01_PGSinLogin extends JFrame {
         getContentPane().add(botonBuscar);
 
         // ---------------- TABLA ----------------
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Imagen");
-        model.addColumn("Título");
+     // ---------------- TABLA ----------------
+     // ---------------- TABLA ----------------
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 6) return Date.class; // Columna de fecha
+                if (columnIndex == 8) return Integer.class; // Columna de ranking
+                return String.class;
+            }
+        };
+
+        // Definir columnas (todas excepto 'foto')
         model.addColumn("Estado");
         model.addColumn("Edificio");
         model.addColumn("Piso");
+        model.addColumn("Descripción");
         model.addColumn("Aula");
+        model.addColumn("Justificación");
         model.addColumn("Fecha");
+        model.addColumn("Campus");
+        model.addColumn("Ranking");
+        model.addColumn("Usuario");
 
-        model.addRow(new Object[]{"Imagen", "Proyector dañado", "Pendiente", "A", "1", "101A", "2025-01-20"});
-        model.addRow(new Object[]{"Imagen", "Silla rota", "Pendiente", "B", "2", "202B", "2025-02-15"});
-        model.addRow(new Object[]{"Imagen", "Fuga de agua", "En proceso", "C", "3", "303C", "2025-03-10"});
-        model.addRow(new Object[]{"Imagen", "Luz no funciona", "Resuelta", "D", "1", "104D", "2025-01-05"});
+        // Cargar datos
+        cargarIncidenciasDesdeBD(model);
 
+        // Configurar tabla
         table = new JTable(model);
-        table.setRowHeight(70);
+        table.setRowHeight(30);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        // Ajustar anchos de columnas
+        table.getColumnModel().getColumn(3).setPreferredWidth(200); // Descripción más ancha
+        table.getColumnModel().getColumn(5).setPreferredWidth(150); // Justificación
+
         scrollPane = new JScrollPane(table);
         scrollPane.setBounds(40, 120, 1110, 600);
         getContentPane().add(scrollPane);
@@ -131,6 +162,8 @@ public class _01_PGSinLogin extends JFrame {
             if (controlador != null) controlador.abrirLogin();
             dispose();
         });
+        
+        
 
         // ---------------- BOTÓN AYUDA ----------------
         btnAyuda = new JButton("?");
@@ -148,6 +181,62 @@ public class _01_PGSinLogin extends JFrame {
 
     public void setControlador(Controlador controlador) {
         this.controlador = controlador;
+    }
+    
+    private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
+        java.sql.Connection conexion = null;
+        java.sql.Statement stmt = null;
+        java.sql.ResultSet rs = null;
+        
+        try {
+            // Configuración de conexión
+            String url = "jdbc:mysql://localhost:3306/proyecto_integrador?useSSL=false";
+            String usuario = "root";
+            String contraseña = "";
+            
+            // Registrar el driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            
+            // Establecer conexión
+            conexion = DriverManager.getConnection(url, usuario, contraseña);
+            
+            // Consulta SQL - Seleccionamos todas las columnas excepto 'foto'
+            String consulta = "SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias";
+            stmt = conexion.createStatement();
+            rs = stmt.executeQuery(consulta);
+            
+            // Limpiar tabla existente
+            model.setRowCount(0);
+            
+            // Llenar la tabla con los resultados
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("estado"),
+                    rs.getString("edificio"),
+                    rs.getString("piso"),
+                    rs.getString("descripcion"),
+                    rs.getString("aula"),
+                    rs.getString("justificacion"),
+                    rs.getDate("fecha"),
+                    rs.getString("campus"),
+                    rs.getInt("ranking"),
+                    rs.getString("USR")
+                });
+            }
+        } catch (ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error: Driver JDBC no encontrado: " + e.getMessage(),
+                "Error de Driver", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error de base de datos:\n" + e.getMessage(),
+                "Error SQL", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            // Cerrar recursos
+            try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (conexion != null) conexion.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
     }
 
     private JLabel crearNavLabel(String texto, int x, Font fuente) {
