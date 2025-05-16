@@ -1,15 +1,16 @@
-//@autor Haowen
-
 package vista;
 
 import controlador.BarraNavegacion;
 import controlador.Controlador;
-
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.*;
 
 public class _09_Notificaciones extends JFrame {
     private Controlador controlador;
+    private JTable table;
+    private JScrollPane scrollPane;
 
     public _09_Notificaciones() {
         setTitle("09 . Notificaciones");
@@ -21,43 +22,45 @@ public class _09_Notificaciones extends JFrame {
 
         // ✅ Barra de navegación reutilizable
         BarraNavegacion barra = new BarraNavegacion(controlador);
-        barra.setUsuarioLogueado(true);              // Habilita enlaces funcionales
-        barra.setControlador(controlador);           // Asigna listeners y lógica
-        barra.setBounds(0, 0, 1200, 59);             // Asegura que se vea bien
+        barra.setUsuarioLogueado(true);
+        barra.setControlador(controlador);
+        barra.setBounds(0, 0, 1200, 59);
         getContentPane().add(barra);
 
-
-
-        // Contenido de la notificación
-        JLabel lblTitulo = new JLabel("Detalle de Notificación");
+        // Título de la página
+        JLabel lblTitulo = new JLabel("Notificaciones");
         lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 22));
-        lblTitulo.setBounds(460, 80, 400, 30);
+        lblTitulo.setBounds(40, 80, 300, 30);
         getContentPane().add(lblTitulo);
 
-        JLabel lblImagen = new JLabel("Imagen", SwingConstants.CENTER);
-        lblImagen.setBounds(100, 140, 500, 400);
-        lblImagen.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        getContentPane().add(lblImagen);
+        // Crear modelo de tabla
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Hacer que la tabla no sea editable
+            }
+        };
 
-        JTextField txtTitulo = new JTextField("Título");
-        txtTitulo.setBounds(650, 140, 400, 30);
-        getContentPane().add(txtTitulo);
+        // Definir columnas
+        model.addColumn("ID Incidencia");
+        model.addColumn("Usuario");
 
-        JTextArea txtDescripcion = new JTextArea("Descripción");
-        JScrollPane scrollDesc = new JScrollPane(txtDescripcion);
-        scrollDesc.setBounds(650, 180, 400, 200);
-        getContentPane().add(scrollDesc);
+        // Cargar datos desde la base de datos
+        cargarNotificacionesDesdeBD(model);
 
-        JLabel lblEstado = new JLabel("Estado:");
-        lblEstado.setFont(new Font("Tahoma", Font.BOLD, 16));
-        lblEstado.setBounds(650, 400, 100, 30);
-        getContentPane().add(lblEstado);
+        // Configurar tabla
+        table = new JTable(model);
+        table.setRowHeight(30);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
-        JLabel lblEstadoValor = new JLabel("✔ En proceso");
-        lblEstadoValor.setFont(new Font("Tahoma", Font.BOLD, 16));
-        lblEstadoValor.setForeground(new Color(34, 139, 34));
-        lblEstadoValor.setBounds(750, 400, 200, 30);
-        getContentPane().add(lblEstadoValor);
+        // Ajustar anchos de columnas
+        table.getColumnModel().getColumn(0).setPreferredWidth(150); // ID Incidencia
+        table.getColumnModel().getColumn(1).setPreferredWidth(300); // Usuario
+
+        scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(40, 120, 1110, 600);
+        getContentPane().add(scrollPane);
 
         // ✅ Botón de ayuda flotante
         JButton btnAyuda = new JButton("?");
@@ -67,11 +70,39 @@ public class _09_Notificaciones extends JFrame {
         btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
         btnAyuda.setFocusPainted(false);
         btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        getContentPane().add(btnAyuda);
         btnAyuda.addActionListener(e -> {
             if (controlador != null) controlador.abrirAyuda();
-            _09_Notificaciones.this.dispose();
+            dispose();
         });
+        getContentPane().add(btnAyuda);
+    }
+
+    private void cargarNotificacionesDesdeBD(DefaultTableModel model) {
+        String url = "jdbc:mysql://localhost:3306/proyecto_integrador?useSSL=false";
+        String usuario = "root";
+        String contraseña = "";
+
+        try (Connection conexion = DriverManager.getConnection(url, usuario, contraseña);
+             Statement stmt = conexion.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT incidencias_id_incidencia, USERS_USR FROM notificar")) {
+            
+            model.setRowCount(0); // Limpiar tabla existente
+            
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("incidencias_id_incidencia"),
+                    rs.getString("USERS_USR")
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al cargar notificaciones:\n" + e.getMessage(),
+                "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            
+            // Datos de ejemplo en caso de error
+            model.addRow(new Object[]{0, "Error al cargar datos"});
+        }
     }
 
     public void setControlador(Controlador controlador) {
