@@ -1,5 +1,4 @@
 // @Author: Beatriz
-
 package modelo;
 
 public class Modelo {
