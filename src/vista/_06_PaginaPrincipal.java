@@ -11,6 +11,10 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Clase _06_PaginaPrincipal.
+ * Representa la clase _06_PaginaPrincipal.
+ */
 public class _06_PaginaPrincipal extends JFrame {
     private JPanel contentPane;
     private JTable table;
@@ -76,6 +80,11 @@ public class _06_PaginaPrincipal extends JFrame {
         // --- Tabla de incidencias ---
         DefaultTableModel model = new DefaultTableModel() {
             @Override
+/**
+ * Realiza la acción correspondiente.
+ * @param row Valor numérico entero.
+ * @param column Valor numérico entero.
+ */
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -146,6 +155,10 @@ public class _06_PaginaPrincipal extends JFrame {
         contentPane.add(btnAyuda);
     }
 
+/**
+ * Realiza la acción correspondiente.
+ * @param model Parámetro de tipo DefaultTableModel.
+ */
     private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
         try (Connection conexion = modelo.ConexionBD.conectar();
              java.sql.Statement stmt = conexion.createStatement();
@@ -181,6 +194,10 @@ public class _06_PaginaPrincipal extends JFrame {
         }
     }
 
+/**
+ * Establece el valor de controlador.
+ * @param controlador Controlador principal que gestiona la lógica de navegación.
+ */
     public void setControlador(Controlador controlador) {
         this.controlador = controlador;
         for (Component c : getContentPane().getComponents()) {

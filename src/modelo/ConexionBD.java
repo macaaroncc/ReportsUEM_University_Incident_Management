@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Clase ConexionBD.
+ * Representa la clase ConexionBD.
+ */
 public class ConexionBD {
 	private static final String URL = "jdbc:mysql://localhost:3306/proyecto_integrador"; // ajusta si es necesario
 	private static final String USUARIO = "root"; // cambia si usas otro

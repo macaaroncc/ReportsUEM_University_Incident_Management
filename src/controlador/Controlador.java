@@ -20,6 +20,10 @@ import javax.swing.*;
 
 import modelo.ConexionBD;
 
+/**
+ * Clase Controlador.
+ * Representa la clase Controlador.
+ */
 public class Controlador {
 
 	private Modelo modelo;
@@ -28,21 +32,38 @@ public class Controlador {
 	private int intentosFallidos = 0;
 	private boolean usuarioLogueado = false; // ✅ NUEVO: estado del usuario
 
+/**
+ * Establece el valor de modelo.
+ * @param modelo Modelo de datos utilizado en la aplicación.
+ */
 	public void setModelo(Modelo modelo) {
 		this.modelo = modelo;
 	}
 	
 
+/**
+ * Establece el valor de vista.
+ * @param vista Vista gráfica que se mostrará al usuario.
+ * @param crearCuenta Parámetro de tipo _03_CrearCuenta.
+ */
 	public void setVista(_02_Login vista, _03_CrearCuenta crearCuenta) {
 		this._02_login = vista;
 		this._03_crearCuenta = crearCuenta;
 	}
 
+/**
+ * Establece el valor de usuariologueado.
+ * @param logueado Parámetro de tipo boolean.
+ */
 	public void setUsuarioLogueado(boolean logueado) {
 		this.usuarioLogueado = logueado;
 	}
 
 	// ✅ Mostrar cualquier ventana
+/**
+ * Muestra una ventana o componente gráfico.
+ * @param vista Vista gráfica que se mostrará al usuario.
+ */
 	private void mostrarVentana(JFrame vista) {
 		vista.setVisible(true);
 	}
@@ -50,6 +71,10 @@ public class Controlador {
 	// ✅ Volver atrás según estado
 	
 	//cambio
+/**
+ * Vuelve a la ventana anterior o al estado anterior.
+ * @param ventanaActual Ventana actual que se cierra o cambia.
+ */
 	public void volverAtras(JFrame ventanaActual) {
 	    if (usuarioLogueado) {
 	        _06_PaginaPrincipal vista = new _06_PaginaPrincipal();
@@ -68,6 +93,9 @@ public class Controlador {
 
 
 	// ✅ Cerrar sesión
+/**
+ * Realiza la acción correspondiente.
+ */
 	public void cerrarSesion() {
 		setUsuarioLogueado(false);
 		_01_PGSinLogin vista = new _01_PGSinLogin();
@@ -76,6 +104,10 @@ public class Controlador {
 	}
 
 	// 🔄 Métodos de navegación
+/**
+ * Realiza la acción correspondiente.
+ * @param ventanaActual Ventana actual que se cierra o cambia.
+ */
 	public void abrirPaginaPrincipal(JFrame ventanaActual) {
 	    _06_PaginaPrincipal pagina = new _06_PaginaPrincipal();
 	    pagina.setControlador(this);
@@ -86,6 +118,10 @@ public class Controlador {
 	}
 
 
+/**
+ * Realiza la acción correspondiente.
+ * @param ventanaActual Ventana actual que se cierra o cambia.
+ */
 	public void abrirMisIncidencias(JFrame ventanaActual) {
 	    _07_MisIncidencias vista = new _07_MisIncidencias();
 	    vista.setControlador(this);
@@ -96,6 +132,10 @@ public class Controlador {
 	}
 
 
+/**
+ * Crea una nueva entidad o interfaz.
+ * @param ventanaActual Ventana actual que se cierra o cambia.
+ */
 	public void abrirCrearIncidencia(JFrame ventanaActual) {
 	    _08_CrearIncidencia vista = new _08_CrearIncidencia();
 	    vista.setControlador(this);
@@ -104,6 +144,9 @@ public class Controlador {
 	        ventanaActual.dispose();
 	    }
 	}
+/**
+ * Realiza la acción correspondiente.
+ */
 	public void abrirPerfilUsuario() {
 		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
 		perfil.setControlador(this);
@@ -111,12 +154,19 @@ public class Controlador {
 	}
 
 
+/**
+ * Realiza la acción correspondiente.
+ */
 	public void abrirPaginaAdmin() {
 		_12_PaginaAdmin vista = new _12_PaginaAdmin();
 		vista.setControlador(this);
 		mostrarVentana(vista);
 	}
 
+/**
+ * Realiza la acción correspondiente.
+ * @param ventanaActual Ventana actual que se cierra o cambia.
+ */
 	public void abrirNotificaciones(JFrame ventanaActual) {
 	    _09_Notificaciones vista = new _09_Notificaciones();
 	    vista.setControlador(this);
@@ -124,12 +174,18 @@ public class Controlador {
 	    ventanaActual.dispose(); // Cierra la ventana actual
 	}
 
+/**
+ * Realiza la acción correspondiente.
+ */
 	public void abrirAyuda() {
 		_14_Ayuda vista = new _14_Ayuda();
 		vista.setControlador(this);
 		mostrarVentana(vista);
 	}
 
+/**
+ * Realiza la acción correspondiente.
+ */
 	public void abrirLogin() {
 		_02_Login login = new _02_Login();
 		login.setControlador(this);
@@ -137,12 +193,19 @@ public class Controlador {
 		mostrarVentana(login);
 	}
 
+/**
+ * Realiza la acción correspondiente.
+ */
 	public void abrirRestContrasena() {
 		_05_RestContrasena rest = new _05_RestContrasena();
 		rest.setControlador(this);
 		mostrarVentana(rest);
 	}
 
+/**
+ * Realiza la acción correspondiente.
+ * @param ventanaActual Ventana actual que se cierra o cambia.
+ */
 	public void abrirPerfilUsuario(JFrame ventanaActual) {
 		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
 		perfil.setControlador(this);
@@ -151,6 +214,12 @@ public class Controlador {
 	}
 
 	// ✅ LOGIN con lógica de rol
+/**
+ * Valida la información o credenciales del usuario.
+ * @param email Correo electrónico del usuario.
+ * @param password Contraseña del usuario.
+ * @param vistaActual Vista gráfica que se mostrará al usuario.
+ */
 	public void validarLogin(String email, String password, JFrame vistaActual) {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "SELECT ROL FROM USERS WHERE USR = ? AND PWD = ?";
@@ -186,6 +255,17 @@ public class Controlador {
 		}
 	}
 
+/**
+ * Realiza la acción correspondiente.
+ * @param email Correo electrónico del usuario.
+ * @param password Contraseña del usuario.
+ * @param codigoAdmin Código de verificación o autenticación.
+ * @param preg1 Valor numérico entero.
+ * @param preg2 Valor numérico entero.
+ * @param resp1 Cadena de texto.
+ * @param resp2 Cadena de texto.
+ * @param vistaActual Vista gráfica que se mostrará al usuario.
+ */
 	public void registrarUsuario(String email, String password, String codigoAdmin, int preg1, int preg2, String resp1, String resp2, JFrame vistaActual) {
         if (email.isEmpty() || password.isEmpty() || resp1.isEmpty() || resp2.isEmpty()) {
             JOptionPane.showMessageDialog(vistaActual, "Debe rellenar todos los campos");
@@ -234,6 +314,13 @@ public class Controlador {
         }
     }
 
+/**
+ * Realiza la acción correspondiente.
+ * @param email Correo electrónico del usuario.
+ * @param resp1 Cadena de texto.
+ * @param resp2 Cadena de texto.
+ * @param vistaActual Vista gráfica que se mostrará al usuario.
+ */
 	public void comprobarPreguntasSeguridad(String email, String resp1, String resp2, JFrame vistaActual) {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "SELECT * FROM USERS WHERE USR = ? AND RESP1 = ? AND RESP2 = ?";
@@ -258,6 +345,12 @@ public class Controlador {
 		}
 	}
 
+/**
+ * Realiza la acción correspondiente.
+ * @param email Correo electrónico del usuario.
+ * @param nuevaPwd Cadena de texto.
+ * @param vistaActual Vista gráfica que se mostrará al usuario.
+ */
 	public void restablecerContrasena(String email, String nuevaPwd, JFrame vistaActual) {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "UPDATE USERS SET PWD = ? WHERE USR = ?";

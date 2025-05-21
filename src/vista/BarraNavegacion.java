@@ -8,6 +8,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * Clase BarraNavegacion.
+ * Representa la clase BarraNavegacion.
+ */
 public class BarraNavegacion extends JPanel {
 	private boolean usuarioLogueado = true;
 	private Controlador controlador;
@@ -18,6 +22,10 @@ public class BarraNavegacion extends JPanel {
 	public JLabel lblUsuario;
 	public JButton btnAtras;
 
+/**
+ * Establece el valor de usuariologueado.
+ * @param logueado Parámetro de tipo boolean.
+ */
 	public void setUsuarioLogueado(boolean logueado) {
 	    this.usuarioLogueado = logueado;
 	}
@@ -59,6 +67,10 @@ public class BarraNavegacion extends JPanel {
 		// Eventos
 		lblPGNPrincipal.addMouseListener(new MouseAdapter() {
 		    @Override
+/**
+ * Realiza la acción correspondiente.
+ * @param e Parámetro de tipo MouseEvent.
+ */
 		    public void mouseClicked(MouseEvent e) {
 		        if (controlador != null) {
 		            JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblPGNPrincipal);
@@ -70,6 +82,10 @@ public class BarraNavegacion extends JPanel {
 
 		lblMisIncidencias.addMouseListener(new MouseAdapter() {
 		    @Override
+/**
+ * Realiza la acción correspondiente.
+ * @param e Parámetro de tipo MouseEvent.
+ */
 		    public void mouseClicked(MouseEvent e) {
 		        if (controlador != null) {
 		            // Obtener la ventana actual donde está el label
@@ -82,6 +98,10 @@ public class BarraNavegacion extends JPanel {
 
 		lblCrearIncidencia.addMouseListener(new MouseAdapter() {
 		    @Override
+/**
+ * Realiza la acción correspondiente.
+ * @param e Parámetro de tipo MouseEvent.
+ */
 		    public void mouseClicked(MouseEvent e) {
 		        if (controlador != null) {
 		            JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblCrearIncidencia);
@@ -93,6 +113,10 @@ public class BarraNavegacion extends JPanel {
 
 		lblNotificaciones.addMouseListener(new MouseAdapter() {
 		    @Override
+/**
+ * Realiza la acción correspondiente.
+ * @param e Parámetro de tipo MouseEvent.
+ */
 		    public void mouseClicked(MouseEvent e) {
 		        if (controlador != null) {
 		            // Obtener la ventana actual (el JFrame que contiene este label)
@@ -104,6 +128,11 @@ public class BarraNavegacion extends JPanel {
 
 	}
 
+/**
+ * Crea una nueva entidad o interfaz.
+ * @param texto Cadena de texto.
+ * @param x Valor numérico entero.
+ */
 	private JLabel crearLink(String texto, int x) {
 		JLabel label = new JLabel(texto);
 		label.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -114,11 +143,19 @@ public class BarraNavegacion extends JPanel {
 		return label;
 	}
 
+/**
+ * Establece el valor de controlador.
+ * @param controlador Controlador principal que gestiona la lógica de navegación.
+ */
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
 
 		lblUsuario.addMouseListener(new MouseAdapter() {
 			@Override
+/**
+ * Realiza la acción correspondiente.
+ * @param e Parámetro de tipo MouseEvent.
+ */
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
 					controlador.abrirPerfilUsuario(); // ✅ Método correcto

@@ -18,6 +18,10 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Clase _01_PGSinLogin.
+ * Representa la clase _01_PGSinLogin.
+ */
 public class _01_PGSinLogin extends JFrame {
 
     private Controlador controlador;
@@ -61,6 +65,10 @@ public class _01_PGSinLogin extends JFrame {
         barra.add(lblUsuario);
 
         MouseAdapter abrirLogin = new MouseAdapter() {
+/**
+ * Realiza la acción correspondiente.
+ * @param e Parámetro de tipo MouseEvent.
+ */
             public void mouseClicked(MouseEvent e) {
                 if (controlador != null) controlador.abrirLogin();
                 dispose();
@@ -111,6 +119,11 @@ public class _01_PGSinLogin extends JFrame {
      // ---------------- TABLA ----------------
         DefaultTableModel model = new DefaultTableModel() {
             @Override
+/**
+ * Realiza la acción correspondiente.
+ * @param row Valor numérico entero.
+ * @param column Valor numérico entero.
+ */
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -181,10 +194,18 @@ public class _01_PGSinLogin extends JFrame {
         });
     }
 
+/**
+ * Establece el valor de controlador.
+ * @param controlador Controlador principal que gestiona la lógica de navegación.
+ */
     public void setControlador(Controlador controlador) {
         this.controlador = controlador;
     }
     
+/**
+ * Realiza la acción correspondiente.
+ * @param model Parámetro de tipo DefaultTableModel.
+ */
     private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
         java.sql.Connection conexion = null;
         java.sql.Statement stmt = null;
@@ -229,6 +250,12 @@ public class _01_PGSinLogin extends JFrame {
         }
     }
 
+/**
+ * Crea una nueva entidad o interfaz.
+ * @param texto Cadena de texto.
+ * @param x Valor numérico entero.
+ * @param fuente Parámetro de tipo Font.
+ */
     private JLabel crearNavLabel(String texto, int x, Font fuente) {
         JLabel lbl = new JLabel(texto);
         lbl.setFont(fuente);
