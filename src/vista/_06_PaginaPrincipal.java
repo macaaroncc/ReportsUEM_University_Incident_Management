@@ -2,7 +2,6 @@
 
 package vista;
 
-import controlador.BarraNavegacion;
 import controlador.Controlador;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -129,7 +128,7 @@ public class _06_PaginaPrincipal extends JFrame {
         btnCrearIncidenciaInferior.setFocusPainted(false);
         btnCrearIncidenciaInferior.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnCrearIncidenciaInferior.addActionListener(e -> {
-            if (controlador != null) controlador.abrirCrearIncidencia();
+            if (controlador != null) controlador.abrirCrearIncidencia(this);
         });
         contentPane.add(btnCrearIncidenciaInferior);
 

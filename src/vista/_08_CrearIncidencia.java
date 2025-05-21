@@ -1,7 +1,6 @@
 // Vista actualizada: _08_CrearIncidencia.java
 package vista;
 
-import controlador.BarraNavegacion;
 import controlador.Controlador;
 
 import javax.swing.*;
@@ -34,7 +33,7 @@ public class _08_CrearIncidencia extends JFrame {
 
         // Acción del botón atrás
         barra.btnAtras.addActionListener(e -> {
-            if (controlador != null) controlador.volverAtras();
+            if (controlador != null) controlador.volverAtras(this);
             dispose();
         });
 

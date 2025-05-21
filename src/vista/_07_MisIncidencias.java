@@ -2,7 +2,6 @@
 
 package vista;
 
-import controlador.BarraNavegacion;
 import controlador.Controlador;
 
 import javax.swing.*;
@@ -28,7 +27,7 @@ public class _07_MisIncidencias extends JFrame {
 		BarraNavegacion barra = new BarraNavegacion();
 		barra.btnAtras.addActionListener(e -> {
 			if (controlador != null)
-				controlador.volverAtras();
+				controlador.volverAtras(this);
 			dispose();
 		});
 		barra.setUsuarioLogueado(true);
@@ -93,7 +92,7 @@ public class _07_MisIncidencias extends JFrame {
 		btnNuevaIncidencia.setBounds(40, 720, 150, 30);
 		btnNuevaIncidencia.addActionListener(e -> {
 			if (controlador != null) {
-				controlador.abrirCrearIncidencia();
+				controlador.abrirCrearIncidencia(this);
 				dispose();
 			}
 		});

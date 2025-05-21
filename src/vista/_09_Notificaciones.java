@@ -1,6 +1,5 @@
 package vista;
 
-import controlador.BarraNavegacion;
 import controlador.Controlador;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

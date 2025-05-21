@@ -1,7 +1,6 @@
 package vista;
 
 import controlador.Controlador;
-import controlador.BarraNavegacion;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +25,7 @@ public class _13_Estadisticas extends JFrame {
 
 		barra.btnAtras.addActionListener(e -> {
 			if (controlador != null)
-				controlador.volverAtras();
+				controlador.volverAtras(this);
 			dispose();
 		});
 

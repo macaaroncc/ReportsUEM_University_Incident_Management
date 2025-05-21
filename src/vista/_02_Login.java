@@ -158,7 +158,7 @@ public class _02_Login extends JFrame {
         outerPanel.add(btnAtras);
         btnAtras.addActionListener(e -> {
             if (controlador != null) {
-                controlador.volverAtras();
+                controlador.volverAtras(this);
             }
             _02_Login.this.dispose();
         });

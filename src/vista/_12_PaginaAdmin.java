@@ -1,7 +1,6 @@
 package vista;
 
 import controlador.Controlador;
-import controlador.BarraNavegacion;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +29,7 @@ public class _12_PaginaAdmin extends JFrame {
 		// Acción del botón Atrás de la barra
 		barra.btnAtras.addActionListener(e -> {
 			if (controlador != null)
-				controlador.volverAtras();
+				controlador.volverAtras(this);
 			dispose();
 		});
 

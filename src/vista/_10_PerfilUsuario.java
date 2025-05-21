@@ -1,6 +1,5 @@
 package vista;
 
-import controlador.BarraNavegacion;
 import controlador.Controlador;
 
 import javax.swing.*;
@@ -28,7 +27,7 @@ public class _10_PerfilUsuario extends JFrame {
 
 
         barra.btnAtras.addActionListener(e -> {
-            if (controlador != null) controlador.volverAtras();
+            if (controlador != null) controlador.volverAtras(this);
             dispose();
         });
 

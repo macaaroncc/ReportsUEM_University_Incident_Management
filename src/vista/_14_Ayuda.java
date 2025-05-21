@@ -2,7 +2,6 @@
 package vista;
 
 import controlador.Controlador;
-import controlador.BarraNavegacion;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +22,7 @@ public class _14_Ayuda extends JFrame {
         barra.setBounds(0, 0, 1200, 59);
         getContentPane().add(barra);
         barra.btnAtras.addActionListener(e -> {
-            if (controlador != null) controlador.volverAtras();
+            if (controlador != null) controlador.volverAtras(this);
             dispose();
         });
 

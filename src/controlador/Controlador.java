@@ -48,17 +48,24 @@ public class Controlador {
 	}
 
 	// ✅ Volver atrás según estado
-	public void volverAtras() {
-		if (usuarioLogueado) {
-			_06_PaginaPrincipal vista = new _06_PaginaPrincipal();
-			vista.setControlador(this);
-			mostrarVentana(vista);
-		} else {
-			_01_PGSinLogin vista = new _01_PGSinLogin();
-			vista.setControlador(this);
-			mostrarVentana(vista);
-		}
+	
+	//cambio
+	public void volverAtras(JFrame ventanaActual) {
+	    if (usuarioLogueado) {
+	        _06_PaginaPrincipal vista = new _06_PaginaPrincipal();
+	        vista.setControlador(this);
+	        vista.setVisible(true);
+	    } else {
+	        _01_PGSinLogin vista = new _01_PGSinLogin();
+	        vista.setControlador(this);
+	        vista.setVisible(true);
+	    }
+	    if (ventanaActual != null) {
+	        ventanaActual.dispose();
+	    }
 	}
+
+
 
 	// ✅ Cerrar sesión
 	public void cerrarSesion() {
@@ -69,24 +76,34 @@ public class Controlador {
 	}
 
 	// 🔄 Métodos de navegación
-	public void abrirPaginaPrincipal() {
-		_06_PaginaPrincipal vista = new _06_PaginaPrincipal();
-		vista.setControlador(this);
-		mostrarVentana(vista);
+	public void abrirPaginaPrincipal(JFrame ventanaActual) {
+	    _06_PaginaPrincipal pagina = new _06_PaginaPrincipal();
+	    pagina.setControlador(this);
+	    pagina.setVisible(true);
+	    if (ventanaActual != null) {
+	        ventanaActual.dispose();
+	    }
 	}
 
-	public void abrirMisIncidencias() {
-		_07_MisIncidencias vista = new _07_MisIncidencias();
-		vista.setControlador(this);
-		mostrarVentana(vista);
+
+	public void abrirMisIncidencias(JFrame ventanaActual) {
+	    _07_MisIncidencias vista = new _07_MisIncidencias();
+	    vista.setControlador(this);
+	    vista.setVisible(true);
+	    if (ventanaActual != null) {
+	        ventanaActual.dispose();
+	    }
 	}
 
-	public void abrirCrearIncidencia() {
-		_08_CrearIncidencia vista = new _08_CrearIncidencia();
-		vista.setControlador(this);
-		mostrarVentana(vista);
-	}
 
+	public void abrirCrearIncidencia(JFrame ventanaActual) {
+	    _08_CrearIncidencia vista = new _08_CrearIncidencia();
+	    vista.setControlador(this);
+	    vista.setVisible(true);
+	    if (ventanaActual != null) {
+	        ventanaActual.dispose();
+	    }
+	}
 	public void abrirPerfilUsuario() {
 		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
 		perfil.setControlador(this);
@@ -100,10 +117,11 @@ public class Controlador {
 		mostrarVentana(vista);
 	}
 
-	public void abrirNotificaciones() {
-		_09_Notificaciones vista = new _09_Notificaciones();
-		vista.setControlador(this);
-		mostrarVentana(vista);
+	public void abrirNotificaciones(JFrame ventanaActual) {
+	    _09_Notificaciones vista = new _09_Notificaciones();
+	    vista.setControlador(this);
+	    vista.setVisible(true);
+	    ventanaActual.dispose(); // Cierra la ventana actual
 	}
 
 	public void abrirAyuda() {
@@ -151,7 +169,7 @@ public class Controlador {
 				if (rol.equalsIgnoreCase("administrador")) {
 					abrirPaginaAdmin();
 				} else {
-					abrirPaginaPrincipal();
+					abrirPaginaPrincipal(vistaActual);
 				}
 			} else {
 				intentosFallidos++;
@@ -260,6 +278,4 @@ public class Controlador {
 			ex.printStackTrace();
 		}
 	}
-	
-	
 }
