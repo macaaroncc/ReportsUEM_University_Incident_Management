@@ -1,8 +1,5 @@
 package controlador;
 
-import controlador.Controlador;
-import vista._10_PerfilUsuario;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -17,12 +14,12 @@ public class BarraNavegacion extends JPanel {
 	public JLabel lblNotificaciones;
 	public JLabel lblUsuario;
 	public JButton btnAtras;
-	private JFrame ventanaActual;
+
 	public void setUsuarioLogueado(boolean logueado) {
 	    this.usuarioLogueado = logueado;
 	}
 
-	public BarraNavegacion(Controlador controlador) {
+	public BarraNavegacion() {
 		setLayout(null);
 		setBackground(new Color(128, 0, 0));
 		setBounds(0, 0, 1200, 59);
@@ -102,10 +99,9 @@ public class BarraNavegacion extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
-					controlador.abrirPerfilUsuario(ventanaActual); // ← Pasas la ventana actual
+					controlador.abrirPerfilUsuario(); // ✅ Método correcto
 				}
 			}
 		});
-
 	}
 }

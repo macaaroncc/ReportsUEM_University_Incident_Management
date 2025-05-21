@@ -88,10 +88,11 @@ public class Controlador {
 	}
 
 	public void abrirPerfilUsuario() {
-		_10_PerfilUsuario vista = new _10_PerfilUsuario();
-		vista.setControlador(this);
-		mostrarVentana(vista);
+		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
+		perfil.setControlador(this);
+		mostrarVentana(perfil);
 	}
+
 
 	public void abrirPaginaAdmin() {
 		_12_PaginaAdmin vista = new _12_PaginaAdmin();
@@ -259,4 +260,6 @@ public class Controlador {
 			ex.printStackTrace();
 		}
 	}
+	
+	
 }

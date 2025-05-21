@@ -19,7 +19,7 @@ public class _10_PerfilUsuario extends JFrame {
         getContentPane().setBackground(new Color(255, 255, 252));
 
         // ✅ Barra de navegación
-        BarraNavegacion barra = new BarraNavegacion(controlador);
+        BarraNavegacion barra = new BarraNavegacion();
         barra.setUsuarioLogueado(true);              // Habilita enlaces funcionales
         barra.setControlador(controlador);           // Asigna listeners y lógica
         barra.setBounds(0, 0, 1200, 59);             // Asegura que se vea bien

@@ -21,7 +21,7 @@ public class _09_Notificaciones extends JFrame {
         getContentPane().setBackground(new Color(255, 255, 252));
 
         // ✅ Barra de navegación reutilizable
-        BarraNavegacion barra = new BarraNavegacion(controlador);
+        BarraNavegacion barra = new BarraNavegacion();
         barra.setUsuarioLogueado(true);
         barra.setControlador(controlador);
         barra.setBounds(0, 0, 1200, 59);

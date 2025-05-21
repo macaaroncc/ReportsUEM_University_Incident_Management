@@ -19,7 +19,7 @@ public class _14_Ayuda extends JFrame {
         getContentPane().setLayout(null);
 
         // Barra de navegación reutilizable
-        BarraNavegacion barra = new BarraNavegacion(null);
+        BarraNavegacion barra = new BarraNavegacion();
         barra.setBounds(0, 0, 1200, 59);
         getContentPane().add(barra);
         barra.btnAtras.addActionListener(e -> {

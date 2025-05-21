@@ -25,7 +25,7 @@ public class _07_MisIncidencias extends JFrame {
 		getContentPane().setBackground(new Color(255, 255, 252));
 
 		// ✅ Barra de navegación reutilizable
-		BarraNavegacion barra = new BarraNavegacion(controlador);
+		BarraNavegacion barra = new BarraNavegacion();
 		barra.btnAtras.addActionListener(e -> {
 			if (controlador != null)
 				controlador.volverAtras();

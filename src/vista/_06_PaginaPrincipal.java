@@ -34,7 +34,7 @@ public class _06_PaginaPrincipal extends JFrame {
         contentPane.setBackground(new Color(255, 255, 252));
 
         // ✅ Barra de navegación
-        BarraNavegacion barra = new BarraNavegacion(controlador);
+        BarraNavegacion barra = new BarraNavegacion();
         barra.setUsuarioLogueado(true);
         barra.setControlador(controlador);
         barra.setBounds(0, 0, 1200, 59);
