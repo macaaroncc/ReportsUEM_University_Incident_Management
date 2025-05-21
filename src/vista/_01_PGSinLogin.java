@@ -191,16 +191,8 @@ public class _01_PGSinLogin extends JFrame {
         java.sql.ResultSet rs = null;
         
         try {
-            // Configuración de conexión
-            String url = "jdbc:mysql://localhost:3306/proyecto_integrador?useSSL=false";
-            String usuario = "root";
-            String contraseña = "";
             
-            // Registrar el driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            
-            // Establecer conexión
-            conexion = DriverManager.getConnection(url, usuario, contraseña);
+            conexion = modelo.ConexionBD.conectar();
             
             // Consulta SQL - Seleccionamos todas las columnas excepto 'foto'
             String consulta = "SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias";
@@ -225,10 +217,6 @@ public class _01_PGSinLogin extends JFrame {
                     rs.getString("USR")
                 });
             }
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(this, 
-                "Error: Driver JDBC no encontrado: " + e.getMessage(),
-                "Error de Driver", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, 
                 "Error de base de datos:\n" + e.getMessage(),

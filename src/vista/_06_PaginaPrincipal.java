@@ -147,13 +147,9 @@ public class _06_PaginaPrincipal extends JFrame {
     }
 
     private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
-        String url = "jdbc:mysql://localhost:3306/proyecto_integrador?useSSL=false";
-        String usuario = "root";
-        String contraseña = "";
-
-        try (Connection conexion = DriverManager.getConnection(url, usuario, contraseña);
-             Statement stmt = conexion.createStatement();
-             ResultSet rs = stmt.executeQuery(
+        try (Connection conexion = modelo.ConexionBD.conectar();
+             java.sql.Statement stmt = conexion.createStatement();
+             java.sql.ResultSet rs = stmt.executeQuery(
                  "SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR " +
                  "FROM incidencias ORDER BY fecha DESC")) {
             
@@ -178,7 +174,7 @@ public class _06_PaginaPrincipal extends JFrame {
                 "Error al cargar incidencias:\n" + e.getMessage(),
                 "Error de base de datos", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-            
+
             // Datos de ejemplo en caso de error
             model.addRow(new Object[]{"Error", "Error", "Error", "No se pudo conectar a la BD", 
                 "Error", "Error", new Date(), "Error", 0, "Error"});

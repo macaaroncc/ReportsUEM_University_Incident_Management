@@ -3,7 +3,7 @@
 package vista;
 
 import controlador.Controlador;
-
+import modelo.ConexionBD;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -135,34 +135,31 @@ public class _07_MisIncidencias extends JFrame {
 	}
 
 	private void cargarIncidenciasDesdeBD() {
-		String URL = "jdbc:mysql://localhost:3306/proyecto_integrador";
-		String user = "root";
-		String password = "";
+	    try (Connection conexion = ConexionBD.conectar();
+	         Statement stmt = conexion.createStatement();
+	         ResultSet rs = stmt.executeQuery("SELECT estado, edificio, aula, descripcion, fecha FROM incidencias")) {
 
-		try (Connection conn = DriverManager.getConnection(URL, user, password)) {
-			String query = "SELECT estado, edificio, aula, descripcion, fecha FROM incidencias";
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
+	        // Limpiar la tabla antes de cargar nuevos datos
+	        modelo.setRowCount(0);
 
-			// Limpiar la tabla antes de cargar nuevos datos
-			modelo.setRowCount(0);
+	        while (rs.next()) {
+	            String estado = rs.getString("estado");
+	            String edificio = rs.getString("edificio");
+	            String aula = rs.getString("aula");
+	            String descripcion = rs.getString("descripcion");
+	            Date fecha = rs.getDate("fecha");
 
-			while (rs.next()) {
-				String estado = rs.getString("estado");
-				String edificio = rs.getString("edificio");
-				String aula = rs.getString("aula");
-				String descripcion = rs.getString("descripcion");
-				Date fecha = rs.getDate("fecha");
-
-				// Añadir fila a la tabla
-				modelo.addRow(new Object[] { descripcion, estado, edificio, aula, fecha });
-			}
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this, "Error al cargar incidencias: " + e.getMessage(),
-					"Error de base de datos", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
+	            // Añadir fila a la tabla - ordena las columnas según tu modelo de tabla
+	            modelo.addRow(new Object[] { estado, edificio, aula, descripcion, fecha });
+	        }
+	    } catch (SQLException e) {
+	        JOptionPane.showMessageDialog(this, 
+	            "Error al cargar incidencias: " + e.getMessage(),
+	            "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+	        e.printStackTrace();
+	    }
 	}
+
 
 	private void editarIncidencia() {
 		int fila = table.getSelectedRow();

@@ -18,7 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.*;
 
-import database.ConexionBD;
+import modelo.ConexionBD;
 
 public class Controlador {
 

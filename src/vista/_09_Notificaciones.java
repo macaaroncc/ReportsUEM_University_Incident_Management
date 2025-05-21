@@ -77,11 +77,8 @@ public class _09_Notificaciones extends JFrame {
     }
 
     private void cargarNotificacionesDesdeBD(DefaultTableModel model) {
-        String url = "jdbc:mysql://localhost:3306/proyecto_integrador?useSSL=false";
-        String usuario = "root";
-        String contraseña = "";
-
-        try (Connection conexion = DriverManager.getConnection(url, usuario, contraseña);
+      
+        try (Connection conexion = modelo.ConexionBD.conectar();
              Statement stmt = conexion.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT incidencias_id_incidencia, USERS_USR FROM notificar")) {
             
