@@ -82,6 +82,7 @@ public class Configuracion extends JFrame {
 			modelo.ConexionBD.recargarConfiguracion();
 
 			JOptionPane.showMessageDialog(this, "Configuración guardada correctamente.");
+			
 		}
 	}
 
