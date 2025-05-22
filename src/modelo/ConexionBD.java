@@ -8,25 +8,46 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexionBD {
-	private static String URL;
-	private static String USUARIO;
-	private static String CONTRASENA;
 
+	private static String URL = "";
+	private static String USUARIO = "";
+	private static String CONTRASENA = "";
+
+	private static final String CONFIG_PATH = "config/dbconfig.ini";
+
+	// Se ejecuta una vez cuando se carga la clase
 	static {
 		cargarConfiguracion();
 	}
 
+	// Método para cargar el archivo INI
 	private static void cargarConfiguracion() {
-		try (BufferedReader br = new BufferedReader(new FileReader("config/dbconfig.ini"))) {
-			USUARIO = br.readLine().split(":")[1].trim();
-			CONTRASENA = br.readLine().split(":")[1].trim();
-			URL = br.readLine().split(":")[1].trim();
+		try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH))) {
+			String linea;
+			while ((linea = br.readLine()) != null) {
+				if (linea.startsWith("usr")) {
+					USUARIO = linea.split(":")[1].trim();
+				} else if (linea.startsWith("pwd")) {
+					CONTRASENA = linea.split(":")[1].trim();
+				} else if (linea.startsWith("url")) {
+					URL = linea.split(":")[1].trim();
+				}
+			}
 		} catch (IOException e) {
-			System.err.println("Error al leer el archivo de configuración: " + e.getMessage());
+			System.err.println("⚠ Error al leer el archivo de configuración: " + e.getMessage());
 		}
 	}
 
+	// Método para obtener la conexión a la base de datos
 	public static Connection conectar() throws SQLException {
+		if (URL.isEmpty() || USUARIO.isEmpty()) {
+			throw new SQLException("La configuración de la base de datos no se ha cargado correctamente.");
+		}
 		return DriverManager.getConnection(URL, USUARIO, CONTRASENA);
+	}
+
+	// Si quieres permitir recargar los datos (ej. después de editar el INI)
+	public static void recargarConfiguracion() {
+		cargarConfiguracion();
 	}
 }
