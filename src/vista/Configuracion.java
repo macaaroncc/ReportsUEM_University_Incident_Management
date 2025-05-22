@@ -55,6 +55,7 @@ public class Configuracion extends JFrame {
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this, "Error al cargar el archivo de configuración: " + e.getMessage());
 		}
+
 	}
 
 	private void guardarDatos() throws IOException {
@@ -62,7 +63,12 @@ public class Configuracion extends JFrame {
 			bw.write("usr : " + usrField.getText() + "\n");
 			bw.write("pwd : " + pwdField.getText() + "\n");
 			bw.write("url : " + urlField.getText() + "\n");
+
+			// ✅ Recargar la configuración
+			modelo.ConexionBD.recargarConfiguracion();
+
 			JOptionPane.showMessageDialog(this, "Configuración guardada correctamente.");
 		}
 	}
+
 }

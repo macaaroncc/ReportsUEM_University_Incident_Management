@@ -42,7 +42,7 @@ public class Main {
         Modelo modelo = new Modelo();
         Controlador controlador = new Controlador();
 
-        _01_PGSinLogin vistaInicial = new _01_PGSinLogin();
+        _02_Login vistaInicial = new _02_Login();
         vistaInicial.setControlador(controlador);
 
         controlador.setModelo(modelo);

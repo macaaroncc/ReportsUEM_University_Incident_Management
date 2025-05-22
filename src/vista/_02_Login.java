@@ -181,10 +181,11 @@ public class _02_Login extends JFrame {
         btnConfiguracion.setBounds(1064, 11, 106, 30);
         btnConfiguracion.setFocusPainted(false);
         outerPanel.add(btnConfiguracion);
+
         btnConfiguracion.addActionListener(e -> {
-            if (controlador != null) {
-            }
+            new Configuracion(); // ✅ Abrir la ventana de configuración
         });
+
     }
 
     public void setControlador(Controlador controlador) {

@@ -226,40 +226,45 @@ public class Controlador {
 	 * @param password    Contraseña del usuario.
 	 * @param vistaActual Vista gráfica que se mostrará al usuario.
 	 */
-	public void validarLogin(String email, String password, JFrame vistaActual) {
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "SELECT ROL FROM USERS WHERE USR = ? AND PWD = ?";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, email);
-			stmt.setString(2, password);
-			ResultSet rs = stmt.executeQuery();
+public void validarLogin(String email, String password, JFrame vistaActual) {
+    try {
+        ConexionBD.recargarConfiguracion(); // <-- AÑADE ESTA LÍNEA
 
-			if (rs.next()) {
-				String rol = rs.getString("ROL");
-				intentosFallidos = 0;
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "SELECT ROL FROM USERS WHERE USR = ? AND PWD = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, email);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
 
-				setUsuarioLogueado(true); // ✅ marcaremos como logueado
-				vistaActual.dispose();
+            if (rs.next()) {
+                String rol = rs.getString("ROL");
+                intentosFallidos = 0;
 
-				if (rol.equalsIgnoreCase("administrador")) {
-					abrirPaginaAdmin();
-				} else {
-					abrirPaginaPrincipal(vistaActual);
-				}
-			} else {
-				intentosFallidos++;
-				JOptionPane.showMessageDialog(vistaActual,
-						"Usuario o contraseña incorrectos. Intento " + intentosFallidos + " de 3.");
-				if (intentosFallidos >= 3) {
-					JOptionPane.showMessageDialog(vistaActual, "Demasiados intentos fallidos. Cerrando aplicación.");
-					System.exit(0);
-				}
-			}
-		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(vistaActual, "Error de conexión:\n" + ex.getMessage());
-			ex.printStackTrace();
-		}
-	}
+                setUsuarioLogueado(true);
+                vistaActual.dispose();
+
+                if (rol.equalsIgnoreCase("administrador")) {
+                    abrirPaginaAdmin();
+                } else {
+                    abrirPaginaPrincipal(vistaActual);
+                }
+            } else {
+                intentosFallidos++;
+                JOptionPane.showMessageDialog(vistaActual,
+                        "Usuario o contraseña incorrectos. Intento " + intentosFallidos + " de 3.");
+                if (intentosFallidos >= 3) {
+                    JOptionPane.showMessageDialog(vistaActual, "Demasiados intentos fallidos. Cerrando aplicación.");
+                    System.exit(0);
+                }
+            }
+        }
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(vistaActual, "Error de conexión:\n" + ex.getMessage());
+        ex.printStackTrace();
+    }
+}
+
 
 	/**
 	 * Realiza la acción correspondiente.
