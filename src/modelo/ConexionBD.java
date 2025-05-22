@@ -13,7 +13,7 @@ public class ConexionBD {
 	private static String USUARIO = "";
 	private static String CONTRASENA = "";
 
-	private static final String CONFIG_PATH = "config/dbconfig.ini";
+	private static final String CONFIG_PATH = "src/config/config.ini";
 
 	// Se ejecuta una vez cuando se carga la clase
 	static {
