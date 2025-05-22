@@ -10,7 +10,7 @@ public class Configuracion extends JFrame {
 	private JTextField urlField;
 	private JButton guardarButton;
 
-	private static final String CONFIG_PATH = "config/config.ini";
+	private static final String CONFIG_PATH = "src/config/config.ini";
 
 	public Configuracion() {
 		setTitle("Configuración de Base de Datos");
@@ -48,15 +48,29 @@ public class Configuracion extends JFrame {
 	}
 
 	private void cargarDatos() {
-		try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH))) {
-			usrField.setText(br.readLine().split(":")[1].trim());
-			pwdField.setText(br.readLine().split(":")[1].trim());
-			urlField.setText(br.readLine().split(":")[1].trim());
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, "Error al cargar el archivo de configuración: " + e.getMessage());
+		File configFile = new File(CONFIG_PATH);
+
+		if (!configFile.exists()) {
+			JOptionPane.showMessageDialog(this, "Archivo de configuración no encontrado:\n" + configFile.getAbsolutePath());
+			return;
 		}
 
+		try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
+			String usrLine = br.readLine();
+			String pwdLine = br.readLine();
+			String urlLine = br.readLine();
+
+			if (usrLine != null && usrLine.contains(":"))
+				usrField.setText(usrLine.split(":", 2)[1].trim());
+			if (pwdLine != null && pwdLine.contains(":"))
+				pwdField.setText(pwdLine.split(":", 2)[1].trim());
+			if (urlLine != null && urlLine.contains(":"))
+				urlField.setText(urlLine.split(":", 2)[1].trim());
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(this, "Error al leer configuración:\n" + e.getMessage());
+		}
 	}
+
 
 	private void guardarDatos() throws IOException {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH))) {
