@@ -1,17 +1,30 @@
 package modelo;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Clase ConexionBD.
- * Representa la clase ConexionBD.
- */
 public class ConexionBD {
-	private static final String URL = "jdbc:mysql://localhost:3306/proyecto_integrador"; // ajusta si es necesario
-	private static final String USUARIO = "root"; // cambia si usas otro
-	private static final String CONTRASENA = ""; // pon tu contraseña aquí
+	private static String URL;
+	private static String USUARIO;
+	private static String CONTRASENA;
+
+	static {
+		cargarConfiguracion();
+	}
+
+	private static void cargarConfiguracion() {
+		try (BufferedReader br = new BufferedReader(new FileReader("config/dbconfig.ini"))) {
+			USUARIO = br.readLine().split(":")[1].trim();
+			CONTRASENA = br.readLine().split(":")[1].trim();
+			URL = br.readLine().split(":")[1].trim();
+		} catch (IOException e) {
+			System.err.println("Error al leer el archivo de configuración: " + e.getMessage());
+		}
+	}
 
 	public static Connection conectar() throws SQLException {
 		return DriverManager.getConnection(URL, USUARIO, CONTRASENA);
