@@ -40,12 +40,16 @@ public class _02_Login extends JFrame {
 
         // Banner
         try {
-            URL bannerUrl = new URL("https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Universidad-europea-logo_poc9mEM.2e16d0ba.fill-767x384.png/500px-Universidad-europea-logo_poc9mEM.2e16d0ba.fill-767x384.png");
-            Image bannerImage = ImageIO.read(bannerUrl).getScaledInstance(358, 140, Image.SCALE_SMOOTH);
-            JLabel bannerLabel = new JLabel(new ImageIcon(bannerImage));
-            bannerLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-            bannerLabel.setBounds(0, 0, 360, 140);
-            cardPanel.add(bannerLabel);
+            int anchoImagen = 140;
+            int altoImagen = 140;
+
+            Image logo = ImageIO.read(getClass().getResource("/img/Logo.png"))
+                                .getScaledInstance(anchoImagen, altoImagen, Image.SCALE_SMOOTH);
+
+            JLabel logoLabel = new JLabel(new ImageIcon(logo));
+            logoLabel.setBounds(124, 53, 100, 87);
+            logoLabel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
+            cardPanel.add(logoLabel);
         } catch (IOException e) {
             e.printStackTrace();
         }
