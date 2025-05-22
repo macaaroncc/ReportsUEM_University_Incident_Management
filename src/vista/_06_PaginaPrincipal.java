@@ -43,7 +43,7 @@ public class _06_PaginaPrincipal extends JFrame {
 		contentPane.add(barra);
 
 		// --- Filtros y buscador ---
-		comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Resuelta", "En proceso" });
+		comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Solucionada", "En revisión" });
 		comboBoxEstado.setBounds(40, 70, 150, 30);
 		contentPane.add(comboBoxEstado);
 
@@ -61,7 +61,6 @@ public class _06_PaginaPrincipal extends JFrame {
 			Date date = new Date(System.currentTimeMillis() - (i * 24L * 60 * 60 * 1000));
 			comboBoxFecha.addItem("Hace " + i + " día(s) - " + sdf.format(date));
 		}
-		comboBoxFecha.addItem("Personalizado...");
 		contentPane.add(comboBoxFecha);
 
 		campoBusqueda = new JTextField();
@@ -75,6 +74,75 @@ public class _06_PaginaPrincipal extends JFrame {
 		botonBuscar.setFont(new Font("Tahoma", Font.BOLD, 12));
 		botonBuscar.setFocusPainted(false);
 		contentPane.add(botonBuscar);
+		
+		botonBuscar.addActionListener(e -> {
+			String estado = comboBoxEstado.getSelectedItem().toString();
+			String orden = comboBoxOrden.getSelectedItem().toString();
+			String fecha = comboBoxFecha.getSelectedItem().toString();
+			String busqueda = campoBusqueda.getText().trim().toLowerCase();
+
+			StringBuilder query = new StringBuilder("SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias WHERE 1=1");
+
+			// Filtro por estado
+			if (!estado.equals("Estado")) {
+				query.append(" AND estado = '").append(estado).append("'");
+			}
+
+			// Filtro por búsqueda
+			if (!busqueda.isEmpty()) {
+				query.append(" AND (LOWER(descripcion) LIKE '%").append(busqueda).append("%' OR ")
+				     .append("LOWER(aula) LIKE '%").append(busqueda).append("%' OR ")
+				     .append("LOWER(justificacion) LIKE '%").append(busqueda).append("%')");
+			}
+
+			// Filtro por fecha
+			if (!fecha.equals("Fecha") && !fecha.equals("Personalizado...")) {
+				String[] partes = fecha.split(" - ");
+				if (partes.length == 2) {
+					query.append(" AND fecha = '").append(partes[1]).append("'");
+				}
+			}
+
+			// Orden
+			if (orden.equals("Más relevante primero")) {
+				query.append(" ORDER BY ranking DESC");
+			} else if (orden.equals("Menos relevante primero")) {
+				query.append(" ORDER BY ranking ASC");
+			} else if (orden.equals("Más reciente primero")) {
+				query.append(" ORDER BY fecha DESC");
+			} else {
+				query.append(" ORDER BY fecha DESC"); // Default
+			}
+
+			// Ejecutar consulta
+			try (Connection conexion = modelo.ConexionBD.conectar();
+				 Statement stmt = conexion.createStatement();
+				 ResultSet rs = stmt.executeQuery(query.toString())) {
+
+				DefaultTableModel model = (DefaultTableModel) table.getModel();
+				model.setRowCount(0); // limpiar tabla
+
+				while (rs.next()) {
+					model.addRow(new Object[] {
+						rs.getString("estado"),
+						rs.getString("edificio"),
+						rs.getString("piso"),
+						rs.getString("descripcion"),
+						rs.getString("aula"),
+						rs.getString("justificacion"),
+						rs.getDate("fecha"),
+						rs.getString("campus"),
+						rs.getInt("ranking"),
+						rs.getString("USR")
+					});
+				}
+			} catch (SQLException ex) {
+				JOptionPane.showMessageDialog(this, "Error al ejecutar búsqueda:\n" + ex.getMessage(),
+						"Error de base de datos", JOptionPane.ERROR_MESSAGE);
+				ex.printStackTrace();
+			}
+		});
+
 
 		// --- Tabla de incidencias ---
 		DefaultTableModel model = new DefaultTableModel() {

@@ -7,13 +7,9 @@ import controlador.Controlador;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import com.mysql.cj.xdevapi.Statement;
-import com.sun.jdi.connect.spi.Connection;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +34,6 @@ public class _01_PGSinLogin extends JFrame {
 		getContentPane().setLayout(null);
 		getContentPane().setBackground(new Color(255, 255, 252));
 
-		// 🔝 Barra de navegación con mismo estilo
 		JPanel barra = new JPanel(null);
 		barra.setBackground(new Color(128, 0, 0));
 		barra.setBounds(0, 0, 1200, 59);
@@ -64,11 +59,6 @@ public class _01_PGSinLogin extends JFrame {
 		barra.add(lblUsuario);
 
 		MouseAdapter abrirLogin = new MouseAdapter() {
-			/**
-			 * Realiza la acción correspondiente.
-			 * 
-			 * @param e Parámetro de tipo MouseEvent.
-			 */
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null)
 					controlador.abrirLogin();
@@ -82,8 +72,7 @@ public class _01_PGSinLogin extends JFrame {
 		lblNotificaciones.addMouseListener(abrirLogin);
 		lblUsuario.addMouseListener(abrirLogin);
 
-		// ---------------- FILTROS Y BUSCADOR ----------------
-		comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Resuelta", "En proceso" });
+		comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Solucionada", "En revisión"  });
 		comboBoxEstado.setBounds(40, 70, 150, 30);
 		getContentPane().add(comboBoxEstado);
 
@@ -116,17 +105,8 @@ public class _01_PGSinLogin extends JFrame {
 		botonBuscar.setFocusPainted(false);
 		getContentPane().add(botonBuscar);
 
-		// ---------------- TABLA ----------------
-		// ---------------- TABLA ----------------
-		// ---------------- TABLA ----------------
 		DefaultTableModel model = new DefaultTableModel() {
 			@Override
-			/**
-			 * Realiza la acción correspondiente.
-			 * 
-			 * @param row    Valor numérico entero.
-			 * @param column Valor numérico entero.
-			 */
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
@@ -134,14 +114,13 @@ public class _01_PGSinLogin extends JFrame {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
 				if (columnIndex == 6)
-					return Date.class; // Columna de fecha
+					return Date.class;
 				if (columnIndex == 8)
-					return Integer.class; // Columna de ranking
+					return Integer.class;
 				return String.class;
 			}
 		};
 
-		// Definir columnas (todas excepto 'foto')
 		model.addColumn("Estado");
 		model.addColumn("Edificio");
 		model.addColumn("Piso");
@@ -153,24 +132,19 @@ public class _01_PGSinLogin extends JFrame {
 		model.addColumn("Ranking");
 		model.addColumn("Usuario");
 
-		// Cargar datos
 		cargarIncidenciasDesdeBD(model);
 
-		// Configurar tabla
 		table = new JTable(model);
 		table.setRowHeight(30);
 		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-		// Ajustar anchos de columnas
-		table.getColumnModel().getColumn(3).setPreferredWidth(200); // Descripción más ancha
-		table.getColumnModel().getColumn(5).setPreferredWidth(150); // Justificación
+		table.getColumnModel().getColumn(3).setPreferredWidth(200);
+		table.getColumnModel().getColumn(5).setPreferredWidth(150);
 
 		scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(40, 120, 1110, 600);
 		getContentPane().add(scrollPane);
 
-		// ---------------- BOTÓN CREAR INCIDENCIA ----------------
 		btnCrearIncidencia = new JButton("Crear Incidencia");
 		btnCrearIncidencia.setBounds((getWidth() - 200) / 2, 740, 200, 40);
 		btnCrearIncidencia.setBackground(new Color(128, 0, 0));
@@ -184,7 +158,6 @@ public class _01_PGSinLogin extends JFrame {
 			dispose();
 		});
 
-		// ---------------- BOTÓN AYUDA ----------------
 		btnAyuda = new JButton("?");
 		btnAyuda.setBounds(1120, 740, 50, 50);
 		btnAyuda.setBackground(new Color(128, 0, 0));
@@ -197,41 +170,30 @@ public class _01_PGSinLogin extends JFrame {
 				controlador.abrirAyuda();
 			dispose();
 		});
+
+		// 🔍 Acción del botón Buscar con filtros
+		botonBuscar.addActionListener(e -> {
+			DefaultTableModel m = (DefaultTableModel) table.getModel();
+			cargarIncidenciasFiltradas(m);
+		});
 	}
 
-	/**
-	 * Establece el valor de controlador.
-	 * 
-	 * @param controlador Controlador principal que gestiona la lógica de
-	 *                    navegación.
-	 */
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
 	}
 
-	/**
-	 * Realiza la acción correspondiente.
-	 * 
-	 * @param model Parámetro de tipo DefaultTableModel.
-	 */
 	private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
 		java.sql.Connection conexion = null;
 		java.sql.Statement stmt = null;
 		java.sql.ResultSet rs = null;
 
 		try {
-
 			conexion = modelo.ConexionBD.conectar();
-
-			// Consulta SQL - Seleccionamos todas las columnas excepto 'foto'
 			String consulta = "SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias";
 			stmt = conexion.createStatement();
 			rs = stmt.executeQuery(consulta);
-
-			// Limpiar tabla existente
 			model.setRowCount(0);
 
-			// Llenar la tabla con los resultados
 			while (rs.next()) {
 				model.addRow(new Object[] { rs.getString("estado"), rs.getString("edificio"), rs.getString("piso"),
 						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
@@ -241,20 +203,11 @@ public class _01_PGSinLogin extends JFrame {
 			JOptionPane.showMessageDialog(this, "Error de base de datos:\n" + e.getMessage(), "Error SQL",
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
-			// Cerrar recursos
 			try {
 				if (rs != null)
 					rs.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			try {
 				if (stmt != null)
 					stmt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			try {
 				if (conexion != null)
 					conexion.close();
 			} catch (SQLException e) {
@@ -263,13 +216,76 @@ public class _01_PGSinLogin extends JFrame {
 		}
 	}
 
-	/**
-	 * Crea una nueva entidad o interfaz.
-	 * 
-	 * @param texto  Cadena de texto.
-	 * @param x      Valor numérico entero.
-	 * @param fuente Parámetro de tipo Font.
-	 */
+	private void cargarIncidenciasFiltradas(DefaultTableModel model) {
+		java.sql.Connection conexion = null;
+		java.sql.Statement stmt = null;
+		java.sql.ResultSet rs = null;
+
+		try {
+			conexion = modelo.ConexionBD.conectar();
+			String consulta = construirConsultaFiltrada();
+			stmt = conexion.createStatement();
+			rs = stmt.executeQuery(consulta);
+			model.setRowCount(0);
+
+			while (rs.next()) {
+				model.addRow(new Object[] {
+						rs.getString("estado"), rs.getString("edificio"), rs.getString("piso"),
+						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
+						rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR")
+				});
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(this, "Error al filtrar incidencias:\n" + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+		} finally {
+			try { if (rs != null) rs.close(); } catch (SQLException e) {}
+			try { if (stmt != null) stmt.close(); } catch (SQLException e) {}
+			try { if (conexion != null) conexion.close(); } catch (SQLException e) {}
+		}
+	}
+
+	private String construirConsultaFiltrada() {
+		StringBuilder consulta = new StringBuilder("SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias WHERE 1=1");
+
+		String estado = comboBoxEstado.getSelectedItem().toString();
+		if (!estado.equals("Estado")) {
+			consulta.append(" AND estado = '").append(estado).append("'");
+		}
+
+		String fechaSeleccionada = comboBoxFecha.getSelectedItem().toString();
+		if (!fechaSeleccionada.equals("Fecha") && !fechaSeleccionada.equals("Personalizado...")) {
+			String[] partes = fechaSeleccionada.split(" - ");
+			if (partes.length == 2) {
+				consulta.append(" AND fecha = '").append(partes[1]).append("'");
+			}
+		}
+
+		String busqueda = campoBusqueda.getText().trim();
+		if (!busqueda.isEmpty()) {
+			consulta.append(" AND (descripcion LIKE '%").append(busqueda)
+					.append("%' OR aula LIKE '%").append(busqueda)
+					.append("%' OR edificio LIKE '%").append(busqueda).append("%')");
+		}
+
+		String orden = comboBoxOrden.getSelectedItem().toString();
+		switch (orden) {
+			case "Más relevante primero":
+				consulta.append(" ORDER BY ranking DESC");
+				break;
+			case "Menos relevante primero":
+				consulta.append(" ORDER BY ranking ASC");
+				break;
+			case "Más reciente primero":
+				consulta.append(" ORDER BY fecha DESC");
+				break;
+			default:
+				consulta.append(" ORDER BY fecha DESC");
+				break;
+		}
+
+		return consulta.toString();
+	}
+
 	private JLabel crearNavLabel(String texto, int x, Font fuente) {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(fuente);
