@@ -51,7 +51,8 @@ public class Configuracion extends JFrame {
 		File configFile = new File(CONFIG_PATH);
 
 		if (!configFile.exists()) {
-			JOptionPane.showMessageDialog(this, "Archivo de configuración no encontrado:\n" + configFile.getAbsolutePath());
+			JOptionPane.showMessageDialog(this,
+					"Archivo de configuración no encontrado:\n" + configFile.getAbsolutePath());
 			return;
 		}
 
@@ -71,7 +72,6 @@ public class Configuracion extends JFrame {
 		}
 	}
 
-
 	private void guardarDatos() throws IOException {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH))) {
 			bw.write("usr : " + usrField.getText() + "\n");
@@ -82,7 +82,7 @@ public class Configuracion extends JFrame {
 			modelo.ConexionBD.recargarConfiguracion();
 
 			JOptionPane.showMessageDialog(this, "Configuración guardada correctamente.");
-			
+
 		}
 	}
 

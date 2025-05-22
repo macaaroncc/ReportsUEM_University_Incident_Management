@@ -22,41 +22,38 @@ public class ConexionBD {
 
 	// Método para cargar el archivo INI
 	private static void cargarConfiguracion() {
-	    try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH))) {
-	        String linea;
-	        while ((linea = br.readLine()) != null) {
-	            if (linea.startsWith("usr")) {
-	                USUARIO = linea.substring(linea.indexOf(":") + 1).trim();
-	            } else if (linea.startsWith("pwd")) {
-	                CONTRASENA = linea.substring(linea.indexOf(":") + 1).trim();
-	            } else if (linea.startsWith("url")) {
-	                URL = linea.substring(linea.indexOf(":") + 1).trim();
-	            }
-	        }
-	    } catch (IOException e) {
-	        System.err.println("⚠ Error al leer el archivo de configuración: " + e.getMessage());
-	    }
+		try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH))) {
+			String linea;
+			while ((linea = br.readLine()) != null) {
+				if (linea.startsWith("usr")) {
+					USUARIO = linea.substring(linea.indexOf(":") + 1).trim();
+				} else if (linea.startsWith("pwd")) {
+					CONTRASENA = linea.substring(linea.indexOf(":") + 1).trim();
+				} else if (linea.startsWith("url")) {
+					URL = linea.substring(linea.indexOf(":") + 1).trim();
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("⚠ Error al leer el archivo de configuración: " + e.getMessage());
+		}
 	}
-
 
 	// Método para obtener la conexión a la base de datos
 	public static Connection conectar() throws SQLException {
-	    try {
-	        Class.forName("com.mysql.cj.jdbc.Driver");
-	    } catch (ClassNotFoundException e) {
-	        System.err.println("⚠ No se encontró el driver JDBC de MySQL.");
-	        e.printStackTrace();
-	    }
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			System.err.println("⚠ No se encontró el driver JDBC de MySQL.");
+			e.printStackTrace();
+		}
 
-	    if (URL.isEmpty() || USUARIO.isEmpty()) {
-	        throw new SQLException("La configuración de la base de datos no se ha cargado correctamente.");
-	    }
+		if (URL.isEmpty() || USUARIO.isEmpty()) {
+			throw new SQLException("La configuración de la base de datos no se ha cargado correctamente.");
+		}
 
-	    System.out.println("Conectando con: " + URL);
-	    return DriverManager.getConnection(URL, USUARIO, CONTRASENA);
+		System.out.println("Conectando con: " + URL);
+		return DriverManager.getConnection(URL, USUARIO, CONTRASENA);
 	}
-
-	
 
 	// Si quieres permitir recargar los datos (ej. después de editar el INI)
 	public static void recargarConfiguracion() {

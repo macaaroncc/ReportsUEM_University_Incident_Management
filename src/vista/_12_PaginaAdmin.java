@@ -21,9 +21,9 @@ public class _12_PaginaAdmin extends JFrame {
 
 		// ✅ Barra de navegación reutilizable
 		BarraNavegacion barra = new BarraNavegacion();
-		barra.setUsuarioLogueado(true);              // Habilita enlaces funcionales
-		barra.setControlador(controlador);           // Asigna listeners y lógica
-		barra.setBounds(0, 0, 1200, 59);             // Asegura que se vea bien
+		barra.setUsuarioLogueado(true); // Habilita enlaces funcionales
+		barra.setControlador(controlador); // Asigna listeners y lógica
+		barra.setBounds(0, 0, 1200, 59); // Asegura que se vea bien
 		getContentPane().add(barra);
 
 		// Acción del botón Atrás de la barra

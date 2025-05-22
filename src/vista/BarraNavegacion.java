@@ -9,8 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Clase BarraNavegacion.
- * Representa la clase BarraNavegacion.
+ * Clase BarraNavegacion. Representa la clase BarraNavegacion.
  */
 public class BarraNavegacion extends JPanel {
 	private boolean usuarioLogueado = true;
@@ -22,12 +21,13 @@ public class BarraNavegacion extends JPanel {
 	public JLabel lblUsuario;
 	public JButton btnAtras;
 
-/**
- * Establece el valor de usuariologueado.
- * @param logueado Parámetro de tipo boolean.
- */
+	/**
+	 * Establece el valor de usuariologueado.
+	 * 
+	 * @param logueado Parámetro de tipo boolean.
+	 */
 	public void setUsuarioLogueado(boolean logueado) {
-	    this.usuarioLogueado = logueado;
+		this.usuarioLogueado = logueado;
 	}
 
 	public BarraNavegacion() {
@@ -42,15 +42,14 @@ public class BarraNavegacion extends JPanel {
 		btnAtras.setBackground(new Color(255, 255, 252));
 		btnAtras.setForeground(Color.BLACK);
 		add(btnAtras);
-		
-		//cambio 
+
+		// cambio
 		btnAtras.addActionListener(e -> {
 			if (controlador != null) {
 				JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(this);
 				controlador.volverAtras(ventanaActual);
 			}
 		});
-
 
 		lblPGNPrincipal = crearLink("Página Principal", 130);
 		lblMisIncidencias = crearLink("Mis Incidencias", 290);
@@ -66,73 +65,75 @@ public class BarraNavegacion extends JPanel {
 
 		// Eventos
 		lblPGNPrincipal.addMouseListener(new MouseAdapter() {
-		    @Override
-/**
- * Realiza la acción correspondiente.
- * @param e Parámetro de tipo MouseEvent.
- */
-		    public void mouseClicked(MouseEvent e) {
-		        if (controlador != null) {
-		            JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblPGNPrincipal);
-		            controlador.abrirPaginaPrincipal(ventanaActual);
-		        }
-		    }
+			@Override
+			/**
+			 * Realiza la acción correspondiente.
+			 * 
+			 * @param e Parámetro de tipo MouseEvent.
+			 */
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblPGNPrincipal);
+					controlador.abrirPaginaPrincipal(ventanaActual);
+				}
+			}
 		});
-
 
 		lblMisIncidencias.addMouseListener(new MouseAdapter() {
-		    @Override
-/**
- * Realiza la acción correspondiente.
- * @param e Parámetro de tipo MouseEvent.
- */
-		    public void mouseClicked(MouseEvent e) {
-		        if (controlador != null) {
-		            // Obtener la ventana actual donde está el label
-		            JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblMisIncidencias);
-		            controlador.abrirMisIncidencias(ventanaActual);
-		        }
-		    }
+			@Override
+			/**
+			 * Realiza la acción correspondiente.
+			 * 
+			 * @param e Parámetro de tipo MouseEvent.
+			 */
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					// Obtener la ventana actual donde está el label
+					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblMisIncidencias);
+					controlador.abrirMisIncidencias(ventanaActual);
+				}
+			}
 		});
-
 
 		lblCrearIncidencia.addMouseListener(new MouseAdapter() {
-		    @Override
-/**
- * Realiza la acción correspondiente.
- * @param e Parámetro de tipo MouseEvent.
- */
-		    public void mouseClicked(MouseEvent e) {
-		        if (controlador != null) {
-		            JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblCrearIncidencia);
-		            controlador.abrirCrearIncidencia(ventanaActual);
-		        }
-		    }
+			@Override
+			/**
+			 * Realiza la acción correspondiente.
+			 * 
+			 * @param e Parámetro de tipo MouseEvent.
+			 */
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblCrearIncidencia);
+					controlador.abrirCrearIncidencia(ventanaActual);
+				}
+			}
 		});
 
-
 		lblNotificaciones.addMouseListener(new MouseAdapter() {
-		    @Override
-/**
- * Realiza la acción correspondiente.
- * @param e Parámetro de tipo MouseEvent.
- */
-		    public void mouseClicked(MouseEvent e) {
-		        if (controlador != null) {
-		            // Obtener la ventana actual (el JFrame que contiene este label)
-		            JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblNotificaciones);
-		            controlador.abrirNotificaciones(ventanaActual);
-		        }
-		    }
+			@Override
+			/**
+			 * Realiza la acción correspondiente.
+			 * 
+			 * @param e Parámetro de tipo MouseEvent.
+			 */
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					// Obtener la ventana actual (el JFrame que contiene este label)
+					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblNotificaciones);
+					controlador.abrirNotificaciones(ventanaActual);
+				}
+			}
 		});
 
 	}
 
-/**
- * Crea una nueva entidad o interfaz.
- * @param texto Cadena de texto.
- * @param x Valor numérico entero.
- */
+	/**
+	 * Crea una nueva entidad o interfaz.
+	 * 
+	 * @param texto Cadena de texto.
+	 * @param x     Valor numérico entero.
+	 */
 	private JLabel crearLink(String texto, int x) {
 		JLabel label = new JLabel(texto);
 		label.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -143,24 +144,27 @@ public class BarraNavegacion extends JPanel {
 		return label;
 	}
 
-/**
- * Establece el valor de controlador.
- * @param controlador Controlador principal que gestiona la lógica de navegación.
- */
+	/**
+	 * Establece el valor de controlador.
+	 * 
+	 * @param controlador Controlador principal que gestiona la lógica de
+	 *                    navegación.
+	 */
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
 
+		if (this.controlador != null && controlador.getUsuarioActual() != null) {
+			lblUsuario.setText(controlador.getUsuarioActual());
+		}
+
 		lblUsuario.addMouseListener(new MouseAdapter() {
 			@Override
-/**
- * Realiza la acción correspondiente.
- * @param e Parámetro de tipo MouseEvent.
- */
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
-					controlador.abrirPerfilUsuario(); // ✅ Método correcto
+					controlador.abrirPerfilUsuario();
 				}
 			}
 		});
 	}
+
 }
