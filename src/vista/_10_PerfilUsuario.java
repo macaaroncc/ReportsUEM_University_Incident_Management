@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class _10_PerfilUsuario extends JFrame {
 	private Controlador controlador;
-	private JTextField txtNombre, txtApellidos, txtCodigoPostal, txtCampus;
+	private JTextField txtNombre, txtfecha, txtCampus;
 
 	public _10_PerfilUsuario() {
 		setTitle("10 . Perfil de Usuario");
@@ -19,9 +19,8 @@ public class _10_PerfilUsuario extends JFrame {
 
 		// ✅ Barra de navegación
 		BarraNavegacion barra = new BarraNavegacion();
-		barra.setUsuarioLogueado(true); // Habilita enlaces funcionales
-		barra.setControlador(controlador); // Asigna listeners y lógica
-		barra.setBounds(0, 0, 1200, 59); // Asegura que se vea bien
+		barra.setUsuarioLogueado(true);
+		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
 
 		barra.btnAtras.addActionListener(e -> {
@@ -33,62 +32,77 @@ public class _10_PerfilUsuario extends JFrame {
 		// 📋 Título
 		JLabel lblTitulo = new JLabel("Perfil de usuario", SwingConstants.CENTER);
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
-		lblTitulo.setBounds(400, 80, 400, 30);
+		lblTitulo.setBounds(0, 80, 1200, 30);
 		getContentPane().add(lblTitulo);
 
-		// 🖼 Imagen / avatar
+		JPanel panel = new JPanel(null);
+		panel.setBounds(150, 140, 900, 500);
+		panel.setBackground(new Color(245, 245, 245));
+		panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+		getContentPane().add(panel);
+
 		JLabel lblFoto = new JLabel("Foto");
-		lblFoto.setBounds(100, 150, 150, 150);
+		lblFoto.setBounds(40, 40, 180, 180);
 		lblFoto.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
-		getContentPane().add(lblFoto);
+		panel.add(lblFoto);
 
 		JButton btnEditarFoto = new JButton("Editar Foto");
-		btnEditarFoto.setBounds(100, 310, 150, 30);
-		getContentPane().add(btnEditarFoto);
+		btnEditarFoto.setBounds(60, 230, 140, 30);
+		panel.add(btnEditarFoto);
 
-		// 📄 Campos de información
-		JLabel lblNombre = new JLabel("Nombre:");
-		lblNombre.setBounds(300, 150, 100, 30);
-		getContentPane().add(lblNombre);
+		int labelX = 250, fieldX = 370, rowHeight = 40, y = 40;
+
+		JLabel lblNombre = new JLabel("Correo electrónico:");
+		lblNombre.setBounds(labelX, y, 150, 30);
+		panel.add(lblNombre);
 
 		txtNombre = new JTextField();
-		txtNombre.setBounds(400, 150, 300, 30);
-		getContentPane().add(txtNombre);
+		txtNombre.setBounds(fieldX, y, 300, 30);
+		txtNombre.setEditable(false);  // Solo lectura
+		panel.add(txtNombre);
 
-		JLabel lblApellidos = new JLabel("Apellidos:");
-		lblApellidos.setBounds(300, 200, 100, 30);
-		getContentPane().add(lblApellidos);
+		y += rowHeight;
+		JLabel lblfecha = new JLabel("Fecha Nacimiento:");
+		lblfecha.setBounds(labelX, y, 150, 30);
+		panel.add(lblfecha);
 
-		txtApellidos = new JTextField();
-		txtApellidos.setBounds(400, 200, 300, 30);
-		getContentPane().add(txtApellidos);
+		txtfecha = new JTextField();
+		txtfecha.setBounds(fieldX, y, 300, 30);
+		panel.add(txtfecha);
 
-		JLabel lblCodigoPostal = new JLabel("Código Postal:");
-		lblCodigoPostal.setBounds(300, 250, 100, 30);
-		getContentPane().add(lblCodigoPostal);
-
-		txtCodigoPostal = new JTextField();
-		txtCodigoPostal.setBounds(400, 250, 300, 30);
-		getContentPane().add(txtCodigoPostal);
-
+		y += rowHeight;
 		JLabel lblCampus = new JLabel("Campus:");
-		lblCampus.setBounds(300, 300, 100, 30);
-		getContentPane().add(lblCampus);
+		lblCampus.setBounds(labelX, y, 150, 30);
+		panel.add(lblCampus);
 
 		txtCampus = new JTextField();
-		txtCampus.setBounds(400, 300, 300, 30);
-		getContentPane().add(txtCampus);
+		txtCampus.setBounds(fieldX, y, 300, 30);
+		panel.add(txtCampus);
 
-		// 🔒 Botón cambiar contraseña
+		JButton btnGuardar = new JButton("Guardar Cambios");
+		btnGuardar.setBounds(fieldX, y + 60, 300, 40);
+		btnGuardar.setBackground(new Color(34, 139, 34));
+		btnGuardar.setForeground(Color.WHITE);
+		btnGuardar.setFont(new Font("Tahoma", Font.BOLD, 14));
+		panel.add(btnGuardar);
+
+		btnGuardar.addActionListener(e -> {
+			if (controlador != null) {
+				String fecha = txtfecha.getText();
+				String campus = txtCampus.getText();
+				controlador.actualizarPerfilUsuario(fecha, campus);
+				JOptionPane.showMessageDialog(this, "Perfil actualizado correctamente.");
+			}
+		});
+
 		JButton btnCambiarContrasena = new JButton("Cambiar Contraseña");
-		btnCambiarContrasena.setBounds(400, 360, 300, 40);
+		btnCambiarContrasena.setBounds(fieldX, y + 110, 300, 40);
 		btnCambiarContrasena.setBackground(Color.GRAY);
 		btnCambiarContrasena.setForeground(Color.WHITE);
 		btnCambiarContrasena.setFont(new Font("Tahoma", Font.BOLD, 14));
-		getContentPane().add(btnCambiarContrasena);
+		panel.add(btnCambiarContrasena);
 
-		// ❓ Ayuda flotante
 		JButton btnAyuda = new JButton("?");
 		btnAyuda.setBounds(1120, 750, 50, 50);
 		btnAyuda.setBackground(new Color(128, 0, 0));
@@ -105,11 +119,19 @@ public class _10_PerfilUsuario extends JFrame {
 
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
-		Component[] components = getContentPane().getComponents();
-		for (Component c : components) {
+
+		for (Component c : getContentPane().getComponents()) {
 			if (c instanceof BarraNavegacion) {
 				((BarraNavegacion) c).setControlador(controlador);
 			}
+		}
+
+		if (controlador != null && controlador.getUsuarioActual() != null) {
+			// Obtener datos del perfil: fecha, campus, email
+			String[] datos = controlador.obtenerDatosPerfil(); // Asegúrate de que devuelve 3 elementos
+			txtfecha.setText(datos[0]);        // Fecha nacimiento
+			txtCampus.setText(datos[1]);       // Campus
+			txtNombre.setText(datos[2]);       // Correo electrónico
 		}
 	}
 }

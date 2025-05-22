@@ -163,7 +163,6 @@ public class Controlador {
 
 					setUsuarioLogueado(true);
 
-					// Obtener la parte antes del @ o el email completo si no tiene @
 					if (email.contains("@")) {
 						usuarioActual = email.substring(0, email.indexOf('@'));
 					} else {
@@ -284,4 +283,54 @@ public class Controlador {
 			ex.printStackTrace();
 		}
 	}
+
+	// -------------------- NUEVOS MÉTODOS AÑADIDOS --------------------
+
+	public String[] obtenerDatosPerfil() {
+		try (Connection conn = ConexionBD.conectar()) {
+			String sql = "SELECT FECHA, CAMPUS, USR FROM USERS WHERE NICKNAME = ?";
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setString(1, usuarioActual);  // El nickname
+
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				String fecha = rs.getString("FECHA");
+				String campus = rs.getString("CAMPUS");
+				String email = rs.getString("USR");
+				return new String[]{fecha, campus, email};
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return new String[]{"", "", ""}; // Valores por defecto si falla
+	}
+
+
+	public void actualizarPerfilUsuario(String fecha, String campus) {
+	try (Connection conn = ConexionBD.conectar()) {
+		String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ? WHERE USR = ?";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+
+		// FECHA: si está vacía, insertar NULL
+		if (fecha == null || fecha.trim().isEmpty()) {
+			stmt.setNull(1, java.sql.Types.DATE);
+		} else {
+			stmt.setDate(1, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
+		}
+
+		// CAMPUS: si está vacío, insertar NULL
+		if (campus == null || campus.trim().isEmpty()) {
+			stmt.setNull(2, java.sql.Types.VARCHAR);
+		} else {
+			stmt.setString(2, campus);
+		}
+
+		stmt.setString(3, usuarioActual + "@gmail.com"); // o como sea el email completo
+		stmt.executeUpdate();
+	} catch (Exception ex) {
+		ex.printStackTrace();
+		JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
+	}
+}
+
 }
