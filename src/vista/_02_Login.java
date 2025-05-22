@@ -121,6 +121,8 @@ public class _02_Login extends JFrame {
             String email = txtEmail.getText();
             String password = new String(txtPassword.getPassword());
             controlador.validarLogin(email, password, _02_Login.this);
+            
+            
         });
 
         // Crear cuenta
