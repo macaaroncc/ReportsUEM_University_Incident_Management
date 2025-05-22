@@ -16,6 +16,11 @@ public class _02_Login extends JFrame {
     private JTextField txtEmail;
     private JPasswordField txtPassword;
     private Controlador controlador;
+    private JButton btnConfiguracion;
+    private JPanel cardPanel;
+    private JButton btnAtras;
+    private JPanel outerPanel;
+    private JLabel backgroundLabel;
 
     public _02_Login() {
         setTitle("02 . Login");
@@ -24,16 +29,16 @@ public class _02_Login extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         // Fondo
-        JLabel backgroundLabel = new JLabel(new ImageIcon(_02_Login.class.getResource("/img/fondo.jpg")));
+        backgroundLabel = new JLabel(new ImageIcon(_02_Login.class.getResource("/img/fondo.jpg")));
         backgroundLabel.setLayout(new BorderLayout());
         setContentPane(backgroundLabel);
 
         getContentPane().setLayout(new BorderLayout());
-        JPanel outerPanel = new JPanel(null);
+        outerPanel = new JPanel(null);
         outerPanel.setOpaque(false);
 
         // Panel de login (tarjeta)
-        JPanel cardPanel = new JPanel(null);
+        cardPanel = new JPanel(null);
         cardPanel.setBounds(420, 180, 360, 440);
         cardPanel.setBackground(new Color(255, 255, 252));
         cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -150,7 +155,7 @@ public class _02_Login extends JFrame {
         });
 
         // Botón atrás
-        JButton btnAtras = new JButton("◀ Atrás");
+        btnAtras = new JButton("◀ Atrás");
         btnAtras.setForeground(Color.BLACK);
         btnAtras.setBackground(new Color(255, 255, 252));
         btnAtras.setBounds(10, 11, 90, 30);
@@ -165,6 +170,19 @@ public class _02_Login extends JFrame {
 
         outerPanel.add(cardPanel);
         getContentPane().add(outerPanel, BorderLayout.CENTER);
+        
+     // Botón Configuración
+        btnConfiguracion = new JButton("Configuración");
+        btnConfiguracion.setFont(new Font("Tahoma", Font.PLAIN, 10));
+        btnConfiguracion.setForeground(Color.BLACK);
+        btnConfiguracion.setBackground(new Color(255, 255, 255));
+        btnConfiguracion.setBounds(1064, 11, 106, 30);
+        btnConfiguracion.setFocusPainted(false);
+        outerPanel.add(btnConfiguracion);
+        btnConfiguracion.addActionListener(e -> {
+            if (controlador != null) {
+            }
+        });
     }
 
     public void setControlador(Controlador controlador) {
