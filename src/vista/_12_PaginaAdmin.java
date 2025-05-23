@@ -26,13 +26,6 @@ public class _12_PaginaAdmin extends JFrame {
 		barra.setBounds(0, 0, 1200, 59); // Asegura que se vea bien
 		getContentPane().add(barra);
 
-		// Acción del botón Atrás de la barra
-		barra.btnAtras.addActionListener(e -> {
-			if (controlador != null)
-				controlador.volverAtras(this);
-			dispose();
-		});
-
 		// Etiqueta
 		JLabel lblTitulo = new JLabel("Gestión de Incidencias");
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 22));

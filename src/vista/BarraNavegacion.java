@@ -1,31 +1,20 @@
 package vista;
 
 import javax.swing.*;
-
 import controlador.Controlador;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * Clase BarraNavegacion. Representa la clase BarraNavegacion.
- */
 public class BarraNavegacion extends JPanel {
 	private boolean usuarioLogueado = true;
 	private Controlador controlador;
 	public JLabel lblPGNPrincipal;
 	public JLabel lblMisIncidencias;
-	public JLabel lblCrearIncidencia;
 	public JLabel lblNotificaciones;
 	public JLabel lblUsuario;
-	public JButton btnAtras;
+	private JLabel lblAdminPanel;
 
-	/**
-	 * Establece el valor de usuariologueado.
-	 * 
-	 * @param logueado Parámetro de tipo boolean.
-	 */
 	public void setUsuarioLogueado(boolean logueado) {
 		this.usuarioLogueado = logueado;
 	}
@@ -35,26 +24,22 @@ public class BarraNavegacion extends JPanel {
 		setBackground(new Color(128, 0, 0));
 		setBounds(0, 0, 1200, 59);
 
-		btnAtras = new JButton("◀ Atrás");
-		btnAtras.setBounds(10, 17, 100, 30);
-		btnAtras.setFocusPainted(false);
-		btnAtras.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-		btnAtras.setBackground(new Color(255, 255, 252));
-		btnAtras.setForeground(Color.BLACK);
-		add(btnAtras);
+		lblPGNPrincipal = crearLink("Página Principal", 20);
+		lblMisIncidencias = crearLink("Mis Incidencias", 180);
+		lblNotificaciones = crearLink("Notificaciones", 350);
 
-		// cambio
-		btnAtras.addActionListener(e -> {
-			if (controlador != null) {
-				JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(this);
-				controlador.volverAtras(ventanaActual);
+		lblAdminPanel = crearLink("Panel Administrador", 520);
+		lblAdminPanel.setVisible(false);
+		add(lblAdminPanel);
+
+		lblAdminPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					controlador.abrirPaginaAdmin();
+				}
 			}
 		});
-
-		lblPGNPrincipal = crearLink("Página Principal", 130);
-		lblMisIncidencias = crearLink("Mis Incidencias", 290);
-		lblCrearIncidencia = crearLink("Crear Incidencia", 460);
-		lblNotificaciones = crearLink("Notificaciones", 642);
 
 		lblUsuario = new JLabel("Usuario");
 		lblUsuario.setForeground(Color.WHITE);
@@ -63,14 +48,8 @@ public class BarraNavegacion extends JPanel {
 		lblUsuario.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		add(lblUsuario);
 
-		// Eventos
 		lblPGNPrincipal.addMouseListener(new MouseAdapter() {
 			@Override
-			/**
-			 * Realiza la acción correspondiente.
-			 * 
-			 * @param e Parámetro de tipo MouseEvent.
-			 */
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
 					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblPGNPrincipal);
@@ -81,59 +60,25 @@ public class BarraNavegacion extends JPanel {
 
 		lblMisIncidencias.addMouseListener(new MouseAdapter() {
 			@Override
-			/**
-			 * Realiza la acción correspondiente.
-			 * 
-			 * @param e Parámetro de tipo MouseEvent.
-			 */
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
-					// Obtener la ventana actual donde está el label
 					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblMisIncidencias);
 					controlador.abrirMisIncidencias(ventanaActual);
 				}
 			}
 		});
 
-		lblCrearIncidencia.addMouseListener(new MouseAdapter() {
-			@Override
-			/**
-			 * Realiza la acción correspondiente.
-			 * 
-			 * @param e Parámetro de tipo MouseEvent.
-			 */
-			public void mouseClicked(MouseEvent e) {
-				if (controlador != null) {
-					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblCrearIncidencia);
-					controlador.abrirCrearIncidencia(ventanaActual);
-				}
-			}
-		});
-
 		lblNotificaciones.addMouseListener(new MouseAdapter() {
 			@Override
-			/**
-			 * Realiza la acción correspondiente.
-			 * 
-			 * @param e Parámetro de tipo MouseEvent.
-			 */
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
-					// Obtener la ventana actual (el JFrame que contiene este label)
 					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblNotificaciones);
 					controlador.abrirNotificaciones(ventanaActual);
 				}
 			}
 		});
-
 	}
 
-	/**
-	 * Crea una nueva entidad o interfaz.
-	 * 
-	 * @param texto Cadena de texto.
-	 * @param x     Valor numérico entero.
-	 */
 	private JLabel crearLink(String texto, int x) {
 		JLabel label = new JLabel(texto);
 		label.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -144,27 +89,21 @@ public class BarraNavegacion extends JPanel {
 		return label;
 	}
 
-	/**
-	 * Establece el valor de controlador.
-	 * 
-	 * @param controlador Controlador principal que gestiona la lógica de
-	 *                    navegación.
-	 */
 	public void setControlador(Controlador controlador) {
-		this.controlador = controlador;
+	    this.controlador = controlador;
 
-		if (this.controlador != null && controlador.getUsuarioActual() != null) {
-			lblUsuario.setText(controlador.getUsuarioActual());
-		}
+	    if (this.controlador != null && controlador.getUsuarioActual() != null) {
+	    	lblUsuario.setText(controlador.getUsuarioActual());
+	    	lblAdminPanel.setVisible(controlador.usuarioEsAdmin());
+	    }
 
-		lblUsuario.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (controlador != null) {
-					controlador.abrirPerfilUsuario();
-				}
-			}
-		});
+	    lblUsuario.addMouseListener(new MouseAdapter() {
+	        @Override
+	        public void mouseClicked(MouseEvent e) {
+	            if (controlador != null) {
+	                controlador.abrirPerfilUsuario();
+	            }
+	        }
+	    });
 	}
-
 }

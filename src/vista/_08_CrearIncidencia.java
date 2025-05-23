@@ -29,12 +29,6 @@ public class _08_CrearIncidencia extends JFrame {
 		barra.setBounds(0, 0, 1200, 59); // Asegura que se vea bien
 		getContentPane().add(barra);
 
-		// Acción del botón atrás
-		barra.btnAtras.addActionListener(e -> {
-			if (controlador != null)
-				controlador.volverAtras(this);
-			dispose();
-		});
 
 		// Título
 		JLabel lblTitulo = new JLabel("Crear incidencia");

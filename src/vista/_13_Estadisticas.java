@@ -23,12 +23,6 @@ public class _13_Estadisticas extends JFrame {
 		barra.setBounds(0, 0, 1200, 59); // Asegura que se vea bien
 		getContentPane().add(barra);
 
-		barra.btnAtras.addActionListener(e -> {
-			if (controlador != null)
-				controlador.volverAtras(this);
-			dispose();
-		});
-
 		// --- FILTROS ---
 		JLabel lblFiltros = new JLabel("Filtros:");
 		lblFiltros.setFont(new Font("Tahoma", Font.BOLD, 14));

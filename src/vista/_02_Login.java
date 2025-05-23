@@ -60,7 +60,7 @@ public class _02_Login extends JFrame {
 			int x = (panelWidth - anchoImagen) / 2;
 			int y = (panelHeight - altoImagen) / 2;
 
-			logoLabel.setBounds(90, -89, 173, 334);
+			logoLabel.setBounds(80, -89, 210, 334);
 
 			cardPanel.add(logoLabel);
 			cardPanel.repaint();

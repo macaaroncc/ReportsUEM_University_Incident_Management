@@ -23,12 +23,6 @@ public class _10_PerfilUsuario extends JFrame {
 		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
 
-		barra.btnAtras.addActionListener(e -> {
-			if (controlador != null)
-				controlador.volverAtras(this);
-			dispose();
-		});
-
 		// 📋 Título
 		JLabel lblTitulo = new JLabel("Perfil de usuario", SwingConstants.CENTER);
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
@@ -59,7 +53,7 @@ public class _10_PerfilUsuario extends JFrame {
 
 		txtNombre = new JTextField();
 		txtNombre.setBounds(fieldX, y, 300, 30);
-		txtNombre.setEditable(false);  // Solo lectura
+		txtNombre.setEditable(false); // Solo lectura
 		panel.add(txtNombre);
 
 		y += rowHeight;
@@ -102,7 +96,7 @@ public class _10_PerfilUsuario extends JFrame {
 		btnCambiarContrasena.setForeground(Color.WHITE);
 		btnCambiarContrasena.setFont(new Font("Tahoma", Font.BOLD, 14));
 		panel.add(btnCambiarContrasena);
-		
+
 		JButton btnCerrarSesion = new JButton("Cerrar Sesión");
 		btnCerrarSesion.setBounds(fieldX, y + 160, 300, 40);
 		btnCerrarSesion.setBackground(new Color(178, 34, 34));
@@ -111,18 +105,15 @@ public class _10_PerfilUsuario extends JFrame {
 		panel.add(btnCerrarSesion);
 
 		btnCerrarSesion.addActionListener(e -> {
-			int confirm = JOptionPane.showConfirmDialog(this,
-					"¿Seguro que deseas cerrar sesión?", "Confirmar cierre de sesión",
-					JOptionPane.YES_NO_OPTION);
+			int confirm = JOptionPane.showConfirmDialog(this, "¿Seguro que deseas cerrar sesión?",
+					"Confirmar cierre de sesión", JOptionPane.YES_NO_OPTION);
 			if (confirm == JOptionPane.YES_OPTION) {
 				if (controlador != null) {
-					controlador.cerrarSesion();  // Abrirá el login
+					controlador.cerrarSesion(); // Abrirá el login
 				}
 				dispose(); // Cierra esta ventana
 			}
 		});
-
-
 
 		JButton btnAyuda = new JButton("?");
 		btnAyuda.setBounds(1120, 750, 50, 50);
@@ -150,9 +141,9 @@ public class _10_PerfilUsuario extends JFrame {
 		if (controlador != null && controlador.getUsuarioActual() != null) {
 			// Obtener datos del perfil: fecha, campus, email
 			String[] datos = controlador.obtenerDatosPerfil(); // Asegúrate de que devuelve 3 elementos
-			txtfecha.setText(datos[0]);        // Fecha nacimiento
-			txtCampus.setText(datos[1]);       // Campus
-			txtNombre.setText(datos[2]);       // Correo electrónico
+			txtfecha.setText(datos[0]); // Fecha nacimiento
+			txtCampus.setText(datos[1]); // Campus
+			txtNombre.setText(datos[2]); // Correo electrónico
 		}
 	}
 }

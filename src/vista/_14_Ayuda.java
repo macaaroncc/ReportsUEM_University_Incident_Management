@@ -21,11 +21,6 @@ public class _14_Ayuda extends JFrame {
 		BarraNavegacion barra = new BarraNavegacion();
 		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
-		barra.btnAtras.addActionListener(e -> {
-			if (controlador != null)
-				controlador.volverAtras(this);
-			dispose();
-		});
 
 		JLabel lblTitulo = new JLabel("Centro de Ayuda");
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 26));
