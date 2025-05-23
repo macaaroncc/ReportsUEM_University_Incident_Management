@@ -2,6 +2,8 @@ package vista;
 
 import javax.swing.*;
 import controlador.Controlador;
+import modelo.Modelo;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,6 +14,7 @@ public class BarraNavegacion extends JPanel {
 	public JLabel lblPGNPrincipal;
 	public JLabel lblMisIncidencias;
 	public JLabel lblNotificaciones;
+	public JLabel lblFavoritos;
 	public JLabel lblUsuario;
 	private JLabel lblAdminPanel;
 
@@ -28,18 +31,12 @@ public class BarraNavegacion extends JPanel {
 		lblMisIncidencias = crearLink("Mis Incidencias", 180);
 		lblNotificaciones = crearLink("Notificaciones", 350);
 
-		lblAdminPanel = crearLink("Panel Administrador", 520);
+		lblFavoritos = crearLink("Favoritos", 520);
+		add(lblFavoritos);
+
+		lblAdminPanel = crearLink("Panel Administrador", 680);
 		lblAdminPanel.setVisible(false);
 		add(lblAdminPanel);
-
-		lblAdminPanel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (controlador != null) {
-					controlador.abrirPaginaAdmin();
-				}
-			}
-		});
 
 		lblUsuario = new JLabel("Usuario");
 		lblUsuario.setForeground(Color.WHITE);
@@ -48,6 +45,7 @@ public class BarraNavegacion extends JPanel {
 		lblUsuario.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		add(lblUsuario);
 
+		// Listeners de navegación
 		lblPGNPrincipal.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -77,6 +75,25 @@ public class BarraNavegacion extends JPanel {
 				}
 			}
 		});
+
+		lblFavoritos.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblFavoritos);
+					controlador.abrirFavoritos(ventanaActual);
+				}
+			}
+		});
+
+		lblAdminPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					controlador.abrirPaginaAdmin();
+				}
+			}
+		});
 	}
 
 	private JLabel crearLink(String texto, int x) {
@@ -90,20 +107,20 @@ public class BarraNavegacion extends JPanel {
 	}
 
 	public void setControlador(Controlador controlador) {
-	    this.controlador = controlador;
+		this.controlador = controlador;
 
-	    if (this.controlador != null && controlador.getUsuarioActual() != null) {
-	    	lblUsuario.setText(controlador.getUsuarioActual());
-	    	lblAdminPanel.setVisible(controlador.usuarioEsAdmin());
-	    }
+		if (this.controlador != null && Modelo.usuarioActual != null) {
+			lblUsuario.setText(Modelo.usuarioActual);
+			lblAdminPanel.setVisible(controlador.usuarioEsAdmin());
+		}
 
-	    lblUsuario.addMouseListener(new MouseAdapter() {
-	        @Override
-	        public void mouseClicked(MouseEvent e) {
-	            if (controlador != null) {
-	                controlador.abrirPerfilUsuario();
-	            }
-	        }
-	    });
+		lblUsuario.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (controlador != null) {
+					controlador.abrirPerfilUsuario();
+				}
+			}
+		});
 	}
 }

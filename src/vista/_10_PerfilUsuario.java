@@ -1,6 +1,7 @@
 package vista;
 
 import controlador.Controlador;
+import modelo.Modelo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -138,7 +139,7 @@ public class _10_PerfilUsuario extends JFrame {
 			}
 		}
 
-		if (controlador != null && controlador.getUsuarioActual() != null) {
+		if (controlador != null && Modelo.usuarioActual != null) {
 			// Obtener datos del perfil: fecha, campus, email
 			String[] datos = controlador.obtenerDatosPerfil(); // Asegúrate de que devuelve 3 elementos
 			txtfecha.setText(datos[0]); // Fecha nacimiento

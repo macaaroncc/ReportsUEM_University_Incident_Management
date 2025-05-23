@@ -78,16 +78,29 @@ public class _09_Notificaciones extends JFrame {
 	}
 
 	private void cargarNotificacionesDesdeBD(DefaultTableModel model) {
+		String usuario = modelo.Modelo.usuarioActual;
+
+		if (usuario == null || usuario.trim().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Usuario no identificado.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		String usuarioConDominio = usuario + "@ueuropea.es";
+
+		String sql = "SELECT incidencias_id_incidencia, USERS_USR FROM notificar WHERE USERS_USR = ?";
 
 		try (Connection conexion = modelo.ConexionBD.conectar();
-				Statement stmt = conexion.createStatement();
-				ResultSet rs = stmt.executeQuery("SELECT incidencias_id_incidencia, USERS_USR FROM notificar")) {
+				PreparedStatement stmt = conexion.prepareStatement(sql)) {
+
+			stmt.setString(1, usuarioConDominio);
+			ResultSet rs = stmt.executeQuery();
 
 			model.setRowCount(0); // Limpiar tabla existente
 
 			while (rs.next()) {
 				model.addRow(new Object[] { rs.getInt("incidencias_id_incidencia"), rs.getString("USERS_USR") });
 			}
+			rs.close();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(this, "Error al cargar notificaciones:\n" + e.getMessage(),
 					"Error de base de datos", JOptionPane.ERROR_MESSAGE);

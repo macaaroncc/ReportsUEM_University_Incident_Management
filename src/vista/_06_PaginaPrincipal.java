@@ -19,7 +19,7 @@ public class _06_PaginaPrincipal extends JFrame {
 	private JTable table;
 	private JComboBox<String> comboBoxEstado, comboBoxOrden, comboBoxFecha;
 	private JTextField campoBusqueda;
-	private JButton botonBuscar, btnCrearIncidenciaInferior, btnAyuda;
+	private JButton botonBuscar, btnAyuda;
 	private JScrollPane scrollPane;
 	private Controlador controlador;
 
@@ -198,19 +198,7 @@ public class _06_PaginaPrincipal extends JFrame {
 		scrollPane.setBounds(40, 120, 1110, 600);
 		contentPane.add(scrollPane);
 
-		// --- Botón Crear Incidencia ---
-		btnCrearIncidenciaInferior = new JButton("Crear Incidencia");
-		btnCrearIncidenciaInferior.setBounds((1200 - 200) / 2, 740, 200, 40);
-		btnCrearIncidenciaInferior.setBackground(new Color(128, 0, 0));
-		btnCrearIncidenciaInferior.setForeground(Color.WHITE);
-		btnCrearIncidenciaInferior.setFont(new Font("Tahoma", Font.BOLD, 14));
-		btnCrearIncidenciaInferior.setFocusPainted(false);
-		btnCrearIncidenciaInferior.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnCrearIncidenciaInferior.addActionListener(e -> {
-			if (controlador != null)
-				controlador.abrirCrearIncidencia(this);
-		});
-		contentPane.add(btnCrearIncidenciaInferior);
+		
 
 		// --- Botón Ayuda ---
 		btnAyuda = new JButton("?");

@@ -23,8 +23,9 @@ public class _01_PGSinLogin extends JFrame {
 	private JTable table;
 	private JComboBox<String> comboBoxEstado, comboBoxOrden, comboBoxFecha;
 	private JTextField campoBusqueda;
-	private JButton botonBuscar, btnCrearIncidencia, btnAyuda;
+	private JButton botonBuscar, btnAyuda;
 	private JScrollPane scrollPane;
+	
 
 	public _01_PGSinLogin() {
 		setTitle("01 . Página Principal sin login");
@@ -144,19 +145,6 @@ public class _01_PGSinLogin extends JFrame {
 		scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(40, 120, 1110, 600);
 		getContentPane().add(scrollPane);
-
-		btnCrearIncidencia = new JButton("Crear Incidencia");
-		btnCrearIncidencia.setBounds((getWidth() - 200) / 2, 740, 200, 40);
-		btnCrearIncidencia.setBackground(new Color(128, 0, 0));
-		btnCrearIncidencia.setForeground(Color.WHITE);
-		btnCrearIncidencia.setFont(new Font("Tahoma", Font.BOLD, 14));
-		btnCrearIncidencia.setFocusPainted(false);
-		getContentPane().add(btnCrearIncidencia);
-		btnCrearIncidencia.addActionListener(e -> {
-			if (controlador != null)
-				controlador.abrirLogin();
-			dispose();
-		});
 
 		btnAyuda = new JButton("?");
 		btnAyuda.setBounds(1120, 740, 50, 50);

@@ -1,5 +1,13 @@
 package controlador;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import modelo.ConexionBD;
 import modelo.Modelo;
 import vista._01_PGSinLogin;
 import vista._02_Login;
@@ -12,13 +20,7 @@ import vista._09_Notificaciones;
 import vista._10_PerfilUsuario;
 import vista._12_PaginaAdmin;
 import vista._14_Ayuda;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import javax.swing.*;
-
-import modelo.ConexionBD;
+import vista._15_Favoritos;
 
 public class Controlador {
 
@@ -28,11 +30,9 @@ public class Controlador {
 	private int intentosFallidos = 0;
 	private boolean usuarioLogueado = false;
 
-	private String usuarioActual = null;
 
-	public String getUsuarioActual() {
-		return usuarioActual;
-	}
+
+
 
 	public void setModelo(Modelo modelo) {
 		this.modelo = modelo;
@@ -157,9 +157,9 @@ public class Controlador {
 					setUsuarioLogueado(true);
 
 					if (email.contains("@")) {
-						usuarioActual = email.substring(0, email.indexOf('@'));
+						Modelo.usuarioActual = email.substring(0, email.indexOf('@'));
 					} else {
-						usuarioActual = email;
+						Modelo.usuarioActual = email;
 					}
 
 					vistaActual.dispose();
@@ -185,6 +185,7 @@ public class Controlador {
 			ex.printStackTrace();
 		}
 	}
+	
 
 	public void registrarUsuario(String email, String password, String codigoAdmin, int preg1, int preg2, String resp1,
 			String resp2, JFrame vistaActual) {
@@ -260,7 +261,7 @@ public class Controlador {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "SELECT ROL FROM USERS WHERE NICKNAME = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, usuarioActual);
+			stmt.setString(1, Modelo.usuarioActual);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
 				return "Y".equalsIgnoreCase(rs.getString("ROL"));
@@ -298,7 +299,7 @@ public class Controlador {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "SELECT FECHA, CAMPUS, USR FROM USERS WHERE NICKNAME = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, usuarioActual); // El nickname
+			stmt.setString(1, Modelo.usuarioActual); // El nickname
 
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -315,7 +316,7 @@ public class Controlador {
 
 	public void cerrarSesion() {
 		setUsuarioLogueado(false);
-		usuarioActual = null;
+		Modelo.usuarioActual = null;
 
 		_02_Login login = new _02_Login();
 		login.setControlador(this);
@@ -341,12 +342,20 @@ public class Controlador {
 				stmt.setString(2, campus);
 			}
 
-			stmt.setString(3, usuarioActual + "@gmail.com"); // o como sea el email completo
+			stmt.setString(3, Modelo.usuarioActual + "@gmail.com"); // o como sea el email completo
 			stmt.executeUpdate();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
 		}
 	}
+	
+	public void abrirFavoritos(JFrame ventanaActual) {
+	    ventanaActual.dispose();
+	    _15_Favoritos favoritos = new _15_Favoritos();
+	    favoritos.setControlador(this);
+	    favoritos.setVisible(true);
+	}
+
 
 }

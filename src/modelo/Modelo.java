@@ -8,6 +8,8 @@ package modelo;
 public class Modelo {
     private int intentosFallidos = 0;
     
+	public static String usuarioActual = null;
+    
 /**
  * Realiza la acción correspondiente.
  * @param email Correo electrónico del usuario.
@@ -30,4 +32,8 @@ public class Modelo {
         }
         return "incorrecto";
     }
+    
+	public String getUsuarioActual() {
+		return usuarioActual;
+	}
 }

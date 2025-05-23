@@ -4,6 +4,8 @@ package vista;
 
 import controlador.Controlador;
 import modelo.ConexionBD;
+import modelo.Modelo;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -84,7 +86,7 @@ public class _07_MisIncidencias extends JFrame {
 		cargarIncidenciasDesdeBD();
 
 		// Botones de acción
-		JButton btnNuevaIncidencia = new JButton("Nueva Incidencia");
+		JButton btnNuevaIncidencia = new JButton("Crear Incidencia");
 		btnNuevaIncidencia.setBounds(40, 720, 150, 30);
 		btnNuevaIncidencia.addActionListener(e -> {
 			if (controlador != null) {
@@ -93,25 +95,6 @@ public class _07_MisIncidencias extends JFrame {
 			}
 		});
 		getContentPane().add(btnNuevaIncidencia);
-
-		JButton btnEditar = new JButton("Editar");
-		btnEditar.setBounds(200, 720, 100, 30);
-		btnEditar.setEnabled(false);
-		btnEditar.addActionListener(e -> editarIncidencia());
-		getContentPane().add(btnEditar);
-
-		JButton btnEliminar = new JButton("Eliminar");
-		btnEliminar.setBounds(310, 720, 100, 30);
-		btnEliminar.setEnabled(false);
-		btnEliminar.addActionListener(e -> eliminarIncidencia());
-		getContentPane().add(btnEliminar);
-
-		// Listener para habilitar/deshabilitar botones según selección
-		table.getSelectionModel().addListSelectionListener(e -> {
-			boolean rowSelected = table.getSelectedRow() != -1;
-			btnEditar.setEnabled(rowSelected);
-			btnEliminar.setEnabled(rowSelected);
-		});
 
 		// Botón ayuda flotante
 		JButton btnAyuda = new JButton("?");
@@ -131,62 +114,47 @@ public class _07_MisIncidencias extends JFrame {
 	}
 
 	private void cargarIncidenciasDesdeBD() {
-	    try (Connection conexion = ConexionBD.conectar();
-	         Statement stmt = conexion.createStatement();
-	         ResultSet rs = stmt.executeQuery("SELECT estado, edificio, aula, descripcion, fecha FROM incidencias")) {
+    String usuario = Modelo.usuarioActual;
 
-	        // Limpiar la tabla antes de cargar nuevos datos
-	        modelo.setRowCount(0);
-
-	        while (rs.next()) {
-	            String estado = rs.getString("estado");
-	            String edificio = rs.getString("edificio");
-	            String aula = rs.getString("aula");
-	            String descripcion = rs.getString("descripcion");
-	            Date fecha = rs.getDate("fecha");
-
-	            // Añadir fila a la tabla - ordena las columnas según tu modelo de tabla
-	            modelo.addRow(new Object[] { estado, edificio, aula, descripcion, fecha });
-	        }
-	    } catch (SQLException e) {
-	        JOptionPane.showMessageDialog(this, 
-	            "Error al cargar incidencias: " + e.getMessage(),
-	            "Error de base de datos", JOptionPane.ERROR_MESSAGE);
-	        e.printStackTrace();
-	    }
-	}
+    if (usuario == null || usuario.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Usuario no identificado.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    String usuarioConDominio = usuario + "@ueuropea.es";
 
 
-	private void editarIncidencia() {
-		int fila = table.getSelectedRow();
-		if (fila != -1) {
-			String descripcion = (String) modelo.getValueAt(fila, 0);
-			String estado = (String) modelo.getValueAt(fila, 1);
-			String edificio = (String) modelo.getValueAt(fila, 2);
-			String aula = (String) modelo.getValueAt(fila, 3);
-			Date fecha = (Date) modelo.getValueAt(fila, 4);
+    String sql = "SELECT descripcion, estado, edificio, aula, fecha FROM incidencias WHERE USERS_USR = ?";
 
-			// Aquí iría la lógica para editar la incidencia
-			JOptionPane.showMessageDialog(this,
-					"Editando incidencia:\n" + "Descripción: " + descripcion + "\n" + "Estado: " + estado + "\n"
-							+ "Edificio: " + edificio + "\n" + "Aula: " + aula + "\n" + "Fecha: " + fecha.toString(),
-					"Editar Incidencia", JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
+    try (Connection conexion = ConexionBD.conectar();
+         PreparedStatement stmt = conexion.prepareStatement(sql)) {
 
-	private void eliminarIncidencia() {
-		int fila = table.getSelectedRow();
-		if (fila != -1) {
-			int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar esta incidencia?",
-					"Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+        stmt.setString(1, usuarioConDominio);
+        ResultSet rs = stmt.executeQuery();
 
-			if (confirmacion == JOptionPane.YES_OPTION) {
-				// Aquí iría el código para eliminar de la base de datos
-				// Por ahora solo eliminamos de la tabla
-				modelo.removeRow(fila);
-			}
-		}
-	}
+        // Limpiar la tabla antes de cargar nuevos datos
+        modelo.setRowCount(0);
+
+        while (rs.next()) {
+            String descripcion = rs.getString("descripcion");
+            String estado = rs.getString("estado");
+            String edificio = rs.getString("edificio");
+            String aula = rs.getString("aula");
+            Date fecha = rs.getDate("fecha");
+
+            // Añadir fila a la tabla
+            modelo.addRow(new Object[] { descripcion, estado, edificio, aula, fecha });
+        }
+        rs.close();
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al cargar incidencias: " + e.getMessage(),
+            "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
+
 
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
