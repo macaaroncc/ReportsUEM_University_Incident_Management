@@ -102,6 +102,27 @@ public class _10_PerfilUsuario extends JFrame {
 		btnCambiarContrasena.setForeground(Color.WHITE);
 		btnCambiarContrasena.setFont(new Font("Tahoma", Font.BOLD, 14));
 		panel.add(btnCambiarContrasena);
+		
+		JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+		btnCerrarSesion.setBounds(fieldX, y + 160, 300, 40);
+		btnCerrarSesion.setBackground(new Color(178, 34, 34));
+		btnCerrarSesion.setForeground(Color.WHITE);
+		btnCerrarSesion.setFont(new Font("Tahoma", Font.BOLD, 14));
+		panel.add(btnCerrarSesion);
+
+		btnCerrarSesion.addActionListener(e -> {
+			int confirm = JOptionPane.showConfirmDialog(this,
+					"¿Seguro que deseas cerrar sesión?", "Confirmar cierre de sesión",
+					JOptionPane.YES_NO_OPTION);
+			if (confirm == JOptionPane.YES_OPTION) {
+				if (controlador != null) {
+					controlador.cerrarSesion();  // Abrirá el login
+				}
+				dispose(); // Cierra esta ventana
+			}
+		});
+
+
 
 		JButton btnAyuda = new JButton("?");
 		btnAyuda.setBounds(1120, 750, 50, 50);

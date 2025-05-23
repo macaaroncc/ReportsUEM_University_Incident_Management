@@ -101,7 +101,7 @@ public class _02_Login extends JFrame {
 		// Botón Login
 		JButton btnLogin = new JButton("Iniciar Sesión");
 		btnLogin.setForeground(Color.WHITE);
-		btnLogin.setBackground(new Color(217, 2, 2));
+		btnLogin.setBackground(new Color(128, 0, 0));
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnLogin.setBounds(60, 330, 240, 35);
 		btnLogin.setFocusPainted(false);

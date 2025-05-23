@@ -87,7 +87,7 @@ public class _04_OlvContrasena extends JFrame {
 		// Botón comprobar
 		JButton btnComprobar = new JButton("Comprobar");
 		btnComprobar.setForeground(Color.WHITE);
-		btnComprobar.setBackground(new Color(217, 2, 2));
+		btnComprobar.setBackground(new Color(128, 0, 0));
 		btnComprobar.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnComprobar.setFocusPainted(false);
 		btnComprobar.setBounds(80, 270, 240, 35);

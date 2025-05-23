@@ -66,12 +66,6 @@ public class Controlador {
 		}
 	}
 
-	public void cerrarSesion() {
-		setUsuarioLogueado(false);
-		_01_PGSinLogin vista = new _01_PGSinLogin();
-		vista.setControlador(this);
-		mostrarVentana(vista);
-	}
 
 	public void abrirPaginaPrincipal(JFrame ventanaActual) {
 		_06_PaginaPrincipal pagina = new _06_PaginaPrincipal();
@@ -305,7 +299,16 @@ public class Controlador {
 		return new String[]{"", "", ""}; // Valores por defecto si falla
 	}
 
+	public void cerrarSesion() {
+		setUsuarioLogueado(false);
+		usuarioActual = null;
 
+		_02_Login login = new _02_Login();
+		login.setControlador(this);
+		login.setVisible(true);
+	}
+
+	
 	public void actualizarPerfilUsuario(String fecha, String campus) {
 	try (Connection conn = ConexionBD.conectar()) {
 		String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ? WHERE USR = ?";

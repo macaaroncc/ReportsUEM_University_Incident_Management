@@ -82,7 +82,7 @@ public class _05_RestContrasena extends JFrame {
 		// Botón Restablecer
 		JButton btnRestablecer = new JButton("Restablecer");
 		btnRestablecer.setForeground(Color.WHITE);
-		btnRestablecer.setBackground(new Color(217, 2, 2));
+		btnRestablecer.setBackground(new Color(128, 0, 0));
 		btnRestablecer.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnRestablecer.setFocusPainted(false);
 		btnRestablecer.setBounds(60, 210, 240, 35);

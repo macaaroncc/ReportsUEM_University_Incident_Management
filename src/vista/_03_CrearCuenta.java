@@ -163,7 +163,7 @@ public class _03_CrearCuenta extends JFrame {
 
 		btnCrear = new JButton("Crear Cuenta");
 		btnCrear.setForeground(Color.WHITE);
-		btnCrear.setBackground(new Color(217, 2, 2));
+		btnCrear.setBackground(new Color(128, 0, 0));
 		btnCrear.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnCrear.setFocusPainted(false);
 		btnCrear.setBounds(x + 20, y + 50, 240, 35);
