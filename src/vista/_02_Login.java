@@ -42,16 +42,28 @@ public class _02_Login extends JFrame {
 		cardPanel.setBounds(420, 180, 360, 440);
 		cardPanel.setBackground(new Color(255, 255, 252));
 		cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-
 		// Banner
 		try {
-			URL bannerUrl = new URL(
-					"https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Universidad-europea-logo_poc9mEM.2e16d0ba.fill-767x384.png/500px-Universidad-europea-logo_poc9mEM.2e16d0ba.fill-767x384.png");
-			Image bannerImage = ImageIO.read(bannerUrl).getScaledInstance(358, 140, Image.SCALE_SMOOTH);
-			JLabel bannerLabel = new JLabel(new ImageIcon(bannerImage));
-			bannerLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-			bannerLabel.setBounds(0, 0, 360, 140);
-			cardPanel.add(bannerLabel);
+			int anchoImagen = 360;
+			int altoImagen = 140;
+
+			// Cargar imagen desde recursos
+			Image logo = ImageIO.read(getClass().getResource("/img/Logo6.png")).getScaledInstance(anchoImagen,
+					altoImagen, Image.SCALE_SMOOTH);
+
+			JLabel logoLabel = new JLabel(new ImageIcon(logo));
+			logoLabel.setBackground(new Color(255, 255, 252));
+
+			// Centrado en un panel de, por ejemplo, 800x600
+			int panelWidth = cardPanel.getWidth();
+			int panelHeight = cardPanel.getHeight();
+			int x = (panelWidth - anchoImagen) / 2;
+			int y = (panelHeight - altoImagen) / 2;
+
+			logoLabel.setBounds(90, -89, 173, 334);
+
+			cardPanel.add(logoLabel);
+			cardPanel.repaint();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
