@@ -40,16 +40,26 @@ public class _02_Login extends JFrame {
 
         // Banner
         try {
-            int anchoImagen = 140;
+            int anchoImagen = 360;
             int altoImagen = 140;
 
-            Image logo = ImageIO.read(getClass().getResource("/img/Logo.png"))
+            // Cargar imagen desde recursos
+            Image logo = ImageIO.read(getClass().getResource("/img/Logo6.png"))
                                 .getScaledInstance(anchoImagen, altoImagen, Image.SCALE_SMOOTH);
 
             JLabel logoLabel = new JLabel(new ImageIcon(logo));
-            logoLabel.setBounds(124, 53, 100, 87);
-            logoLabel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
+            logoLabel.setBackground(new Color(255, 255, 252));
+
+            // Centrado en un panel de, por ejemplo, 800x600
+            int panelWidth = cardPanel.getWidth();
+            int panelHeight = cardPanel.getHeight();
+            int x = (panelWidth - anchoImagen) / 2;
+            int y = (panelHeight - altoImagen) / 2;
+
+            logoLabel.setBounds(90, -89, 173, 334);
+
             cardPanel.add(logoLabel);
+            cardPanel.repaint();
         } catch (IOException e) {
             e.printStackTrace();
         }
