@@ -287,9 +287,9 @@ public class Controlador {
 
 	public String[] obtenerDatosPerfil() {
 		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "SELECT FECHA, CAMPUS, USR FROM USERS WHERE NICKNAME = ?";
+			String sql = "SELECT FECHA, CAMPUS, USR FROM USERS WHERE USR = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, Modelo.usuarioActual); // El nickname
+			stmt.setString(1, Modelo.usuarioActual + "@ueuropea.es"); // El nickname
 
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -332,7 +332,7 @@ public class Controlador {
 				stmt.setString(2, campus);
 			}
 
-			stmt.setString(3, Modelo.usuarioActual + "@gmail.com"); // o como sea el email completo
+			stmt.setString(3, Modelo.usuarioActual + "@ueuropea.es"); 
 			stmt.executeUpdate();
 		} catch (Exception ex) {
 			ex.printStackTrace();

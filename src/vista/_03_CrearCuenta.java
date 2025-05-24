@@ -181,6 +181,12 @@ public class _03_CrearCuenta extends JFrame {
 
 			String resp1 = respuesta1.getText().trim();
 			String resp2 = respuesta2.getText().trim();
+			
+			if (!email.endsWith("@ueuropea.es")) {
+				JOptionPane.showMessageDialog(this, "Solo se admiten correos proporcionados por la universidad (@ueuropea.es)", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
 
 			if (!pwd.equals(repPwd)) {
 				JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden", "Error", JOptionPane.ERROR_MESSAGE);

@@ -30,6 +30,7 @@ public class _10_PerfilUsuario extends JFrame {
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
 		lblTitulo.setBounds(0, 80, 1200, 30);
 		getContentPane().add(lblTitulo);
+		
 
 		JPanel panel = new JPanel(null);
 		panel.setBounds(150, 140, 900, 500);
@@ -142,7 +143,7 @@ public class _10_PerfilUsuario extends JFrame {
 
 		if (controlador != null && Modelo.usuarioActual != null) {
 			// Obtener datos del perfil: fecha, campus, email
-			String[] datos = controlador.obtenerDatosPerfil(); // Asegúrate de que devuelve 3 elementos
+			String[] datos = controlador.obtenerDatosPerfil(); 
 			txtfecha.setText(datos[0]); // Fecha nacimiento
 			txtCampus.setText(datos[1]); // Campus
 			txtNombre.setText(datos[2]); // Correo electrónico
