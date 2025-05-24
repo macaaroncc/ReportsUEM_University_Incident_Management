@@ -225,7 +225,7 @@ public class Controlador {
 
 	public void comprobarPreguntasSeguridad(String email, String resp1, String resp2, JFrame vistaActual) {
 		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "SELECT * FROM USERS WHERE USR = ? AND RESP1 = ? AND RESP2 = ?";
+			String sql = "SELECT * FROM SEGURIDAD WHERE USERS_USR = ? AND RESP1 = ? AND RESP2 = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
 			stmt.setString(1, email);
 			stmt.setString(2, resp1);

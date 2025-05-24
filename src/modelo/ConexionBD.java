@@ -51,7 +51,6 @@ public class ConexionBD {
 			throw new SQLException("La configuración de la base de datos no se ha cargado correctamente.");
 		}
 
-		System.out.println("Conectando con: " + URL);
 		return DriverManager.getConnection(URL, USUARIO, CONTRASENA);
 	}
 
