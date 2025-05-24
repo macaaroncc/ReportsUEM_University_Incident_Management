@@ -93,16 +93,11 @@ public class Controlador {
 		}
 	}
 
-	public void abrirPerfilUsuario() {
-		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
-		perfil.setControlador(this);
-		mostrarVentana(perfil);
-	}
-
-	public void abrirPaginaAdmin() {
+	public void abrirPaginaAdmin(JFrame ventanaActual) {
 		_12_PaginaAdmin vista = new _12_PaginaAdmin();
 		vista.setControlador(this);
 		mostrarVentana(vista);
+		ventanaActual.dispose();
 	}
 
 	public void abrirNotificaciones(JFrame ventanaActual) {
@@ -151,7 +146,6 @@ public class Controlador {
 				ResultSet rs = stmt.executeQuery();
 
 				if (rs.next()) {
-					String rol = rs.getString("ROL");
 					intentosFallidos = 0;
 
 					setUsuarioLogueado(true);
@@ -164,11 +158,7 @@ public class Controlador {
 
 					vistaActual.dispose();
 
-					if (rol.equalsIgnoreCase("administrador")) {
-						abrirPaginaAdmin();
-					} else {
 						abrirPaginaPrincipal(vistaActual);
-					}
 				} else {
 					intentosFallidos++;
 					JOptionPane.showMessageDialog(vistaActual,

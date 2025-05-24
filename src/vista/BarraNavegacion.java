@@ -90,7 +90,8 @@ public class BarraNavegacion extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
-					controlador.abrirPaginaAdmin();
+					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblAdminPanel);
+					controlador.abrirPaginaAdmin(ventanaActual);
 				}
 			}
 		});
@@ -118,7 +119,8 @@ public class BarraNavegacion extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (controlador != null) {
-					controlador.abrirPerfilUsuario();
+					JFrame ventanaActual = (JFrame) SwingUtilities.getWindowAncestor(lblUsuario);
+					controlador.abrirPerfilUsuario(ventanaActual);
 				}
 			}
 		});

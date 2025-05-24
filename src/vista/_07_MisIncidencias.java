@@ -88,6 +88,9 @@ public class _07_MisIncidencias extends JFrame {
 		// Botones de acción
 		JButton btnNuevaIncidencia = new JButton("Crear Incidencia");
 		btnNuevaIncidencia.setBounds(40, 720, 150, 30);
+		btnNuevaIncidencia.setBackground(new Color(128, 0, 0));
+		btnNuevaIncidencia.setForeground(Color.WHITE);
+		btnNuevaIncidencia.setFont(new Font("Arial", Font.BOLD, 14));
 		btnNuevaIncidencia.addActionListener(e -> {
 			if (controlador != null) {
 				controlador.abrirCrearIncidencia(this);

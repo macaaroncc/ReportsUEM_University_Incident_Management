@@ -40,22 +40,15 @@ public class _01_PGSinLogin extends JFrame {
 		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
 
-		JButton btnAtras = new JButton("◀ Atrás");
-		btnAtras.setBounds(10, 14, 90, 30);
-		btnAtras.setFocusPainted(false);
-		barra.add(btnAtras);
-
 		Font fuente = new Font("Tahoma", Font.BOLD, 13);
 
-		JLabel lblPGNPrincipal = crearNavLabel("Página Principal", 120, fuente);
-		JLabel lblMisIncidencias = crearNavLabel("Mis Incidencias", 280, fuente);
-		JLabel lblCrearIncidencia = crearNavLabel("Crear Incidencia", 440, fuente);
-		JLabel lblNotificaciones = crearNavLabel("Notificaciones", 600, fuente);
-		JLabel lblUsuario = crearNavLabel("Usuario", 1000, fuente);
+		JLabel lblPGNPrincipal = crearNavLabel("Página Principal", 20, fuente);
+		JLabel lblMisIncidencias = crearNavLabel("Mis Incidencias", 180, fuente);
+		JLabel lblNotificaciones = crearNavLabel("Notificaciones", 350, fuente);
+		JLabel lblUsuario = crearNavLabel("Usuario", 1109, fuente);
 
 		barra.add(lblPGNPrincipal);
 		barra.add(lblMisIncidencias);
-		barra.add(lblCrearIncidencia);
 		barra.add(lblNotificaciones);
 		barra.add(lblUsuario);
 
@@ -69,7 +62,6 @@ public class _01_PGSinLogin extends JFrame {
 
 		lblPGNPrincipal.addMouseListener(abrirLogin);
 		lblMisIncidencias.addMouseListener(abrirLogin);
-		lblCrearIncidencia.addMouseListener(abrirLogin);
 		lblNotificaciones.addMouseListener(abrirLogin);
 		lblUsuario.addMouseListener(abrirLogin);
 

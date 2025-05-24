@@ -24,7 +24,7 @@ public class _02_Login extends JFrame {
 
 	public _02_Login() {
 		setTitle("02 . Login");
-		setSize(1200, 800);
+		setSize(1200, 900);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
