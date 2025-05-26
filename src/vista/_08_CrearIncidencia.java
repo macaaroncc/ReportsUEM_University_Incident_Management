@@ -1,4 +1,3 @@
-// Vista actualizada: _08_CrearIncidencia.java
 package vista;
 
 import controlador.Controlador;
@@ -9,10 +8,12 @@ import java.awt.*;
 public class _08_CrearIncidencia extends JFrame {
 	private Controlador controlador;
 
-	private JTextField txtTitulo;
+	private JTextField txtFoto;
+	private JTextField txtAula;
+	private JTextField txtFecha;
+	private JTextField txtRanking;
 	private JTextArea txtDescripcion;
-	private JTextArea txtAula;
-	private JComboBox<String> comboCampus, comboEdificio, comboPiso;
+	private JComboBox<String> comboCampus, comboEdificio, comboPiso, comboEstado;
 
 	public _08_CrearIncidencia() {
 		setTitle("08 . Crear Incidencia");
@@ -22,82 +23,127 @@ public class _08_CrearIncidencia extends JFrame {
 		getContentPane().setLayout(null);
 		getContentPane().setBackground(new Color(255, 255, 252));
 
-		// ✅ Barra de navegación reutilizable
+		// Barra de navegación
 		BarraNavegacion barra = new BarraNavegacion();
-		barra.setUsuarioLogueado(true); // Habilita enlaces funcionales
-		barra.setControlador(controlador); // Asigna listeners y lógica
-		barra.setBounds(0, 0, 1200, 59); // Asegura que se vea bien
+		barra.setUsuarioLogueado(true);
+		barra.setControlador(controlador);
+		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
 
-
-		// Título
 		JLabel lblTitulo = new JLabel("Crear incidencia");
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
 		lblTitulo.setBounds(100, 80, 300, 30);
 		getContentPane().add(lblTitulo);
 
-		// Imagen (placeholder)
-		JLabel lblImagen = new JLabel("Imagen");
-		lblImagen.setBounds(100, 130, 500, 400);
-		lblImagen.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		getContentPane().add(lblImagen);
+		// Estado
+		JLabel lblEstado = new JLabel("Estado:");
+		lblEstado.setBounds(100, 130, 100, 25);
+		getContentPane().add(lblEstado);
 
-		// Título de la incidencia
-		txtTitulo = new JTextField("Título");
-		txtTitulo.setBounds(650, 130, 400, 35);
-		getContentPane().add(txtTitulo);
+		comboEstado = new JComboBox<>(new String[] { "Pendiente", "En Progreso", "Resuelta" });
+		comboEstado.setBounds(200, 130, 150, 30);
+		getContentPane().add(comboEstado);
+
+		// Edificio
+		JLabel lblEdificio = new JLabel("Edificio:");
+		lblEdificio.setBounds(100, 180, 100, 25);
+		getContentPane().add(lblEdificio);
+
+		comboEdificio = new JComboBox<>(new String[] { "Edificio A", "Edificio B", "Edificio C" });
+		comboEdificio.setBounds(200, 180, 150, 30);
+		getContentPane().add(comboEdificio);
+
+		// Piso
+		JLabel lblPiso = new JLabel("Piso:");
+		lblPiso.setBounds(100, 230, 100, 25);
+		getContentPane().add(lblPiso);
+
+		comboPiso = new JComboBox<>(new String[] { "1", "2", "3", "4", "5" });
+		comboPiso.setBounds(200, 230, 150, 30);
+		getContentPane().add(comboPiso);
+
+		// Foto
+		JLabel lblFoto = new JLabel("Foto (URL o path):");
+		lblFoto.setBounds(100, 280, 150, 25);
+		getContentPane().add(lblFoto);
+
+		txtFoto = new JTextField();
+		txtFoto.setBounds(250, 280, 300, 30);
+		getContentPane().add(txtFoto);
+
+		// Aula
+		JLabel lblAula = new JLabel("Aula:");
+		lblAula.setBounds(100, 330, 100, 25);
+		getContentPane().add(lblAula);
+
+		txtAula = new JTextField();
+		txtAula.setBounds(200, 330, 150, 30);
+		getContentPane().add(txtAula);
+
+		// Fecha (formato YYYY-MM-DD)
+		JLabel lblFecha = new JLabel("Fecha (YYYY-MM-DD):");
+		lblFecha.setBounds(100, 380, 150, 25);
+		getContentPane().add(lblFecha);
+
+		txtFecha = new JTextField();
+		txtFecha.setBounds(250, 380, 150, 30);
+		getContentPane().add(txtFecha);
+
+		// Campus
+		JLabel lblCampus = new JLabel("Campus:");
+		lblCampus.setBounds(100, 430, 100, 25);
+		getContentPane().add(lblCampus);
+
+		comboCampus = new JComboBox<>(new String[] { "Campus 1", "Campus 2", "Campus 3" });
+		comboCampus.setBounds(200, 430, 150, 30);
+		getContentPane().add(comboCampus);
+
+		// Ranking
+		JLabel lblRanking = new JLabel("Ranking:");
+		lblRanking.setBounds(100, 480, 100, 25);
+		getContentPane().add(lblRanking);
+
+		txtRanking = new JTextField();
+		txtRanking.setBounds(200, 480, 100, 30);
+		getContentPane().add(txtRanking);
 
 		// Descripción
-		txtDescripcion = new JTextArea("Descripción");
-		txtDescripcion.setBounds(650, 180, 400, 200);
+		JLabel lblDescripcion = new JLabel("Descripción:");
+		lblDescripcion.setBounds(100, 530, 100, 25);
+		getContentPane().add(lblDescripcion);
+
+		txtDescripcion = new JTextArea();
 		txtDescripcion.setLineWrap(true);
 		txtDescripcion.setWrapStyleWord(true);
 		txtDescripcion.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-		getContentPane().add(txtDescripcion);
+		JScrollPane scrollDescripcion = new JScrollPane(txtDescripcion);
+		scrollDescripcion.setBounds(200, 530, 400, 150);
+		getContentPane().add(scrollDescripcion);
 
-		// Campus
-		comboCampus = new JComboBox<>(new String[] { "Campus" });
-		comboCampus.setBounds(650, 400, 400, 35);
-		getContentPane().add(comboCampus);
-
-		// Edificio y Piso
-		comboEdificio = new JComboBox<>(new String[] { "Edificio" });
-		comboEdificio.setBounds(650, 450, 190, 35);
-		getContentPane().add(comboEdificio);
-
-		comboPiso = new JComboBox<>(new String[] { "Piso" });
-		comboPiso.setBounds(860, 450, 190, 35);
-		getContentPane().add(comboPiso);
-
-		// Aula
-		txtAula = new JTextArea("Aula:");
-		txtAula.setBounds(650, 500, 400, 35);
-		txtAula.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-		getContentPane().add(txtAula);
-
-		// Botón Crear
+		// Botón Crear Incidencia
 		JButton btnCrear = new JButton("Crear Incidencia");
-		btnCrear.setBounds(650, 560, 400, 45);
+		btnCrear.setBounds(200, 700, 400, 45);
 		btnCrear.setBackground(new Color(128, 0, 0));
 		btnCrear.setForeground(Color.WHITE);
 		btnCrear.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnCrear.setFocusPainted(false);
 		getContentPane().add(btnCrear);
 
-		// Botón Ayuda flotante
-		JButton btnAyuda = new JButton("?");
-		btnAyuda.setBounds(1120, 740, 50, 50);
-		btnAyuda.setBackground(new Color(128, 0, 0));
-		btnAyuda.setForeground(Color.WHITE);
-		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
-		btnAyuda.setFocusPainted(false);
-		btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		getContentPane().add(btnAyuda);
-
-		btnAyuda.addActionListener(e -> {
-			if (controlador != null)
-				controlador.abrirAyuda();
-			dispose();
+		btnCrear.addActionListener(e -> {
+			if (controlador != null) {
+				// Enviar datos para crear incidencia
+				controlador.crearIncidencia(
+					comboEstado.getSelectedItem().toString(),
+					comboEdificio.getSelectedItem().toString(),
+					txtFoto.getText(),
+					comboPiso.getSelectedItem().toString(),
+					txtDescripcion.getText(),
+					txtAula.getText(),
+					txtFecha.getText(),
+					comboCampus.getSelectedItem().toString(),
+					txtRanking.getText()
+				);
+			}
 		});
 	}
 

@@ -37,6 +37,76 @@ public class Controlador {
 	public void setModelo(Modelo modelo) {
 		this.modelo = modelo;
 	}
+	
+	public void crearIncidencia(String estado, String edificio, String foto, String piso, String descripcion, String aula, String fecha, String campus, String ranking) {
+	    if (descripcion.isEmpty() || aula.isEmpty() || fecha.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula, fecha).");
+	        return;
+	    }
+	    
+	    try (Connection conn = ConexionBD.conectar()) {
+	        // Obtener el id_incidencia actual máximo + 1
+	        int nuevoId = obtenerMaxIdIncidencia() + 1;
+
+	        String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	        PreparedStatement stmt = conn.prepareStatement(sql);
+
+	        stmt.setInt(1, nuevoId);          // id_incidencia
+	        stmt.setString(2, estado);
+	        stmt.setString(3, edificio);
+	        stmt.setString(4, foto);
+	        stmt.setString(5, piso);
+	        stmt.setString(6, descripcion);
+	        stmt.setString(7, aula);
+	        stmt.setDate(8, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
+	        stmt.setString(9, campus);
+
+	        int rankInt = 0;
+	        try {
+	            rankInt = Integer.parseInt(ranking);
+	        } catch (NumberFormatException e) {
+	            JOptionPane.showMessageDialog(null, "Ranking debe ser un número entero. Se pondrá 0 por defecto.");
+	        }
+	        stmt.setInt(10, rankInt);
+
+	        // Obtener usuario actual con el formato
+	        String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
+	        stmt.setString(11, user);  // USERS_USR
+	        stmt.setString(12, user);  // USR
+
+	        int filas = stmt.executeUpdate();
+	        if (filas > 0) {
+	            JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
+	        }
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
+	    }
+	}
+
+
+// No olvides incluir el método obtenerMaxIdIncidencia() que definimos antes en esta misma clase.
+
+
+	public int obtenerMaxIdIncidencia() {
+	    int maxId = 0;
+	    try (Connection conn = ConexionBD.conectar()) {
+	        String sql = "SELECT MAX(id_incidencia) AS max_id FROM incidencias";
+	        PreparedStatement stmt = conn.prepareStatement(sql);
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            maxId = rs.getInt("max_id");
+	        }
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        // Opcional: podrías mostrar mensaje de error si quieres
+	    }
+	    return maxId;
+	}
+
 
 	public void setVista(_02_Login vista, _03_CrearCuenta crearCuenta) {
 		this._02_login = vista;
