@@ -13,7 +13,7 @@ public class _08_CrearIncidencia extends JFrame {
 	private JTextField txtFecha;
 	private JTextField txtRanking;
 	private JTextArea txtDescripcion;
-	private JComboBox<String> comboCampus, comboEdificio, comboPiso, comboEstado;
+	private JComboBox<String> comboCampus, comboEdificio, comboPiso;
 
 	public _08_CrearIncidencia() {
 		setTitle("08 . Crear Incidencia");
@@ -35,81 +35,17 @@ public class _08_CrearIncidencia extends JFrame {
 		lblTitulo.setBounds(100, 80, 300, 30);
 		getContentPane().add(lblTitulo);
 
-		// Estado
-		JLabel lblEstado = new JLabel("Estado:");
-		lblEstado.setBounds(100, 130, 100, 25);
-		getContentPane().add(lblEstado);
+		// Coordenadas base
+		int leftColumnX = 100;
+		int rightColumnX = 600; // para centrar los componentes de la columna derecha
+		int labelWidth = 150;
+		int fieldWidth = 300;
+		int heightStep = 50;
+		int baseY = 180;
 
-		comboEstado = new JComboBox<>(new String[] { "Pendiente", "En Progreso", "Resuelta" });
-		comboEstado.setBounds(200, 130, 150, 30);
-		getContentPane().add(comboEstado);
-
-		// Edificio
-		JLabel lblEdificio = new JLabel("Edificio:");
-		lblEdificio.setBounds(100, 180, 100, 25);
-		getContentPane().add(lblEdificio);
-
-		comboEdificio = new JComboBox<>(new String[] { "Edificio A", "Edificio B", "Edificio C" });
-		comboEdificio.setBounds(200, 180, 150, 30);
-		getContentPane().add(comboEdificio);
-
-		// Piso
-		JLabel lblPiso = new JLabel("Piso:");
-		lblPiso.setBounds(100, 230, 100, 25);
-		getContentPane().add(lblPiso);
-
-		comboPiso = new JComboBox<>(new String[] { "1", "2", "3", "4", "5" });
-		comboPiso.setBounds(200, 230, 150, 30);
-		getContentPane().add(comboPiso);
-
-		// Foto
-		JLabel lblFoto = new JLabel("Foto (URL o path):");
-		lblFoto.setBounds(100, 280, 150, 25);
-		getContentPane().add(lblFoto);
-
-		txtFoto = new JTextField();
-		txtFoto.setBounds(250, 280, 300, 30);
-		getContentPane().add(txtFoto);
-
-		// Aula
-		JLabel lblAula = new JLabel("Aula:");
-		lblAula.setBounds(100, 330, 100, 25);
-		getContentPane().add(lblAula);
-
-		txtAula = new JTextField();
-		txtAula.setBounds(200, 330, 150, 30);
-		getContentPane().add(txtAula);
-
-		// Fecha (formato YYYY-MM-DD)
-		JLabel lblFecha = new JLabel("Fecha (YYYY-MM-DD):");
-		lblFecha.setBounds(100, 380, 150, 25);
-		getContentPane().add(lblFecha);
-
-		txtFecha = new JTextField();
-		txtFecha.setBounds(250, 380, 150, 30);
-		getContentPane().add(txtFecha);
-
-		// Campus
-		JLabel lblCampus = new JLabel("Campus:");
-		lblCampus.setBounds(100, 430, 100, 25);
-		getContentPane().add(lblCampus);
-
-		comboCampus = new JComboBox<>(new String[] { "Campus 1", "Campus 2", "Campus 3" });
-		comboCampus.setBounds(200, 430, 150, 30);
-		getContentPane().add(comboCampus);
-
-		// Ranking
-		JLabel lblRanking = new JLabel("Ranking:");
-		lblRanking.setBounds(100, 480, 100, 25);
-		getContentPane().add(lblRanking);
-
-		txtRanking = new JTextField();
-		txtRanking.setBounds(200, 480, 100, 30);
-		getContentPane().add(txtRanking);
-
-		// Descripción
+		// ---- COLUMNA IZQUIERDA: Descripción ----
 		JLabel lblDescripcion = new JLabel("Descripción:");
-		lblDescripcion.setBounds(100, 530, 100, 25);
+		lblDescripcion.setBounds(leftColumnX, baseY, labelWidth, 25);
 		getContentPane().add(lblDescripcion);
 
 		txtDescripcion = new JTextArea();
@@ -117,12 +53,61 @@ public class _08_CrearIncidencia extends JFrame {
 		txtDescripcion.setWrapStyleWord(true);
 		txtDescripcion.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		JScrollPane scrollDescripcion = new JScrollPane(txtDescripcion);
-		scrollDescripcion.setBounds(200, 530, 400, 150);
+		scrollDescripcion.setBounds(leftColumnX, baseY + 30, 400, 300);
 		getContentPane().add(scrollDescripcion);
 
-		// Botón Crear Incidencia
+		// ---- COLUMNA DERECHA: Edificio, Piso, Foto, Aula, Campus ----
+
+		int currentY = baseY;
+
+		JLabel lblEdificio = new JLabel("Edificio:");
+		lblEdificio.setBounds(rightColumnX, currentY, labelWidth, 25);
+		getContentPane().add(lblEdificio);
+
+		comboEdificio = new JComboBox<>(new String[] { "Edificio A", "Edificio B", "Edificio C", "Edificio E" });
+		comboEdificio.setBounds(rightColumnX + labelWidth, currentY, fieldWidth, 30);
+		getContentPane().add(comboEdificio);
+		currentY += heightStep;
+
+		JLabel lblPiso = new JLabel("Piso:");
+		lblPiso.setBounds(rightColumnX, currentY, labelWidth, 25);
+		getContentPane().add(lblPiso);
+
+		comboPiso = new JComboBox<>(new String[] { "0", "1", "2", "3" });
+		comboPiso.setBounds(rightColumnX + labelWidth, currentY, fieldWidth, 30);
+		getContentPane().add(comboPiso);
+		currentY += heightStep;
+
+		JLabel lblFoto = new JLabel("Foto (URL o path):");
+		lblFoto.setBounds(rightColumnX, currentY, labelWidth, 25);
+		getContentPane().add(lblFoto);
+
+		txtFoto = new JTextField();
+		txtFoto.setBounds(rightColumnX + labelWidth, currentY, fieldWidth, 30);
+		getContentPane().add(txtFoto);
+		currentY += heightStep;
+
+		JLabel lblAula = new JLabel("Aula:");
+		lblAula.setBounds(rightColumnX, currentY, labelWidth, 25);
+		getContentPane().add(lblAula);
+
+		txtAula = new JTextField();
+		txtAula.setBounds(rightColumnX + labelWidth, currentY, fieldWidth, 30);
+		getContentPane().add(txtAula);
+		currentY += heightStep;
+
+		JLabel lblCampus = new JLabel("Campus:");
+		lblCampus.setBounds(rightColumnX, currentY, labelWidth, 25);
+		getContentPane().add(lblCampus);
+
+		comboCampus = new JComboBox<>(new String[] { "Alcobendas", "Villaviciosa" });
+		comboCampus.setBounds(rightColumnX + labelWidth, currentY, fieldWidth, 30);
+		getContentPane().add(comboCampus);
+		currentY += heightStep + 30;
+
+		// Botón
 		JButton btnCrear = new JButton("Crear Incidencia");
-		btnCrear.setBounds(200, 700, 400, 45);
+		btnCrear.setBounds(rightColumnX + labelWidth, currentY, fieldWidth, 45);
 		btnCrear.setBackground(new Color(128, 0, 0));
 		btnCrear.setForeground(Color.WHITE);
 		btnCrear.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -133,15 +118,12 @@ public class _08_CrearIncidencia extends JFrame {
 			if (controlador != null) {
 				// Enviar datos para crear incidencia
 				controlador.crearIncidencia(
-					comboEstado.getSelectedItem().toString(),
 					comboEdificio.getSelectedItem().toString(),
 					txtFoto.getText(),
 					comboPiso.getSelectedItem().toString(),
 					txtDescripcion.getText(),
 					txtAula.getText(),
-					txtFecha.getText(),
-					comboCampus.getSelectedItem().toString(),
-					txtRanking.getText()
+					comboCampus.getSelectedItem().toString()
 				);
 			}
 		});

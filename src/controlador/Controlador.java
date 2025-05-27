@@ -38,9 +38,9 @@ public class Controlador {
 		this.modelo = modelo;
 	}
 	
-	public void crearIncidencia(String estado, String edificio, String foto, String piso, String descripcion, String aula, String fecha, String campus, String ranking) {
-	    if (descripcion.isEmpty() || aula.isEmpty() || fecha.isEmpty()) {
-	        JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula, fecha).");
+	public void crearIncidencia(String edificio, String foto, String piso, String descripcion, String aula, String campus) {
+	    if (descripcion.isEmpty() || aula.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
 	        return;
 	    }
 	    
@@ -52,22 +52,14 @@ public class Controlador {
 	        PreparedStatement stmt = conn.prepareStatement(sql);
 
 	        stmt.setInt(1, nuevoId);          // id_incidencia
-	        stmt.setString(2, estado);
+	        stmt.setString(2, "En revisión");
 	        stmt.setString(3, edificio);
 	        stmt.setString(4, foto);
 	        stmt.setString(5, piso);
 	        stmt.setString(6, descripcion);
 	        stmt.setString(7, aula);
-	        stmt.setDate(8, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
+	        stmt.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
 	        stmt.setString(9, campus);
-
-	        int rankInt = 0;
-	        try {
-	            rankInt = Integer.parseInt(ranking);
-	        } catch (NumberFormatException e) {
-	            JOptionPane.showMessageDialog(null, "Ranking debe ser un número entero. Se pondrá 0 por defecto.");
-	        }
-	        stmt.setInt(10, rankInt);
 
 	        // Obtener usuario actual con el formato
 	        String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
