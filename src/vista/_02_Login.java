@@ -226,13 +226,25 @@ public class _02_Login extends JFrame {
 		cardPanel.add(txtPassword);
 
 		// Botón mostrar/ocultar contraseña
-		JButton btnMostrarPwd = new JButton("👁");
+		
+		ImageIcon eyeIcon = new ImageIcon(getClass().getResource("/img/eye.png"));
+		Image scaledEye = eyeIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+		ImageIcon scaledEyeIcon = new ImageIcon(scaledEye);
+	
+		JButton btnMostrarPwd = new JButton(scaledEyeIcon);
 		btnMostrarPwd.setBounds(325, 280, 30, 30);
+
+		
 		btnMostrarPwd.setFocusable(false);
-		btnMostrarPwd.setBackground(new Color(255, 255, 252));
-		btnMostrarPwd.setMargin(new Insets(0, 0, 0, 0));
-		btnMostrarPwd.setFont(new Font("Dialog", Font.PLAIN, 10));
+		btnMostrarPwd.setBorderPainted(false);          
+		btnMostrarPwd.setContentAreaFilled(false);      
+		btnMostrarPwd.setFocusPainted(false);           
+		btnMostrarPwd.setOpaque(false);                 
+		btnMostrarPwd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
+		btnMostrarPwd.setMargin(new Insets(0, 0, 0, 0)); 
+
 		cardPanel.add(btnMostrarPwd);
+
 
 		final boolean[] pwdVisible = { false };
 		btnMostrarPwd.addActionListener(e -> {
