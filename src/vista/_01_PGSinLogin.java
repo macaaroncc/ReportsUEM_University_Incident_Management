@@ -91,7 +91,7 @@ public class _01_PGSinLogin extends JFrame {
 		getContentPane().add(campoBusqueda);
 
 		botonBuscar = new JButton("Buscar");
-		botonBuscar.setBounds(1010, 70, 100, 30);
+		botonBuscar.setBounds(1010, 70, 138, 30);
 		botonBuscar.setBackground(new Color(128, 0, 0));
 		botonBuscar.setForeground(Color.WHITE);
 		botonBuscar.setFont(new Font("Tahoma", Font.BOLD, 12));

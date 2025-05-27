@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -35,78 +37,108 @@ public class Controlador {
 	public void setModelo(Modelo modelo) {
 		this.modelo = modelo;
 	}
+
 	public static DefaultTableModel cargarUsuarios() {
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.setColumnIdentifiers(new String[]{"Usuario", "Nickname", "Rol", "Campus", "Contraseña", "Fecha", "Foto"});
+		DefaultTableModel modelo = new DefaultTableModel();
+		modelo.setColumnIdentifiers(
+				new String[] { "Usuario", "Nickname", "Rol", "Campus", "Contraseña", "Fecha", "Foto" });
 
-        try (Connection conexion = ConexionBD.conectar();
-             PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM users");
-             ResultSet rs = stmt.executeQuery()) {
+		try (Connection conexion = ConexionBD.conectar();
+				PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM users");
+				ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                modelo.addRow(new Object[]{
-                        rs.getString("USR"),
-                        rs.getString("NICKNAME"),
-                        rs.getString("ROL"),
-                        rs.getString("campus"),
-                        rs.getString("PWD"),
-                        rs.getDate("fecha"),
-                        rs.getString("foto")
-                });
-            }
+			while (rs.next()) {
+				modelo.addRow(new Object[] { rs.getString("USR"), rs.getString("NICKNAME"), rs.getString("ROL"),
+						rs.getString("campus"), rs.getString("PWD"), rs.getDate("fecha"), rs.getString("foto") });
+			}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        return modelo;
-    }
+		return modelo;
+	}
 
-    public static DefaultTableModel cargarIncidencias() {
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.setColumnIdentifiers(new String[]{
-                "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción",
-                "Aula", "Justificación", "Fecha", "Campus", "Ranking", "Usuario"
-        });
+	public static DefaultTableModel cargarIncidencias() {
+		DefaultTableModel modelo = new DefaultTableModel();
+		modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
+				"Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
 
-        try (Connection conexion = ConexionBD.conectar();
-             PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM incidencias");
-             ResultSet rs = stmt.executeQuery()) {
+		try (Connection conexion = ConexionBD.conectar();
+				PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM incidencias");
+				ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                modelo.addRow(new Object[]{
-                        rs.getInt("id_incidencia"),
-                        rs.getString("estado"),
-                        rs.getString("edificio"),
-                        rs.getString("foto"),
-                        rs.getString("piso"),
-                        rs.getString("descripcion"),
-                        rs.getString("aula"),
-                        rs.getString("justificacion"),
-                        rs.getDate("fecha"),
-                        rs.getString("campus"),
-                        rs.getInt("ranking"),
-                        rs.getString("USR")
-                });
-            }
+			while (rs.next()) {
+				modelo.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
+						rs.getString("edificio"), rs.getString("foto"), rs.getString("piso"),
+						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
+						rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
+			}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        return modelo;
-    }
+		return modelo;
+	}
 
-    public boolean eliminarUsuario(String usr) {
-        try (Connection conexion = ConexionBD.conectar();
-             PreparedStatement stmt = conexion.prepareStatement("DELETE FROM users WHERE USR = ?")) {
-            stmt.setString(1, usr);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+	public static DefaultTableModel buscarIncidencias(String estado, Integer ranking, String usuario) {
+		DefaultTableModel modelo = new DefaultTableModel();
+		modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
+				"Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
+
+		StringBuilder query = new StringBuilder("SELECT * FROM incidencias WHERE 1=1");
+		List<Object> parametros = new ArrayList<>();
+
+		if (estado != null && !estado.isEmpty()) {
+			query.append(" AND estado LIKE ?");
+			parametros.add("%" + estado + "%");
+		}
+
+		if (ranking != null) {
+			query.append(" AND ranking = ?");
+			parametros.add(ranking);
+		}
+
+		if (usuario != null && !usuario.isEmpty()) {
+			query.append(" AND USR LIKE ?");
+			parametros.add("%" + usuario + "%");
+		}
+
+		try (Connection conexion = ConexionBD.conectar();
+				PreparedStatement stmt = conexion.prepareStatement(query.toString())) {
+
+			// Setear parámetros dinámicos
+			for (int i = 0; i < parametros.size(); i++) {
+				stmt.setObject(i + 1, parametros.get(i));
+			}
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					modelo.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
+							rs.getString("edificio"), rs.getString("foto"), rs.getString("piso"),
+							rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
+							rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return modelo;
+	}
+
+	public boolean eliminarUsuario(String usr) {
+		try (Connection conexion = ConexionBD.conectar();
+				PreparedStatement stmt = conexion.prepareStatement("DELETE FROM users WHERE USR = ?")) {
+			stmt.setString(1, usr);
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	public void crearIncidencia(String edificio, String foto, String piso, String descripcion, String aula,
 			String campus) {
@@ -133,8 +165,8 @@ public class Controlador {
 			stmt.setString(9, campus);
 
 			String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
-			stmt.setString(11, user); 
-			stmt.setString(12, user); 
+			stmt.setString(11, user);
+			stmt.setString(12, user);
 
 			int filas = stmt.executeUpdate();
 			if (filas > 0) {
