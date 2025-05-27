@@ -17,9 +17,9 @@ import vista._13_Estadisticas;
 import vista._14_Ayuda;
 
 public class Main {
-    public static void main(String[] args) {
-    	// Conexión sql
-    	String hostname = "localhost";
+	public static void main(String[] args) {
+		// Conexión sql
+		String hostname = "localhost";
 		String port = "";
 		String database = "";
 		String usrname = "root";
@@ -38,16 +38,15 @@ public class Main {
 			System.err.println("Error de conexion");
 			e.printStackTrace();
 		}
-		
-        Modelo modelo = new Modelo();
-        Controlador controlador = new Controlador();
 
-        _02_Login vistaInicial = new _02_Login();
-        vistaInicial.setControlador(controlador);
+		Modelo modelo = new Modelo();
+		Controlador controlador = new Controlador();
 
-        controlador.setModelo(modelo);
-        // Puedes crear más setters en Controlador si necesitas rastrear la vista actual
+		_12_PaginaAdmin vistaInicial = new _12_PaginaAdmin();
+		vistaInicial.setControlador(controlador);
 
-        vistaInicial.setVisible(true);
-    }
+		controlador.setModelo(modelo);
+
+		vistaInicial.setVisible(true);
+	}
 }

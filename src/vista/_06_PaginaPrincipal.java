@@ -47,8 +47,8 @@ public class _06_PaginaPrincipal extends JFrame {
 		comboBoxEstado.setBounds(40, 70, 150, 30);
 		contentPane.add(comboBoxEstado);
 
-		comboBoxOrden = new JComboBox<>(new String[] { "Orden de Relevancia", "Más relevante primero",
-				"Menos relevante primero", "Más reciente primero" });
+		comboBoxOrden = new JComboBox<>(new String[] { "Orden de Relevancia", "Más votaciones",
+				"Menos votaciones", "Más reciente" });
 		comboBoxOrden.setBounds(200, 70, 180, 30);
 		contentPane.add(comboBoxOrden);
 
@@ -104,11 +104,11 @@ public class _06_PaginaPrincipal extends JFrame {
 			}
 
 			// Orden
-			if (orden.equals("Más relevante primero")) {
+			if (orden.equals("Más votaciones")) {
 				query.append(" ORDER BY ranking DESC");
-			} else if (orden.equals("Menos relevante primero")) {
+			} else if (orden.equals("Menos votaciones")) {
 				query.append(" ORDER BY ranking ASC");
-			} else if (orden.equals("Más reciente primero")) {
+			} else if (orden.equals("Más reciente")) {
 				query.append(" ORDER BY fecha DESC");
 			} else {
 				query.append(" ORDER BY fecha DESC"); // Default

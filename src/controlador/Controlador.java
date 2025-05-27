@@ -82,7 +82,7 @@ public class Controlador {
 		return modelo;
 	}
 
-	public static DefaultTableModel buscarIncidencias(String estado, Integer ranking, String usuario) {
+	public static DefaultTableModel buscarIncidencias(String estado, String usuario, String orden) {
 		DefaultTableModel modelo = new DefaultTableModel();
 		modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
 				"Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
@@ -95,20 +95,38 @@ public class Controlador {
 			parametros.add("%" + estado + "%");
 		}
 
-		if (ranking != null) {
-			query.append(" AND ranking = ?");
-			parametros.add(ranking);
-		}
 
 		if (usuario != null && !usuario.isEmpty()) {
 			query.append(" AND USR LIKE ?");
 			parametros.add("%" + usuario + "%");
 		}
 
+		// Orden según el valor de 'orden'
+		if (orden != null) {
+			switch (orden) {
+			case "Más votaciones":
+				query.append(" ORDER BY ranking DESC");
+				break;
+			case "Menos votaciones":
+				query.append(" ORDER BY ranking ASC");
+				break;
+			case "Más reciente":
+				query.append(" ORDER BY fecha DESC");
+				break;
+			case "Orden de Relevancia":
+				query.append(" ORDER BY fecha DESC"); // O el orden que definas como relevancia
+				break;
+			default:
+				query.append(" ORDER BY fecha DESC"); // Orden por defecto
+				break;
+			}
+		} else {
+			query.append(" ORDER BY fecha DESC"); // Orden por defecto si orden es null
+		}
+
 		try (Connection conexion = ConexionBD.conectar();
 				PreparedStatement stmt = conexion.prepareStatement(query.toString())) {
 
-			// Setear parámetros dinámicos
 			for (int i = 0; i < parametros.size(); i++) {
 				stmt.setObject(i + 1, parametros.get(i));
 			}
