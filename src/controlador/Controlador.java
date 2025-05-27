@@ -30,75 +30,65 @@ public class Controlador {
 	private int intentosFallidos = 0;
 	private boolean usuarioLogueado = false;
 
-
-
-
-
 	public void setModelo(Modelo modelo) {
 		this.modelo = modelo;
 	}
-	
-	public void crearIncidencia(String edificio, String foto, String piso, String descripcion, String aula, String campus) {
-	    if (descripcion.isEmpty() || aula.isEmpty()) {
-	        JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
-	        return;
-	    }
-	    
-	    try (Connection conn = ConexionBD.conectar()) {
-	        // Obtener el id_incidencia actual máximo + 1
-	        int nuevoId = obtenerMaxIdIncidencia() + 1;
 
-	        String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+	public void crearIncidencia(String edificio, String foto, String piso, String descripcion, String aula,
+			String campus) {
+		if (descripcion.isEmpty() || aula.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
+			return;
+		}
 
-	        stmt.setInt(1, nuevoId);          // id_incidencia
-	        stmt.setString(2, "En revisión");
-	        stmt.setString(3, edificio);
-	        stmt.setString(4, foto);
-	        stmt.setString(5, piso);
-	        stmt.setString(6, descripcion);
-	        stmt.setString(7, aula);
-	        stmt.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
-	        stmt.setString(9, campus);
+		try (Connection conn = ConexionBD.conectar()) {
+			// Obtener el id_incidencia actual máximo + 1
+			int nuevoId = obtenerMaxIdIncidencia() + 1;
 
-	        // Obtener usuario actual con el formato
-	        String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
-	        stmt.setString(11, user);  // USERS_USR
-	        stmt.setString(12, user);  // USR
+			String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			PreparedStatement stmt = conn.prepareStatement(sql);
 
-	        int filas = stmt.executeUpdate();
-	        if (filas > 0) {
-	            JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
-	        } else {
-	            JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
-	        }
-	    } catch (Exception ex) {
-	        ex.printStackTrace();
-	        JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
-	    }
+			stmt.setInt(1, nuevoId); // id_incidencia
+			stmt.setString(2, "En revisión");
+			stmt.setString(3, edificio);
+			stmt.setString(4, foto);
+			stmt.setString(5, piso);
+			stmt.setString(6, descripcion);
+			stmt.setString(7, aula);
+			stmt.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
+			stmt.setString(9, campus);
+
+			String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
+			stmt.setString(11, user); 
+			stmt.setString(12, user); 
+
+			int filas = stmt.executeUpdate();
+			if (filas > 0) {
+				JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
+			} else {
+				JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
+		}
 	}
-
-
-// No olvides incluir el método obtenerMaxIdIncidencia() que definimos antes en esta misma clase.
-
 
 	public int obtenerMaxIdIncidencia() {
-	    int maxId = 0;
-	    try (Connection conn = ConexionBD.conectar()) {
-	        String sql = "SELECT MAX(id_incidencia) AS max_id FROM incidencias";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
-	        ResultSet rs = stmt.executeQuery();
-	        
-	        if (rs.next()) {
-	            maxId = rs.getInt("max_id");
-	        }
-	    } catch (Exception ex) {
-	        ex.printStackTrace();
-	        // Opcional: podrías mostrar mensaje de error si quieres
-	    }
-	    return maxId;
-	}
+		int maxId = 0;
+		try (Connection conn = ConexionBD.conectar()) {
+			String sql = "SELECT MAX(id_incidencia) AS max_id FROM incidencias";
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
 
+			if (rs.next()) {
+				maxId = rs.getInt("max_id");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return maxId;
+	}
 
 	public void setVista(_02_Login vista, _03_CrearCuenta crearCuenta) {
 		this._02_login = vista;
@@ -220,7 +210,7 @@ public class Controlador {
 
 					vistaActual.dispose();
 
-						abrirPaginaPrincipal(vistaActual);
+					abrirPaginaPrincipal(vistaActual);
 				} else {
 					intentosFallidos++;
 					JOptionPane.showMessageDialog(vistaActual,
@@ -237,7 +227,6 @@ public class Controlador {
 			ex.printStackTrace();
 		}
 	}
-	
 
 	public void registrarUsuario(String email, String password, String codigoAdmin, int preg1, int preg2, String resp1,
 			String resp2, JFrame vistaActual) {
@@ -345,8 +334,6 @@ public class Controlador {
 		}
 	}
 
-	// -------------------- NUEVOS MÉTODOS AÑADIDOS --------------------
-
 	public String[] obtenerDatosPerfil() {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "SELECT FECHA, CAMPUS, USR FROM USERS WHERE USR = ?";
@@ -380,34 +367,31 @@ public class Controlador {
 			String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ? WHERE USR = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
 
-			// FECHA: si está vacía, insertar NULL
 			if (fecha == null || fecha.trim().isEmpty()) {
 				stmt.setNull(1, java.sql.Types.DATE);
 			} else {
 				stmt.setDate(1, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
 			}
 
-			// CAMPUS: si está vacío, insertar NULL
 			if (campus == null || campus.trim().isEmpty()) {
 				stmt.setNull(2, java.sql.Types.VARCHAR);
 			} else {
 				stmt.setString(2, campus);
 			}
 
-			stmt.setString(3, Modelo.usuarioActual + "@ueuropea.es"); 
+			stmt.setString(3, Modelo.usuarioActual + "@ueuropea.es");
 			stmt.executeUpdate();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
 		}
 	}
-	
-	public void abrirFavoritos(JFrame ventanaActual) {
-	    ventanaActual.dispose();
-	    _15_Favoritos favoritos = new _15_Favoritos();
-	    favoritos.setControlador(this);
-	    favoritos.setVisible(true);
-	}
 
+	public void abrirFavoritos(JFrame ventanaActual) {
+		ventanaActual.dispose();
+		_15_Favoritos favoritos = new _15_Favoritos();
+		favoritos.setControlador(this);
+		favoritos.setVisible(true);
+	}
 
 }
