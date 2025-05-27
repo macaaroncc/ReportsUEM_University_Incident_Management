@@ -39,13 +39,13 @@ public class _10_PerfilUsuario extends JFrame {
 		getContentPane().add(panel);
 
 		JLabel lblFoto = new JLabel("Foto");
-		lblFoto.setBounds(40, 40, 180, 180);
+		lblFoto.setBounds(40, 40, 182, 181);
 		lblFoto.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.add(lblFoto);
 
 		JButton btnEditarFoto = new JButton("Editar Foto");
-		btnEditarFoto.setBounds(60, 230, 140, 30);
+		btnEditarFoto.setBounds(60, 232, 140, 30);
 		panel.add(btnEditarFoto);
 
 		int labelX = 250, fieldX = 370, rowHeight = 40, y = 40;
@@ -55,7 +55,7 @@ public class _10_PerfilUsuario extends JFrame {
 		panel.add(lblNombre);
 
 		txtNombre = new JTextField();
-		txtNombre.setBounds(fieldX, y, 300, 30);
+		txtNombre.setBounds(370, 40, 300, 30);
 		txtNombre.setEditable(false); // Solo lectura
 		panel.add(txtNombre);
 
@@ -78,7 +78,7 @@ public class _10_PerfilUsuario extends JFrame {
 		panel.add(txtCampus);
 
 		JButton btnGuardar = new JButton("Guardar Cambios");
-		btnGuardar.setBounds(fieldX, y + 60, 300, 40);
+		btnGuardar.setBounds(590, 449, 300, 40);
 		btnGuardar.setBackground(new Color(34, 139, 34));
 		btnGuardar.setForeground(Color.WHITE);
 		btnGuardar.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -94,14 +94,14 @@ public class _10_PerfilUsuario extends JFrame {
 		});
 
 		JButton btnCambiarContrasena = new JButton("Cambiar Contraseña");
-		btnCambiarContrasena.setBounds(fieldX, y + 110, 300, 40);
+		btnCambiarContrasena.setBounds(10, 449, 300, 40);
 		btnCambiarContrasena.setBackground(Color.GRAY);
 		btnCambiarContrasena.setForeground(Color.WHITE);
 		btnCambiarContrasena.setFont(new Font("Tahoma", Font.BOLD, 14));
 		panel.add(btnCambiarContrasena);
 
 		JButton btnCerrarSesion = new JButton("Cerrar Sesión");
-		btnCerrarSesion.setBounds(fieldX, y + 160, 300, 40);
+		btnCerrarSesion.setBounds(590, 398, 300, 40);
 		btnCerrarSesion.setBackground(new Color(178, 34, 34));
 		btnCerrarSesion.setForeground(Color.WHITE);
 		btnCerrarSesion.setFont(new Font("Tahoma", Font.BOLD, 14));
