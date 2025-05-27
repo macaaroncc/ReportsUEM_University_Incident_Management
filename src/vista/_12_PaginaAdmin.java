@@ -143,6 +143,7 @@ public class _12_PaginaAdmin extends JFrame {
         cargarIncidencias();
         cargarUsuarios();
     }
+    
 
     private void cargarIncidencias() {
         try {
