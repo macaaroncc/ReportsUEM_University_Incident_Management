@@ -29,7 +29,7 @@ public class _16_EditarIncidencia extends JFrame {
 		lblEstado.setBounds(30, 30, 100, 25);
 		getContentPane().add(lblEstado);
 
-		comboEstado = new JComboBox<>(new String[] { "Pendiente", "En Revisión", "Resuelta" });
+		comboEstado = new JComboBox<>(new String[] { "Pendiente", "En Revisión", "Solucionada" });
 		comboEstado.setBounds(30, 60, 300, 30);
 		comboEstado.setSelectedItem(estado);
 		getContentPane().add(comboEstado);

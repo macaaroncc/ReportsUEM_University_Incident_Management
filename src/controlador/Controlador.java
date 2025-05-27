@@ -95,7 +95,6 @@ public class Controlador {
 			parametros.add("%" + estado + "%");
 		}
 
-
 		if (usuario != null && !usuario.isEmpty()) {
 			query.append(" AND USR LIKE ?");
 			parametros.add("%" + usuario + "%");
@@ -148,10 +147,50 @@ public class Controlador {
 	}
 
 	public boolean eliminarUsuario(String usr) {
-		try (Connection conexion = ConexionBD.conectar();
-				PreparedStatement stmt = conexion.prepareStatement("DELETE FROM users WHERE USR = ?")) {
-			stmt.setString(1, usr);
-			return stmt.executeUpdate() > 0;
+		try (Connection conexion = ConexionBD.conectar()) {
+			// Desactivamos autocommit para hacer todo en una transacción
+			conexion.setAutoCommit(false);
+
+			// 1. Eliminar entradas en favoritos
+			try (PreparedStatement stmtFav = conexion.prepareStatement("DELETE FROM favoritos WHERE USERS_USR = ?")) {
+				stmtFav.setString(1, usr);
+				stmtFav.executeUpdate();
+			}
+
+			// 2. Eliminar entradas en notificar
+			try (PreparedStatement stmtNot = conexion.prepareStatement("DELETE FROM notificar WHERE USERS_USR = ?")) {
+				stmtNot.setString(1, usr);
+				stmtNot.executeUpdate();
+			}
+
+			// 3. Eliminar entradas en SEGURIDAD
+			try (PreparedStatement stmtSeg = conexion.prepareStatement("DELETE FROM SEGURIDAD WHERE USERS_USR = ?")) {
+				stmtSeg.setString(1, usr);
+				stmtSeg.executeUpdate();
+			}
+
+			// 4. Actualizar la tabla incidencias para eliminar referencia del usuario o
+			// poner a NULL
+			// Si no quieres perder la incidencia, puedes poner USERS_USR a NULL si es
+			// nullable
+			try (PreparedStatement stmtInc = conexion
+					.prepareStatement("UPDATE incidencias SET USERS_USR = NULL WHERE USERS_USR = ?")) {
+				stmtInc.setString(1, usr);
+				stmtInc.executeUpdate();
+			}
+
+			// 5. Finalmente eliminar el usuario
+			try (PreparedStatement stmtUsr = conexion.prepareStatement("DELETE FROM USERS WHERE USR = ?")) {
+				stmtUsr.setString(1, usr);
+				int rows = stmtUsr.executeUpdate();
+
+				conexion.commit(); // Confirmamos los cambios si todo va bien
+
+				return rows > 0;
+			} catch (SQLException e) {
+				conexion.rollback(); // Si hay error, revertimos todo
+				throw e;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -332,9 +371,24 @@ public class Controlador {
 						Modelo.usuarioActual = email;
 					}
 
+					// ** NUEVO: comprobar incidencias "Solucionada" para mostrar notificación **
+					String sqlIncidenciasPendientes = "SELECT COUNT(*) FROM incidencias i "
+							+ "JOIN notificar n ON i.id_incidencia = n.incidencias_id_incidencia "
+							+ "WHERE n.USERS_USR = ? AND i.estado = 'Solucionada'";
+					try (PreparedStatement stmtIncPend = conn.prepareStatement(sqlIncidenciasPendientes)) {
+						stmtIncPend.setString(1, email);
+						ResultSet rsIncPend = stmtIncPend.executeQuery();
+						if (rsIncPend.next() && rsIncPend.getInt(1) > 0) {
+							JOptionPane.showMessageDialog(vistaActual, "Tienes notificaciones pendientes",
+									"Notificación", JOptionPane.INFORMATION_MESSAGE);
+						}
+						rsIncPend.close();
+					}
+
 					vistaActual.dispose();
 
 					abrirPaginaPrincipal(vistaActual);
+
 				} else {
 					intentosFallidos++;
 					JOptionPane.showMessageDialog(vistaActual,
