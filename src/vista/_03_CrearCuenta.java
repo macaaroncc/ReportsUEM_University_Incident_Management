@@ -181,12 +181,20 @@ public class _03_CrearCuenta extends JFrame {
 
 			String resp1 = respuesta1.getText().trim();
 			String resp2 = respuesta2.getText().trim();
-			
+
 			if (!email.endsWith("@ueuropea.es")) {
-				JOptionPane.showMessageDialog(this, "Solo se admiten correos proporcionados por la universidad (@ueuropea.es)", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this,
+						"Solo se admiten correos proporcionados por la universidad (@ueuropea.es)", "Error",
+						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
+			// Nueva validación para mínimo 8 caracteres en contraseña
+			if (pwd.length() < 8 || repPwd.length() < 8) {
+				JOptionPane.showMessageDialog(this, "La contraseña debe tener al menos 8 caracteres", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 
 			if (!pwd.equals(repPwd)) {
 				JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden", "Error", JOptionPane.ERROR_MESSAGE);
