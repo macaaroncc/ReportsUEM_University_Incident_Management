@@ -42,7 +42,7 @@ public class Main {
         Modelo modelo = new Modelo();
         Controlador controlador = new Controlador();
 
-        _02_Login vistaInicial = new _02_Login();
+        _13_Estadisticas vistaInicial = new _13_Estadisticas();
         vistaInicial.setControlador(controlador);
 
         controlador.setModelo(modelo);

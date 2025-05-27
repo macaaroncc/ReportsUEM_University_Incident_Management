@@ -48,15 +48,17 @@ public class _13_Estadisticas extends JFrame {
 		btnBuscar.setForeground(Color.WHITE);
 		btnBuscar.setFocusPainted(false);
 		getContentPane().add(btnBuscar);
+		
 
 		// --- GRÁFICOS PLACEHOLDER ---
-		JPanel grafico1 = crearPanelConTitulo("📊 Incidencias por mes", 50, 140, 500, 250);
+		
+		JPanel grafico1 = crearPanelConTituloConIcono("Incidencias por mes", "/img/chart.png", 50, 140, 500, 250);
 		getContentPane().add(grafico1);
 
-		JPanel grafico2 = crearPanelConTitulo("✅ Resueltas vs Pendientes", 600, 140, 500, 250);
+		JPanel grafico2 = crearPanelConTituloConIcono("Resueltas vs Pendientes", "/img/check.png", 600, 140, 500, 250);
 		getContentPane().add(grafico2);
 
-		JPanel grafico3 = crearPanelConTitulo("🏫 Distribución por edificio", 50, 420, 1050, 250);
+		JPanel grafico3 = crearPanelConTituloConIcono("Distribución por edificio", "/img/building.png", 50, 420, 1050, 250);
 		getContentPane().add(grafico3);
 
 		// --- Botón ayuda flotante ---
@@ -74,6 +76,26 @@ public class _13_Estadisticas extends JFrame {
 			dispose();
 		});
 	}
+	private JPanel crearPanelConTituloConIcono(String texto, String iconPath, int x, int y, int width, int height) {
+	    JPanel panel = new JPanel();
+	    panel.setLayout(null);
+	    panel.setBounds(x, y, width, height);
+	    panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+	    // 加载图标
+	    ImageIcon icon = new ImageIcon(getClass().getResource(iconPath));
+	    Image scaledImage = icon.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH);
+	    ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+	    JLabel lblTitulo = new JLabel(texto, scaledIcon, JLabel.LEFT);
+	    lblTitulo.setFont(new Font("Dialog", Font.BOLD, 15));
+	    lblTitulo.setBounds(10, 10, width - 20, 30);
+	    lblTitulo.setIconTextGap(10);
+
+	    panel.add(lblTitulo);
+	    return panel;
+	}
+
 
 	private JPanel crearPanelConTitulo(String titulo, int x, int y, int w, int h) {
 		JPanel panel = new JPanel();
