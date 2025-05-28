@@ -2,6 +2,9 @@
 CREATE DATABASE IF NOT EXISTS proyecto_integrador;
 USE proyecto_integrador;
 
+SET GLOBAL max_allowed_packet=67108864;  
+
+
 -- Desactivamos restricciones de claves foráneas temporalmente
 SET foreign_key_checks = 0;
 
@@ -184,3 +187,6 @@ INSERT INTO notificar (incidencias_id_incidencia, USERS_USR) VALUES
 
 -- Reactivamos las claves foráneas
 SET foreign_key_checks = 1;
+ALTER TABLE INCIDENCIAS MODIFY FOTO MEDIUMBLOB;
+
+

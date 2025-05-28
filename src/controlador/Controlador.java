@@ -1,9 +1,11 @@
 package controlador;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -197,45 +199,52 @@ public class Controlador {
 		}
 	}
 
-	public void crearIncidencia(String edificio, String foto, String piso, String descripcion, String aula,
-			String campus) {
-		if (descripcion.isEmpty() || aula.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
-			return;
-		}
+	public void crearIncidencia(String edificio, byte[] fotoBytes, String piso, String descripcion, String aula, String campus) {
+	    if (descripcion.isEmpty() || aula.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
+	        return;
+	    }
 
-		try (Connection conn = ConexionBD.conectar()) {
-			// Obtener el id_incidencia actual máximo + 1
-			int nuevoId = obtenerMaxIdIncidencia() + 1;
+	    try (Connection conn = ConexionBD.conectar()) {
+	        int nuevoId = obtenerMaxIdIncidencia() + 1;
 
-			String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-			PreparedStatement stmt = conn.prepareStatement(sql);
+	        String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	        PreparedStatement stmt = conn.prepareStatement(sql);
 
-			stmt.setInt(1, nuevoId); // id_incidencia
-			stmt.setString(2, "En revisión");
-			stmt.setString(3, edificio);
-			stmt.setString(4, foto);
-			stmt.setString(5, piso);
-			stmt.setString(6, descripcion);
-			stmt.setString(7, aula);
-			stmt.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
-			stmt.setString(9, campus);
+	        stmt.setInt(1, nuevoId); // id_incidencia
+	        stmt.setString(2, "En revisión");
+	        stmt.setString(3, edificio);
 
-			String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
-			stmt.setString(11, user);
-			stmt.setString(12, user);
+	        if (fotoBytes != null) {
+	            stmt.setBytes(4, fotoBytes); // FOTO como bytes
+	        } else {
+	            stmt.setNull(4, java.sql.Types.BLOB);
+	        }
 
-			int filas = stmt.executeUpdate();
-			if (filas > 0) {
-				JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
-			} else {
-				JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
-		}
+	        stmt.setString(5, piso);
+	        stmt.setString(6, descripcion);
+	        stmt.setString(7, aula);
+	        stmt.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
+	        stmt.setString(9, campus);
+
+	        String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
+	        stmt.setLong(10, 0); // RANKING, si no usas, lo pones null o 0
+	        stmt.setString(11, user);
+	        stmt.setString(12, user);
+
+	        int filas = stmt.executeUpdate();
+	        if (filas > 0) {
+	            JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
+	        }
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
+	    }
 	}
+
+
 
 	public int obtenerMaxIdIncidencia() {
 		int maxId = 0;
