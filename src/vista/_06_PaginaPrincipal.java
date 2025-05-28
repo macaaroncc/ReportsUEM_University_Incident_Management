@@ -1,4 +1,4 @@
-//autor aaron
+//@autor: aaron
 
 package vista;
 
@@ -7,256 +7,228 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Clase _06_PaginaPrincipal. Representa la clase _06_PaginaPrincipal.
- */
 public class _06_PaginaPrincipal extends JFrame {
-	private JPanel contentPane;
-	private JTable table;
-	private JComboBox<String> comboBoxEstado, comboBoxOrden, comboBoxFecha;
-	private JTextField campoBusqueda;
-	private JButton botonBuscar, btnAyuda;
-	private JScrollPane scrollPane;
-	private Controlador controlador;
+    private JPanel contentPane;
+    private JTable table;
+    private JComboBox<String> comboBoxEstado, comboBoxOrden, comboBoxFecha;
+    private JTextField campoBusqueda;
+    private JButton botonBuscar, btnAyuda;
+    private JScrollPane scrollPane;
+    private Controlador controlador;
 
-	public _06_PaginaPrincipal() {
-		setTitle("Página Principal - Usuario");
-		setSize(1200, 900);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public _06_PaginaPrincipal() {
+        setTitle("Página Principal - Usuario");
+        setSize(1200, 900);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(null);
-		setContentPane(contentPane);
-		contentPane.setBackground(new Color(255, 255, 252));
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(null);
+        setContentPane(contentPane);
+        contentPane.setBackground(new Color(255, 255, 252));
 
-		// ✅ Barra de navegación
-		BarraNavegacion barra = new BarraNavegacion();
-		barra.setUsuarioLogueado(true);
-		barra.setControlador(controlador);
-		barra.setBounds(0, 0, 1200, 59);
-		contentPane.add(barra);
+        BarraNavegacion barra = new BarraNavegacion();
+        barra.setUsuarioLogueado(true);
+        barra.setControlador(controlador);
+        barra.setBounds(0, 0, 1200, 59);
+        contentPane.add(barra);
 
-		// --- Filtros y buscador ---
-		comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Solucionada", "En revisión" });
-		comboBoxEstado.setBounds(40, 70, 150, 30);
-		contentPane.add(comboBoxEstado);
+        comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Solucionada", "En revisión" });
+        comboBoxEstado.setBounds(40, 70, 150, 30);
+        contentPane.add(comboBoxEstado);
 
-		comboBoxOrden = new JComboBox<>(new String[] { "Orden de Relevancia", "Más votaciones",
-				"Menos votaciones", "Más reciente" });
-		comboBoxOrden.setBounds(200, 70, 180, 30);
-		contentPane.add(comboBoxOrden);
+        comboBoxOrden = new JComboBox<>(new String[] { "Orden de Relevancia", "Más votaciones", "Menos votaciones", "Más reciente" });
+        comboBoxOrden.setBounds(200, 70, 180, 30);
+        contentPane.add(comboBoxOrden);
 
-		comboBoxFecha = new JComboBox<>();
-		comboBoxFecha.setBounds(390, 70, 150, 30);
-		comboBoxFecha.addItem("Fecha");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		comboBoxFecha.addItem("Hoy - " + sdf.format(new Date()));
-		for (int i = 1; i <= 6; i++) {
-			Date date = new Date(System.currentTimeMillis() - (i * 24L * 60 * 60 * 1000));
-			comboBoxFecha.addItem("Hace " + i + " día(s) - " + sdf.format(date));
-		}
-		contentPane.add(comboBoxFecha);
+        comboBoxFecha = new JComboBox<>();
+        comboBoxFecha.setBounds(390, 70, 150, 30);
+        comboBoxFecha.addItem("Fecha");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        comboBoxFecha.addItem("Hoy - " + sdf.format(new Date()));
+        for (int i = 1; i <= 6; i++) {
+            Date date = new Date(System.currentTimeMillis() - (i * 24L * 60 * 60 * 1000));
+            comboBoxFecha.addItem("Hace " + i + " día(s) - " + sdf.format(date));
+        }
+        contentPane.add(comboBoxFecha);
 
-		campoBusqueda = new JTextField();
-		campoBusqueda.setBounds(750, 70, 250, 30);
-		contentPane.add(campoBusqueda);
+        campoBusqueda = new JTextField();
+        campoBusqueda.setBounds(750, 70, 250, 30);
+        contentPane.add(campoBusqueda);
 
-		botonBuscar = new JButton("Buscar");
-		botonBuscar.setBounds(1010, 70, 138, 30);
-		botonBuscar.setBackground(new Color(128, 0, 0));
-		botonBuscar.setForeground(Color.WHITE);
-		botonBuscar.setFont(new Font("Tahoma", Font.BOLD, 12));
-		botonBuscar.setFocusPainted(false);
-		contentPane.add(botonBuscar);
-		
-		botonBuscar.addActionListener(e -> {
-			String estado = comboBoxEstado.getSelectedItem().toString();
-			String orden = comboBoxOrden.getSelectedItem().toString();
-			String fecha = comboBoxFecha.getSelectedItem().toString();
-			String busqueda = campoBusqueda.getText().trim().toLowerCase();
+        botonBuscar = new JButton("Buscar");
+        botonBuscar.setBounds(1010, 70, 138, 30);
+        botonBuscar.setBackground(new Color(128, 0, 0));
+        botonBuscar.setForeground(Color.WHITE);
+        botonBuscar.setFont(new Font("Tahoma", Font.BOLD, 12));
+        botonBuscar.setFocusPainted(false);
+        contentPane.add(botonBuscar);
 
-			StringBuilder query = new StringBuilder("SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias WHERE 1=1");
+        DefaultTableModel model = new DefaultTableModel() {
+            public boolean isCellEditable(int row, int column) { return false; }
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 7) return Date.class;
+                if (columnIndex == 9) return Integer.class;
+                return String.class;
+            }
+        };
 
-			// Filtro por estado
-			if (!estado.equals("Estado")) {
-				query.append(" AND estado = '").append(estado).append("'");
-			}
+        model.addColumn("ID");
+        model.addColumn("Estado");
+        model.addColumn("Edificio");
+        model.addColumn("Piso");
+        model.addColumn("Descripción");
+        model.addColumn("Aula");
+        model.addColumn("Justificación");
+        model.addColumn("Fecha");
+        model.addColumn("Campus");
+        model.addColumn("Ranking");
+        model.addColumn("Usuario");
 
-			// Filtro por búsqueda
-			if (!busqueda.isEmpty()) {
-				query.append(" AND (LOWER(descripcion) LIKE '%").append(busqueda).append("%' OR ")
-				     .append("LOWER(aula) LIKE '%").append(busqueda).append("%' OR ")
-				     .append("LOWER(justificacion) LIKE '%").append(busqueda).append("%')");
-			}
+        cargarIncidenciasDesdeBD(model);
 
-			// Filtro por fecha
-			if (!fecha.equals("Fecha") && !fecha.equals("Personalizado...")) {
-				String[] partes = fecha.split(" - ");
-				if (partes.length == 2) {
-					query.append(" AND fecha = '").append(partes[1]).append("'");
-				}
-			}
+        table = new JTable(model);
+        table.setRowHeight(30);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getColumnModel().getColumn(4).setPreferredWidth(250);
+        table.getColumnModel().getColumn(6).setPreferredWidth(200);
 
-			// Orden
-			if (orden.equals("Más votaciones")) {
-				query.append(" ORDER BY ranking DESC");
-			} else if (orden.equals("Menos votaciones")) {
-				query.append(" ORDER BY ranking ASC");
-			} else if (orden.equals("Más reciente")) {
-				query.append(" ORDER BY fecha DESC");
-			} else {
-				query.append(" ORDER BY fecha DESC"); // Default
-			}
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int fila = table.getSelectedRow();
+                if (fila != -1) {
+                    try {
+                        Object valorID = table.getValueAt(fila, 0);
+                        int idIncidencia = Integer.parseInt(valorID.toString().trim());
+                        new _17_DetalleIncidencia(idIncidencia).setVisible(true);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "⚠ ID inválido: " + table.getValueAt(fila, 0));
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
 
-			// Ejecutar consulta
-			try (Connection conexion = modelo.ConexionBD.conectar();
-				 Statement stmt = conexion.createStatement();
-				 ResultSet rs = stmt.executeQuery(query.toString())) {
+        scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(40, 120, 1110, 600);
+        contentPane.add(scrollPane);
 
-				DefaultTableModel model = (DefaultTableModel) table.getModel();
-				model.setRowCount(0); // limpiar tabla
+        btnAyuda = new JButton("?");
+        btnAyuda.setBounds(1120, 740, 50, 50);
+        btnAyuda.setBackground(new Color(128, 0, 0));
+        btnAyuda.setForeground(Color.WHITE);
+        btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
+        btnAyuda.setFocusPainted(false);
+        btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnAyuda.addActionListener(e -> {
+            if (controlador != null) controlador.abrirAyuda();
+        });
+        contentPane.add(btnAyuda);
 
-				while (rs.next()) {
-					model.addRow(new Object[] {
-						rs.getString("estado"),
-						rs.getString("edificio"),
-						rs.getString("piso"),
-						rs.getString("descripcion"),
-						rs.getString("aula"),
-						rs.getString("justificacion"),
-						rs.getDate("fecha"),
-						rs.getString("campus"),
-						rs.getInt("ranking"),
-						rs.getString("USR")
-					});
-				}
-			} catch (SQLException ex) {
-				JOptionPane.showMessageDialog(this, "Error al ejecutar búsqueda:\n" + ex.getMessage(),
-						"Error de base de datos", JOptionPane.ERROR_MESSAGE);
-				ex.printStackTrace();
-			}
-		});
+        botonBuscar.addActionListener(e -> {
+            DefaultTableModel m = (DefaultTableModel) table.getModel();
+            cargarIncidenciasFiltradas(m);
+        });
+    }
 
+    private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
+        try (Connection conexion = modelo.ConexionBD.conectar();
+             Statement stmt = conexion.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM incidencias ORDER BY fecha DESC")) {
 
-		// --- Tabla de incidencias ---
-		DefaultTableModel model = new DefaultTableModel() {
-			@Override
-			/**
-			 * Realiza la acción correspondiente.
-			 * 
-			 * @param row    Valor numérico entero.
-			 * @param column Valor numérico entero.
-			 */
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
+            model.setRowCount(0);
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                        rs.getInt("id_incidencia"),
+                        rs.getString("estado"),
+                        rs.getString("edificio"),
+                        rs.getString("piso"),
+                        rs.getString("descripcion"),
+                        rs.getString("aula"),
+                        rs.getString("justificacion"),
+                        rs.getDate("fecha"),
+                        rs.getString("campus"),
+                        rs.getInt("ranking"),
+                        rs.getString("USR")
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar incidencias:\n" + e.getMessage(), "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
 
-			@Override
-			public Class<?> getColumnClass(int columnIndex) {
-				if (columnIndex == 6)
-					return Date.class; // Columna de fecha
-				if (columnIndex == 8)
-					return Integer.class; // Columna de ranking
-				return String.class;
-			}
-		};
+    private void cargarIncidenciasFiltradas(DefaultTableModel model) {
+        StringBuilder consulta = new StringBuilder("SELECT * FROM incidencias WHERE 1=1");
 
-		// Definir columnas (todas excepto 'foto')
-		model.addColumn("Estado");
-		model.addColumn("Edificio");
-		model.addColumn("Piso");
-		model.addColumn("Descripción");
-		model.addColumn("Aula");
-		model.addColumn("Justificación");
-		model.addColumn("Fecha");
-		model.addColumn("Campus");
-		model.addColumn("Ranking");
-		model.addColumn("Usuario");
+        String estado = comboBoxEstado.getSelectedItem().toString();
+        if (!estado.equals("Estado")) {
+            consulta.append(" AND estado = '").append(estado).append("'");
+        }
 
-		// Cargar datos
-		cargarIncidenciasDesdeBD(model);
+        String fecha = comboBoxFecha.getSelectedItem().toString();
+        if (!fecha.equals("Fecha") && !fecha.equals("Personalizado...")) {
+            String[] partes = fecha.split(" - ");
+            if (partes.length == 2) {
+                consulta.append(" AND fecha = '").append(partes[1]).append("'");
+            }
+        }
 
-		// Configurar tabla
-		table = new JTable(model);
-		table.setRowHeight(30);
-		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-		table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        String busqueda = campoBusqueda.getText().trim();
+        if (!busqueda.isEmpty()) {
+            consulta.append(" AND (descripcion LIKE '%").append(busqueda)
+                    .append("%' OR aula LIKE '%").append(busqueda)
+                    .append("%' OR edificio LIKE '%").append(busqueda).append("%')");
+        }
 
-		// Ajustar anchos de columnas
-		table.getColumnModel().getColumn(3).setPreferredWidth(250); // Descripción
-		table.getColumnModel().getColumn(5).setPreferredWidth(200); // Justificación
-		table.getColumnModel().getColumn(9).setPreferredWidth(100); // Usuario
+        String orden = comboBoxOrden.getSelectedItem().toString();
+        switch (orden) {
+            case "Más votaciones": consulta.append(" ORDER BY ranking DESC"); break;
+            case "Menos votaciones": consulta.append(" ORDER BY ranking ASC"); break;
+            case "Más reciente": consulta.append(" ORDER BY fecha DESC"); break;
+            default: consulta.append(" ORDER BY fecha DESC"); break;
+        }
 
-		scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(40, 120, 1110, 600);
-		contentPane.add(scrollPane);
+        try (Connection conexion = modelo.ConexionBD.conectar();
+             Statement stmt = conexion.createStatement();
+             ResultSet rs = stmt.executeQuery(consulta.toString())) {
 
-		
+            model.setRowCount(0);
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                        rs.getInt("id_incidencia"),
+                        rs.getString("estado"),
+                        rs.getString("edificio"),
+                        rs.getString("piso"),
+                        rs.getString("descripcion"),
+                        rs.getString("aula"),
+                        rs.getString("justificacion"),
+                        rs.getDate("fecha"),
+                        rs.getString("campus"),
+                        rs.getInt("ranking"),
+                        rs.getString("USR")
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al filtrar incidencias:\n" + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-		// --- Botón Ayuda ---
-		btnAyuda = new JButton("?");
-		btnAyuda.setBounds(1120, 740, 50, 50);
-		btnAyuda.setBackground(new Color(128, 0, 0));
-		btnAyuda.setForeground(Color.WHITE);
-		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
-		btnAyuda.setFocusPainted(false);
-		btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnAyuda.addActionListener(e -> {
-			if (controlador != null)
-				controlador.abrirAyuda();
-		});
-		contentPane.add(btnAyuda);
-	}
-
-	/**
-	 * Realiza la acción correspondiente.
-	 * 
-	 * @param model Parámetro de tipo DefaultTableModel.
-	 */
-	private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
-		try (Connection conexion = modelo.ConexionBD.conectar();
-				java.sql.Statement stmt = conexion.createStatement();
-				java.sql.ResultSet rs = stmt.executeQuery(
-						"SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR "
-								+ "FROM incidencias ORDER BY fecha DESC")) {
-
-			model.setRowCount(0); // Limpiar tabla existente
-
-			while (rs.next()) {
-				model.addRow(new Object[] { rs.getString("estado"), rs.getString("edificio"), rs.getString("piso"),
-						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
-						rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
-			}
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this, "Error al cargar incidencias:\n" + e.getMessage(),
-					"Error de base de datos", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-
-			// Datos de ejemplo en caso de error
-			model.addRow(new Object[] { "Error", "Error", "Error", "No se pudo conectar a la BD", "Error", "Error",
-					new Date(), "Error", 0, "Error" });
-		}
-	}
-
-	/**
-	 * Establece el valor de controlador.
-	 * 
-	 * @param controlador Controlador principal que gestiona la lógica de
-	 *                    navegación.
-	 */
-	public void setControlador(Controlador controlador) {
-		this.controlador = controlador;
-		for (Component c : getContentPane().getComponents()) {
-			if (c instanceof BarraNavegacion) {
-				((BarraNavegacion) c).setControlador(controlador);
-			}
-		}
-	}
+    public void setControlador(Controlador controlador) {
+        this.controlador = controlador;
+        for (Component c : getContentPane().getComponents()) {
+            if (c instanceof BarraNavegacion) {
+                ((BarraNavegacion) c).setControlador(controlador);
+            }
+        }
+    }
 }
