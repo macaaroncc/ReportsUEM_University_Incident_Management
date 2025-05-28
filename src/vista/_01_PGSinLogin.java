@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import vista._17_DetalleIncidencia;
 
 /**
  * Clase _01_PGSinLogin. Representa la clase _01_PGSinLogin.
@@ -133,6 +134,21 @@ public class _01_PGSinLogin extends JFrame {
 		table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		table.getColumnModel().getColumn(3).setPreferredWidth(200);
 		table.getColumnModel().getColumn(5).setPreferredWidth(150);
+		
+		table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int fila = table.getSelectedRow();
+                if (fila != -1) {
+                    try {
+                        int idIncidencia = Integer.parseInt(table.getValueAt(fila, 0).toString());
+                        new _17_DetalleIncidencia(idIncidencia).setVisible(true);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(null, "No se pudo abrir el detalle de la incidencia.");
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
 
 		scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(40, 120, 1110, 600);
