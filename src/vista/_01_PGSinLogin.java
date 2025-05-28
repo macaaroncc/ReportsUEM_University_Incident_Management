@@ -44,7 +44,6 @@ public class _01_PGSinLogin extends JFrame {
 		}
 
 		Font fuente = new Font("Tahoma", Font.BOLD, 13);
-
 		JLabel lblPGNPrincipal = crearNavLabel("Página Principal", 80, fuente);
 		JLabel lblMisIncidencias = crearNavLabel("Mis Incidencias", 240, fuente);
 		JLabel lblNotificaciones = crearNavLabel("Notificaciones", 410, fuente);
@@ -57,7 +56,8 @@ public class _01_PGSinLogin extends JFrame {
 
 		MouseAdapter abrirLogin = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (controlador != null) controlador.abrirLogin();
+				if (controlador != null)
+					controlador.abrirLogin();
 				dispose();
 			}
 		};
@@ -66,11 +66,12 @@ public class _01_PGSinLogin extends JFrame {
 		lblNotificaciones.addMouseListener(abrirLogin);
 		lblUsuario.addMouseListener(abrirLogin);
 
-		comboBoxEstado = new JComboBox<>(new String[]{"Estado", "Pendiente", "Solucionada", "En revisión"});
+		comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Solucionada", "En revisión" });
 		comboBoxEstado.setBounds(40, 70, 150, 30);
 		getContentPane().add(comboBoxEstado);
 
-		comboBoxOrden = new JComboBox<>(new String[]{"Orden de Relevancia", "Más relevante primero", "Menos relevante primero", "Más reciente primero"});
+		comboBoxOrden = new JComboBox<>(new String[] { "Orden de Relevancia", "Más relevante primero",
+				"Menos relevante primero", "Más reciente primero" });
 		comboBoxOrden.setBounds(200, 70, 180, 30);
 		getContentPane().add(comboBoxOrden);
 
@@ -106,8 +107,10 @@ public class _01_PGSinLogin extends JFrame {
 
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
-				if (columnIndex == 7) return Date.class;
-				if (columnIndex == 9) return Integer.class;
+				if (columnIndex == 7)
+					return Date.class;
+				if (columnIndex == 9)
+					return Integer.class;
 				return String.class;
 			}
 		};
@@ -162,7 +165,8 @@ public class _01_PGSinLogin extends JFrame {
 		btnAyuda.setFocusPainted(false);
 		getContentPane().add(btnAyuda);
 		btnAyuda.addActionListener(e -> {
-			if (controlador != null) controlador.abrirAyuda();
+			if (controlador != null)
+				controlador.abrirAyuda();
 		});
 
 		botonBuscar.addActionListener(e -> {
@@ -177,24 +181,15 @@ public class _01_PGSinLogin extends JFrame {
 
 	private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
 		try (Connection conexion = modelo.ConexionBD.conectar();
-			 Statement stmt = conexion.createStatement();
-			 ResultSet rs = stmt.executeQuery("SELECT * FROM incidencias")) {
+				Statement stmt = conexion.createStatement();
+				ResultSet rs = stmt.executeQuery("SELECT * FROM incidencias")) {
 
 			model.setRowCount(0);
 			while (rs.next()) {
-				model.addRow(new Object[]{
-						rs.getInt("id_incidencia"),
-						rs.getString("estado"),
-						rs.getString("edificio"),
-						rs.getString("piso"),
-						rs.getString("descripcion"),
-						rs.getString("aula"),
-						rs.getString("justificacion"),
-						rs.getDate("fecha"),
-						rs.getString("campus"),
-						rs.getInt("ranking"),
-						rs.getString("USR")
-				});
+				model.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
+						rs.getString("edificio"), rs.getString("piso"), rs.getString("descripcion"),
+						rs.getString("aula"), rs.getString("justificacion"), rs.getDate("fecha"),
+						rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(this, "Error SQL: " + e.getMessage());
@@ -203,24 +198,15 @@ public class _01_PGSinLogin extends JFrame {
 
 	private void cargarIncidenciasFiltradas(DefaultTableModel model) {
 		try (Connection conexion = modelo.ConexionBD.conectar();
-			 Statement stmt = conexion.createStatement();
-			 ResultSet rs = stmt.executeQuery(construirConsultaFiltrada())) {
+				Statement stmt = conexion.createStatement();
+				ResultSet rs = stmt.executeQuery(construirConsultaFiltrada())) {
 
 			model.setRowCount(0);
 			while (rs.next()) {
-				model.addRow(new Object[]{
-						rs.getInt("id_incidencia"),
-						rs.getString("estado"),
-						rs.getString("edificio"),
-						rs.getString("piso"),
-						rs.getString("descripcion"),
-						rs.getString("aula"),
-						rs.getString("justificacion"),
-						rs.getDate("fecha"),
-						rs.getString("campus"),
-						rs.getInt("ranking"),
-						rs.getString("USR")
-				});
+				model.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
+						rs.getString("edificio"), rs.getString("piso"), rs.getString("descripcion"),
+						rs.getString("aula"), rs.getString("justificacion"), rs.getDate("fecha"),
+						rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(this, "Error al filtrar: " + e.getMessage());
@@ -245,17 +231,24 @@ public class _01_PGSinLogin extends JFrame {
 
 		String busqueda = campoBusqueda.getText().trim();
 		if (!busqueda.isEmpty()) {
-			consulta.append(" AND (descripcion LIKE '%").append(busqueda)
-					.append("%' OR aula LIKE '%").append(busqueda)
+			consulta.append(" AND (descripcion LIKE '%").append(busqueda).append("%' OR aula LIKE '%").append(busqueda)
 					.append("%' OR edificio LIKE '%").append(busqueda).append("%')");
 		}
 
 		String orden = comboBoxOrden.getSelectedItem().toString();
 		switch (orden) {
-			case "Más relevante primero": consulta.append(" ORDER BY ranking DESC"); break;
-			case "Menos relevante primero": consulta.append(" ORDER BY ranking ASC"); break;
-			case "Más reciente primero": consulta.append(" ORDER BY fecha DESC"); break;
-			default: consulta.append(" ORDER BY fecha DESC"); break;
+		case "Más relevante primero":
+			consulta.append(" ORDER BY ranking DESC");
+			break;
+		case "Menos relevante primero":
+			consulta.append(" ORDER BY ranking ASC");
+			break;
+		case "Más reciente primero":
+			consulta.append(" ORDER BY fecha DESC");
+			break;
+		default:
+			consulta.append(" ORDER BY fecha DESC");
+			break;
 		}
 
 		return consulta.toString();
