@@ -3,21 +3,15 @@
 package vista;
 
 import controlador.Controlador;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import vista._17_DetalleIncidencia;
 
-/**
- * Clase _01_PGSinLogin. Representa la clase _01_PGSinLogin.
- */
 public class _01_PGSinLogin extends JFrame {
 
 	private Controlador controlador;
@@ -26,7 +20,6 @@ public class _01_PGSinLogin extends JFrame {
 	private JTextField campoBusqueda;
 	private JButton botonBuscar, btnAyuda;
 	private JScrollPane scrollPane;
-	
 
 	public _01_PGSinLogin() {
 		setTitle("01 . Página Principal sin login");
@@ -64,23 +57,20 @@ public class _01_PGSinLogin extends JFrame {
 
 		MouseAdapter abrirLogin = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (controlador != null)
-					controlador.abrirLogin();
+				if (controlador != null) controlador.abrirLogin();
 				dispose();
 			}
 		};
-
 		lblPGNPrincipal.addMouseListener(abrirLogin);
 		lblMisIncidencias.addMouseListener(abrirLogin);
 		lblNotificaciones.addMouseListener(abrirLogin);
 		lblUsuario.addMouseListener(abrirLogin);
 
-		comboBoxEstado = new JComboBox<>(new String[] { "Estado", "Pendiente", "Solucionada", "En revisión"  });
+		comboBoxEstado = new JComboBox<>(new String[]{"Estado", "Pendiente", "Solucionada", "En revisión"});
 		comboBoxEstado.setBounds(40, 70, 150, 30);
 		getContentPane().add(comboBoxEstado);
 
-		comboBoxOrden = new JComboBox<>(new String[] { "Orden de Relevancia", "Más relevante primero",
-				"Menos relevante primero", "Más reciente primero" });
+		comboBoxOrden = new JComboBox<>(new String[]{"Orden de Relevancia", "Más relevante primero", "Menos relevante primero", "Más reciente primero"});
 		comboBoxOrden.setBounds(200, 70, 180, 30);
 		getContentPane().add(comboBoxOrden);
 
@@ -116,14 +106,13 @@ public class _01_PGSinLogin extends JFrame {
 
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
-				if (columnIndex == 6)
-					return Date.class;
-				if (columnIndex == 8)
-					return Integer.class;
+				if (columnIndex == 7) return Date.class;
+				if (columnIndex == 9) return Integer.class;
 				return String.class;
 			}
 		};
 
+		model.addColumn("ID");
 		model.addColumn("Estado");
 		model.addColumn("Edificio");
 		model.addColumn("Piso");
@@ -141,23 +130,25 @@ public class _01_PGSinLogin extends JFrame {
 		table.setRowHeight(30);
 		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		table.getColumnModel().getColumn(3).setPreferredWidth(200);
-		table.getColumnModel().getColumn(5).setPreferredWidth(150);
-		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.getColumnModel().getColumn(4).setPreferredWidth(250);
+		table.getColumnModel().getColumn(6).setPreferredWidth(200);
+
 		table.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                int fila = table.getSelectedRow();
-                if (fila != -1) {
-                    try {
-                        int idIncidencia = Integer.parseInt(table.getValueAt(fila, 0).toString());
-                        new _17_DetalleIncidencia(idIncidencia).setVisible(true);
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, "No se pudo abrir el detalle de la incidencia.");
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        });
+			public void mouseClicked(MouseEvent e) {
+				int fila = table.getSelectedRow();
+				if (fila != -1) {
+					try {
+						Object valorID = table.getValueAt(fila, 0);
+						int idIncidencia = Integer.parseInt(valorID.toString().trim());
+						new _17_DetalleIncidencia(idIncidencia).setVisible(true);
+					} catch (NumberFormatException ex) {
+						JOptionPane.showMessageDialog(null, "⚠ ID inválido: " + table.getValueAt(fila, 0));
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 
 		scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(40, 120, 1110, 600);
@@ -171,12 +162,9 @@ public class _01_PGSinLogin extends JFrame {
 		btnAyuda.setFocusPainted(false);
 		getContentPane().add(btnAyuda);
 		btnAyuda.addActionListener(e -> {
-			if (controlador != null)
-				controlador.abrirAyuda();
-			dispose();
+			if (controlador != null) controlador.abrirAyuda();
 		});
 
-		// 🔍 Acción del botón Buscar con filtros
 		botonBuscar.addActionListener(e -> {
 			DefaultTableModel m = (DefaultTableModel) table.getModel();
 			cargarIncidenciasFiltradas(m);
@@ -188,78 +176,68 @@ public class _01_PGSinLogin extends JFrame {
 	}
 
 	private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
-		java.sql.Connection conexion = null;
-		java.sql.Statement stmt = null;
-		java.sql.ResultSet rs = null;
+		try (Connection conexion = modelo.ConexionBD.conectar();
+			 Statement stmt = conexion.createStatement();
+			 ResultSet rs = stmt.executeQuery("SELECT * FROM incidencias")) {
 
-		try {
-			conexion = modelo.ConexionBD.conectar();
-			String consulta = "SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias";
-			stmt = conexion.createStatement();
-			rs = stmt.executeQuery(consulta);
 			model.setRowCount(0);
-
 			while (rs.next()) {
-				model.addRow(new Object[] { rs.getString("estado"), rs.getString("edificio"), rs.getString("piso"),
-						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
-						rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
+				model.addRow(new Object[]{
+						rs.getInt("id_incidencia"),
+						rs.getString("estado"),
+						rs.getString("edificio"),
+						rs.getString("piso"),
+						rs.getString("descripcion"),
+						rs.getString("aula"),
+						rs.getString("justificacion"),
+						rs.getDate("fecha"),
+						rs.getString("campus"),
+						rs.getInt("ranking"),
+						rs.getString("USR")
+				});
 			}
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this, "Error de base de datos:\n" + e.getMessage(), "Error SQL",
-					JOptionPane.ERROR_MESSAGE);
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (stmt != null)
-					stmt.close();
-				if (conexion != null)
-					conexion.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			JOptionPane.showMessageDialog(this, "Error SQL: " + e.getMessage());
 		}
 	}
 
 	private void cargarIncidenciasFiltradas(DefaultTableModel model) {
-		java.sql.Connection conexion = null;
-		java.sql.Statement stmt = null;
-		java.sql.ResultSet rs = null;
+		try (Connection conexion = modelo.ConexionBD.conectar();
+			 Statement stmt = conexion.createStatement();
+			 ResultSet rs = stmt.executeQuery(construirConsultaFiltrada())) {
 
-		try {
-			conexion = modelo.ConexionBD.conectar();
-			String consulta = construirConsultaFiltrada();
-			stmt = conexion.createStatement();
-			rs = stmt.executeQuery(consulta);
 			model.setRowCount(0);
-
 			while (rs.next()) {
-				model.addRow(new Object[] {
-						rs.getString("estado"), rs.getString("edificio"), rs.getString("piso"),
-						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
-						rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR")
+				model.addRow(new Object[]{
+						rs.getInt("id_incidencia"),
+						rs.getString("estado"),
+						rs.getString("edificio"),
+						rs.getString("piso"),
+						rs.getString("descripcion"),
+						rs.getString("aula"),
+						rs.getString("justificacion"),
+						rs.getDate("fecha"),
+						rs.getString("campus"),
+						rs.getInt("ranking"),
+						rs.getString("USR")
 				});
 			}
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this, "Error al filtrar incidencias:\n" + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
-		} finally {
-			try { if (rs != null) rs.close(); } catch (SQLException e) {}
-			try { if (stmt != null) stmt.close(); } catch (SQLException e) {}
-			try { if (conexion != null) conexion.close(); } catch (SQLException e) {}
+			JOptionPane.showMessageDialog(this, "Error al filtrar: " + e.getMessage());
 		}
 	}
 
 	private String construirConsultaFiltrada() {
-		StringBuilder consulta = new StringBuilder("SELECT estado, edificio, piso, descripcion, aula, justificacion, fecha, campus, ranking, USR FROM incidencias WHERE 1=1");
+		StringBuilder consulta = new StringBuilder("SELECT * FROM incidencias WHERE 1=1");
 
 		String estado = comboBoxEstado.getSelectedItem().toString();
 		if (!estado.equals("Estado")) {
 			consulta.append(" AND estado = '").append(estado).append("'");
 		}
 
-		String fechaSeleccionada = comboBoxFecha.getSelectedItem().toString();
-		if (!fechaSeleccionada.equals("Fecha") && !fechaSeleccionada.equals("Personalizado...")) {
-			String[] partes = fechaSeleccionada.split(" - ");
+		String fecha = comboBoxFecha.getSelectedItem().toString();
+		if (!fecha.equals("Fecha") && !fecha.equals("Personalizado...")) {
+			String[] partes = fecha.split(" - ");
 			if (partes.length == 2) {
 				consulta.append(" AND fecha = '").append(partes[1]).append("'");
 			}
@@ -274,18 +252,10 @@ public class _01_PGSinLogin extends JFrame {
 
 		String orden = comboBoxOrden.getSelectedItem().toString();
 		switch (orden) {
-			case "Más relevante primero":
-				consulta.append(" ORDER BY ranking DESC");
-				break;
-			case "Menos relevante primero":
-				consulta.append(" ORDER BY ranking ASC");
-				break;
-			case "Más reciente primero":
-				consulta.append(" ORDER BY fecha DESC");
-				break;
-			default:
-				consulta.append(" ORDER BY fecha DESC");
-				break;
+			case "Más relevante primero": consulta.append(" ORDER BY ranking DESC"); break;
+			case "Menos relevante primero": consulta.append(" ORDER BY ranking ASC"); break;
+			case "Más reciente primero": consulta.append(" ORDER BY fecha DESC"); break;
+			default: consulta.append(" ORDER BY fecha DESC"); break;
 		}
 
 		return consulta.toString();
