@@ -1,115 +1,127 @@
-//@autor Aaron
-
 package vista;
 
 import controlador.Controlador;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.net.URL;
 
 public class _04_OlvContrasena extends JFrame {
-	private Controlador controlador;
+    private Controlador controlador;
 
-	public _04_OlvContrasena() {
-		setTitle("04 - Olvido de contraseña");
-		setSize(1200, 900);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+    private JTextField txtCorreo;
+    private JLabel lblPregunta1, lblPregunta2;
+    private JTextField txtRespuesta1, txtRespuesta2;
+    private JButton btnValidarCorreo, btnComprobar;
 
-		// Fondo
-		JLabel backgroundLabel = new JLabel(new ImageIcon(_02_Login.class.getResource("/img/fondo.jpg")));
-		backgroundLabel.setLayout(new BorderLayout());
-		setContentPane(backgroundLabel);
+    public _04_OlvContrasena() {
+        setTitle("04 - Olvido de contraseña");
+        setSize(1200, 900);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        getContentPane().setLayout(null);
+        getContentPane().setBackground(new Color(255, 255, 252));
 
-		JPanel outerPanel = new JPanel(null);
-		outerPanel.setOpaque(false);
-		getContentPane().add(outerPanel, BorderLayout.CENTER);
+        // Barra navegación si tienes (opcional)
+        // BarraNavegacion barra = new BarraNavegacion();
+        // barra.setUsuarioLogueado(false);
+        // barra.setControlador(controlador);
+        // barra.setBounds(0, 0, 1200, 59);
+        // getContentPane().add(barra);
 
-		// Panel tipo tarjeta
-		JPanel cardPanel = new JPanel(null);
-		cardPanel.setBounds(400, 180, 400, 370);
-		cardPanel.setBackground(new Color(255, 255, 252, 230));
-		cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        // Botón Atrás
+        JButton btnAtras = new JButton("◀ Atrás");
+        btnAtras.setBounds(10, 10, 90, 30);
+        btnAtras.setBackground(new Color(255, 255, 252));
+        btnAtras.setFocusPainted(false);
+        btnAtras.addActionListener(e -> {
+            if (controlador != null) {
+                controlador.abrirLogin();
+            }
+            dispose();
+        });
+        getContentPane().add(btnAtras);
 
-		// Botón Atrás
-		JButton btnAtras = new JButton("◀ Atrás");
-		btnAtras.setForeground(Color.BLACK);
-		btnAtras.setBackground(new Color(255, 255, 252));
-		btnAtras.setFocusPainted(false);
-		btnAtras.setBounds(10, 11, 90, 30);
-		btnAtras.addActionListener(e -> {
-			if (controlador != null) {
-				_02_Login login = new _02_Login();
-				login.setControlador(controlador);
-				login.setVisible(true);
-			}
-			dispose();
-		});
+        // Etiqueta y campo para correo
+        JLabel lblCorreo = new JLabel("Correo electrónico:");
+        lblCorreo.setBounds(400, 150, 200, 30);
+        lblCorreo.setFont(new Font("Tahoma", Font.BOLD, 16));
+        getContentPane().add(lblCorreo);
 
-		outerPanel.add(btnAtras);
+        txtCorreo = new JTextField();
+        txtCorreo.setBounds(400, 190, 350, 35);
+        txtCorreo.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        getContentPane().add(txtCorreo);
 
-		// Título
-		JLabel lblTitulo = new JLabel("Restablecer contraseña", SwingConstants.CENTER);
-		lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
-		lblTitulo.setBounds(50, 20, 300, 30);
-		cardPanel.add(lblTitulo);
+        btnValidarCorreo = new JButton("Validar Correo");
+        btnValidarCorreo.setBounds(400, 240, 350, 40);
+        btnValidarCorreo.setBackground(new Color(128, 0, 0));
+        btnValidarCorreo.setForeground(Color.WHITE);
+        btnValidarCorreo.setFont(new Font("Tahoma", Font.BOLD, 16));
+        btnValidarCorreo.setFocusPainted(false);
+        getContentPane().add(btnValidarCorreo);
 
-		// Correo
-		JLabel lblCorreo = new JLabel("Correo electrónico:");
-		lblCorreo.setBounds(40, 65, 300, 20);
-		cardPanel.add(lblCorreo);
+        // Pregunta 1
+        lblPregunta1 = new JLabel("");
+        lblPregunta1.setBounds(400, 320, 400, 25);
+        lblPregunta1.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblPregunta1.setVisible(false);
+        getContentPane().add(lblPregunta1);
 
-		JTextField txtCorreo = new JTextField();
-		txtCorreo.setBounds(40, 85, 320, 30);
-		cardPanel.add(txtCorreo);
+        txtRespuesta1 = new JTextField();
+        txtRespuesta1.setBounds(400, 350, 350, 30);
+        txtRespuesta1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        txtRespuesta1.setVisible(false);
+        getContentPane().add(txtRespuesta1);
 
-		// Pregunta 1
-		JLabel lblPregunta1 = new JLabel("Pregunta de seguridad 1:");
-		lblPregunta1.setBounds(40, 125, 300, 20);
-		cardPanel.add(lblPregunta1);
+        // Pregunta 2
+        lblPregunta2 = new JLabel("");
+        lblPregunta2.setBounds(400, 400, 400, 25);
+        lblPregunta2.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblPregunta2.setVisible(false);
+        getContentPane().add(lblPregunta2);
 
-		JTextField txtRespuesta1 = new JTextField();
-		txtRespuesta1.setBounds(40, 145, 320, 30);
-		cardPanel.add(txtRespuesta1);
+        txtRespuesta2 = new JTextField();
+        txtRespuesta2.setBounds(400, 430, 350, 30);
+        txtRespuesta2.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        txtRespuesta2.setVisible(false);
+        getContentPane().add(txtRespuesta2);
 
-		// Pregunta 2
-		JLabel lblPregunta2 = new JLabel("Pregunta de seguridad 2:");
-		lblPregunta2.setBounds(40, 185, 300, 20);
-		cardPanel.add(lblPregunta2);
+        // Botón comprobar respuestas
+        btnComprobar = new JButton("Comprobar Respuestas");
+        btnComprobar.setBounds(400, 490, 350, 40);
+        btnComprobar.setBackground(new Color(128, 0, 0));
+        btnComprobar.setForeground(Color.WHITE);
+        btnComprobar.setFont(new Font("Tahoma", Font.BOLD, 16));
+        btnComprobar.setFocusPainted(false);
+        btnComprobar.setVisible(false);
+        getContentPane().add(btnComprobar);
 
-		JTextField txtRespuesta2 = new JTextField();
-		txtRespuesta2.setBounds(40, 205, 320, 30);
-		cardPanel.add(txtRespuesta2);
+        // Acción botón validar correo
+        btnValidarCorreo.addActionListener(e -> {
+            String email = txtCorreo.getText().trim();
+            if (email.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, introduce tu correo electrónico.");
+                return;
+            }
+            controlador.obtenerPreguntasSeguridad(email, lblPregunta1, lblPregunta2, txtRespuesta1, txtRespuesta2, btnComprobar);
+        });
 
-		// Botón comprobar
-		JButton btnComprobar = new JButton("Comprobar");
-		btnComprobar.setForeground(Color.WHITE);
-		btnComprobar.setBackground(new Color(128, 0, 0));
-		btnComprobar.setFont(new Font("Tahoma", Font.BOLD, 13));
-		btnComprobar.setFocusPainted(false);
-		btnComprobar.setBounds(80, 270, 240, 35);
-		cardPanel.add(btnComprobar);
+        // Acción botón comprobar respuestas
+        btnComprobar.addActionListener(e -> {
+            String email = txtCorreo.getText().trim();
+            String respuesta1 = txtRespuesta1.getText().trim();
+            String respuesta2 = txtRespuesta2.getText().trim();
 
-		btnComprobar.addActionListener(e -> {
-			String email = txtCorreo.getText().trim();
-			String respuesta1 = txtRespuesta1.getText().trim();
-			String respuesta2 = txtRespuesta2.getText().trim();
+            if (respuesta1.isEmpty() || respuesta2.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, responde ambas preguntas de seguridad.");
+                return;
+            }
 
-			if (email.isEmpty() || respuesta1.isEmpty() || respuesta2.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Completa todos los campos.");
-				return;
-			}
+            controlador.comprobarPreguntasSeguridad(email, respuesta1, respuesta2, this);
+        });
+    }
 
-			controlador.comprobarPreguntasSeguridad(email, respuesta1, respuesta2, this);
-		});
-
-		outerPanel.add(cardPanel);
-	}
-
-	public void setControlador(Controlador controlador) {
-		this.controlador = controlador;
-	}
+    public void setControlador(Controlador controlador) {
+        this.controlador = controlador;
+    }
 }

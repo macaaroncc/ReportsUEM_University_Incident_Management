@@ -9,8 +9,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import modelo.ConexionBD;
@@ -97,6 +100,7 @@ public class Controlador {
 			parametros.add("%" + estado + "%");
 		}
 
+		
 		if (usuario != null && !usuario.isEmpty()) {
 			query.append(" AND USR LIKE ?");
 			parametros.add("%" + usuario + "%");
@@ -198,6 +202,48 @@ public class Controlador {
 			return false;
 		}
 	}
+	
+	 public void obtenerPreguntasSeguridad(String email, JLabel lblP1, JLabel lblP2, JTextField r1, JTextField r2, JButton btnComprobar) {
+	        try (Connection conn = ConexionBD.conectar();
+	             PreparedStatement stmt = conn.prepareStatement("SELECT PREG1, PREG2 FROM SEGURIDAD WHERE USERS_USR = ?")) {
+
+	            stmt.setString(1, email);
+	            ResultSet rs = stmt.executeQuery();
+
+	            if (rs.next()) {
+	                int codigoPreg1 = rs.getInt("PREG1");
+	                int codigoPreg2 = rs.getInt("PREG2");
+
+	                lblP1.setText(mapearCodigoPregunta(codigoPreg1));
+	                lblP2.setText(mapearCodigoPregunta(codigoPreg2));
+
+	                lblP1.setVisible(true);
+	                lblP2.setVisible(true);
+	                r1.setVisible(true);
+	                r2.setVisible(true);
+	                btnComprobar.setVisible(true);
+	            } else {
+	                JOptionPane.showMessageDialog(null, "Correo no encontrado o sin preguntas de seguridad.");
+	            }
+	        } catch (SQLException e) {
+	            JOptionPane.showMessageDialog(null, "Error al cargar preguntas:\n" + e.getMessage());
+	            e.printStackTrace();
+	        }
+	    }
+
+	    /**
+	     * Traduce código numérico a texto descriptivo para las preguntas de seguridad.
+	     */
+	    private String mapearCodigoPregunta(int codigo) {
+	        switch (codigo) {
+	            case 1: return "¿Cuál es el nombre de tu primera mascota?";
+	            case 2: return "¿En qué ciudad naciste?";
+	            case 3: return "¿Cuál es el nombre de tu escuela primaria?";
+	            case 4: return "¿Cuál es tu película favorita?";
+	            case 5: return "¿Cómo se llama tu mejor amigo de la infancia?";
+	            default: return "Pregunta desconocida";
+	        }
+	    }
 
 	public void crearIncidencia(String edificio, byte[] fotoBytes, String piso, String descripcion, String aula, String campus) {
 	    if (descripcion.isEmpty() || aula.isEmpty()) {
