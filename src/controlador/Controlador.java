@@ -2,6 +2,7 @@ package controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -87,6 +88,31 @@ public class Controlador {
 
 		return modelo;
 	}
+	
+	
+	public boolean eliminarIncidencia(int idIncidencia) {
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root", "")) {
+	        // Si no tienes ON DELETE CASCADE, elimina relaciones primero
+	        PreparedStatement ps1 = conn.prepareStatement("DELETE FROM favoritos WHERE incidencias_id_incidencia = ?");
+	        ps1.setInt(1, idIncidencia);
+	        ps1.executeUpdate();
+
+	        PreparedStatement ps2 = conn.prepareStatement("DELETE FROM notificar WHERE incidencias_id_incidencia = ?");
+	        ps2.setInt(1, idIncidencia);
+	        ps2.executeUpdate();
+
+	        // Elimina la incidencia
+	        PreparedStatement ps3 = conn.prepareStatement("DELETE FROM incidencias WHERE id_incidencia = ?");
+	        ps3.setInt(1, idIncidencia);
+	        int filasAfectadas = ps3.executeUpdate();
+
+	        return filasAfectadas > 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 
 	public static DefaultTableModel buscarIncidencias(String estado, String usuario, String orden) {
 		DefaultTableModel modelo = new DefaultTableModel();

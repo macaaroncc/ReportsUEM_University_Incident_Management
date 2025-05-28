@@ -2,18 +2,21 @@ package vista;
 
 import javax.swing.*;
 import controlador.Controlador;
+import modelo.Modelo;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.sql.*;
 import javax.imageio.ImageIO;
 
 public class _17_DetalleIncidencia extends JFrame {
-    private Controlador controlador;
+	private Controlador controlador;
+	private String usuario; // Usuario logueado actual
 
-    public _17_DetalleIncidencia(int idIncidencia) {
+	public _17_DetalleIncidencia(int idIncidencia) {
+        this.usuario = Modelo.usuarioActual;
+
         setTitle("Detalle de la Incidencia");
         setSize(700, 750);
         setLocationRelativeTo(null);
@@ -40,7 +43,7 @@ public class _17_DetalleIncidencia extends JFrame {
         lblImagen.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         getContentPane().add(lblImagen);
 
-        // Coordenadas base
+        // Coordenadas base para campos
         int labelX = 30;
         int fieldX = 160;
         int labelWidth = 110;
@@ -51,10 +54,8 @@ public class _17_DetalleIncidencia extends JFrame {
 
         Font fuente = new Font("Tahoma", Font.PLAIN, 13);
 
-        String[] campos = {
-            "Descripción", "Estado", "Edificio", "Piso", "Aula",
-            "Campus", "Fecha", "Me gusta", "Usuario"
-        };
+        // Sin "Me gusta" en los campos normales
+        String[] campos = { "Descripción", "Estado", "Edificio", "Piso", "Aula", "Campus", "Fecha", "Usuario" };
 
         JTextField[] textFields = new JTextField[campos.length];
 
@@ -74,81 +75,170 @@ public class _17_DetalleIncidencia extends JFrame {
             y += gap;
         }
 
-        // Panel de botones inferiores
+        // Label "Me gusta: nº" abajo a la izquierda
+        JLabel lblMeGusta = new JLabel("Me gusta: 0");
+        lblMeGusta.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblMeGusta.setForeground(new Color(128, 0, 0));
+        lblMeGusta.setBounds(30, 630, 150, 40);
+        getContentPane().add(lblMeGusta);
+
+        // Panel de botones inferiores a la derecha abajo
         JPanel panelBotones = new JPanel();
         panelBotones.setBounds((700 - 240) / 2, 630, 240, 50);
         panelBotones.setOpaque(false);
         panelBotones.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
         getContentPane().add(panelBotones);
 
-        String[] simbolos = { "\u2714", "\u21BB", "\u2605" };  // ✔ ↻ ★
-        String[] tooltips = {
-            "Marcar como resuelta",
-            "Confirmar incidencia",
-            "Añadir a favoritos"
-        };
+        String[] simbolos = { "✔️", "🔄", "⭐" };
+        String[] tooltips = { "Marcar como resuelta", "Añadir a Favoritos", "Dar Me gusta" };
 
         for (int i = 0; i < 3; i++) {
             JButton btn = new JButton(simbolos[i]);
             btn.setPreferredSize(new Dimension(50, 50));
             btn.setBackground(new Color(128, 0, 0));
             btn.setForeground(Color.WHITE);
-            // Cambia aquí la fuente según la que tengas instalada
-            btn.setFont(new Font("Arial Unicode MS", Font.BOLD, 20));
             btn.setToolTipText(tooltips[i]);
             btn.setBorderPainted(false);
             btn.setFocusPainted(false);
+            
+            if (i == 0) { 
+                btn.addActionListener(e -> {
+                    JOptionPane.showMessageDialog(this, "Incidencia marcada como resuelta. ¡Gracias!");
+                });
+            }                                  
+                
+            
+            if (i == 1) { // Botón "Añadir a Favoritos" (🔄)
+                btn.addActionListener(e -> {
+                    try (Connection conn = DriverManager
+                            .getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root", "")) {
+
+                        // Concatenar @ueuropea.es al usuario
+                        String usuarioEmail = Modelo.usuarioActual + "@ueuropea.es";
+
+                        // Verificar si ya existe favorito para este usuario e incidencia
+                        PreparedStatement checkStmt = conn.prepareStatement(
+                                "SELECT COUNT(*) FROM favoritos WHERE USERS_USR = ? AND incidencias_id_incidencia = ?");
+                        checkStmt.setString(1, usuarioEmail);
+                        checkStmt.setInt(2, idIncidencia);
+                        ResultSet rs = checkStmt.executeQuery();
+                        rs.next();
+                        int count = rs.getInt(1);
+
+                        if (count > 0) {
+                            JOptionPane.showMessageDialog(this, "Esta incidencia ya está en tus favoritos.");
+                        } else {
+                            // Insertar nuevo favorito
+                            PreparedStatement insertStmt = conn.prepareStatement(
+                                    "INSERT INTO favoritos (USERS_USR, incidencias_id_incidencia) VALUES (?, ?)");
+                            insertStmt.setString(1, usuarioEmail);
+                            insertStmt.setInt(2, idIncidencia);
+                            insertStmt.executeUpdate();
+
+                            JOptionPane.showMessageDialog(this, "Incidencia añadida a tus favoritos.");
+                        }
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Error al añadir a favoritos:\n" + ex.getMessage());
+                    }
+                });
+            }
+
+
+            if (i == 2) { // Botón "Me gusta"
+                btn.addActionListener(e -> {
+                    try (Connection conn = DriverManager
+                            .getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root", "")) {
+                        // Verificar si el usuario ya marcó favorito en la tabla favoritosCount
+                        PreparedStatement checkStmt = conn.prepareStatement(
+                                "SELECT COUNT(*) FROM favoritosCount WHERE id_usuario = ? AND id_incidencia = ?");
+                        checkStmt.setString(1, usuario);
+                        checkStmt.setInt(2, idIncidencia);
+                        ResultSet rs = checkStmt.executeQuery();
+                        rs.next();
+                        int count = rs.getInt(1);
+
+                        if (count > 0) {
+                            JOptionPane.showMessageDialog(this, "Ya has marcado esta incidencia como favorita.");
+                        } else {
+                            // Insertar nuevo favorito en favoritosCount
+                            PreparedStatement insertStmt = conn.prepareStatement(
+                                    "INSERT INTO favoritosCount (id_usuario, id_incidencia) VALUES (?, ?)");
+                            insertStmt.setString(1, usuario);
+                            insertStmt.setInt(2, idIncidencia);
+                            insertStmt.executeUpdate();
+
+                            // Actualizar ranking de la incidencia
+                            PreparedStatement updateStmt = conn.prepareStatement(
+                                    "UPDATE incidencias SET ranking = ranking + 1 WHERE id_incidencia = ?");
+                            updateStmt.setInt(1, idIncidencia);
+                            updateStmt.executeUpdate();
+
+                            JOptionPane.showMessageDialog(this, "¡Añadido a favoritos!");
+
+                            // Actualizar visualmente el label "Me gusta"
+                            int rankingActual = Integer.parseInt(lblMeGusta.getText().replace("Me gusta: ", ""));
+                            lblMeGusta.setText("Me gusta: " + (rankingActual + 1));
+                        }
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Error al marcar favorito:\n" + ex.getMessage());
+                    }
+                });
+            }
+
             panelBotones.add(btn);
         }
 
-
         // Cargar datos de la incidencia
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root", "");
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM incidencias WHERE id_incidencia = ?")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto_integrador",
+                "root", "");
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM incidencias WHERE id_incidencia = ?")) {
 
             stmt.setInt(1, idIncidencia);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 // Mostrar imagen si existe
-            	// Mostrar imagen si existe
-            	byte[] imagenBytes = rs.getBytes("foto");
-            	if (imagenBytes != null && imagenBytes.length > 0) {
-            	    try {
-            	        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imagenBytes));
-            	        if (bufferedImage != null) {
-            	            Image imagenEscalada = bufferedImage.getScaledInstance(lblImagen.getWidth(), lblImagen.getHeight(), Image.SCALE_SMOOTH);
-            	            lblImagen.setIcon(new ImageIcon(imagenEscalada));
-            	        } else {
-            	            // bufferedImage es null, poner imagen blanca vacía
-            	            BufferedImage imagenBlanca = new BufferedImage(lblImagen.getWidth(), lblImagen.getHeight(), BufferedImage.TYPE_INT_RGB);
-            	            Graphics2D g2d = imagenBlanca.createGraphics();
-            	            g2d.setColor(Color.WHITE);
-            	            g2d.fillRect(0, 0, imagenBlanca.getWidth(), imagenBlanca.getHeight());
-            	            g2d.dispose();
-            	            lblImagen.setIcon(new ImageIcon(imagenBlanca));
-            	        }
-            	    } catch (Exception e) {
-            	        // En caso de error, poner imagen blanca vacía
-            	        BufferedImage imagenBlanca = new BufferedImage(lblImagen.getWidth(), lblImagen.getHeight(), BufferedImage.TYPE_INT_RGB);
-            	        Graphics2D g2d = imagenBlanca.createGraphics();
-            	        g2d.setColor(Color.WHITE);
-            	        g2d.fillRect(0, 0, imagenBlanca.getWidth(), imagenBlanca.getHeight());
-            	        g2d.dispose();
-            	        lblImagen.setIcon(new ImageIcon(imagenBlanca));
-            	    }
-            	} else {
-            	    // No hay imagen, poner imagen blanca vacía
-            	    BufferedImage imagenBlanca = new BufferedImage(lblImagen.getWidth(), lblImagen.getHeight(), BufferedImage.TYPE_INT_RGB);
-            	    Graphics2D g2d = imagenBlanca.createGraphics();
-            	    g2d.setColor(Color.WHITE);
-            	    g2d.fillRect(0, 0, imagenBlanca.getWidth(), imagenBlanca.getHeight());
-            	    g2d.dispose();
-            	    lblImagen.setIcon(new ImageIcon(imagenBlanca));
-            	}
+                byte[] imagenBytes = rs.getBytes("foto");
+                if (imagenBytes != null && imagenBytes.length > 0) {
+                    try {
+                        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imagenBytes));
+                        if (bufferedImage != null) {
+                            Image imagenEscalada = bufferedImage.getScaledInstance(lblImagen.getWidth(),
+                                    lblImagen.getHeight(), Image.SCALE_SMOOTH);
+                            lblImagen.setIcon(new ImageIcon(imagenEscalada));
+                        } else {
+                            BufferedImage imagenBlanca = new BufferedImage(lblImagen.getWidth(),
+                                    lblImagen.getHeight(), BufferedImage.TYPE_INT_RGB);
+                            Graphics2D g2d = imagenBlanca.createGraphics();
+                            g2d.setColor(Color.WHITE);
+                            g2d.fillRect(0, 0, imagenBlanca.getWidth(), imagenBlanca.getHeight());
+                            g2d.dispose();
+                            lblImagen.setIcon(new ImageIcon(imagenBlanca));
+                        }
+                    } catch (Exception e) {
+                        BufferedImage imagenBlanca = new BufferedImage(lblImagen.getWidth(), lblImagen.getHeight(),
+                                BufferedImage.TYPE_INT_RGB);
+                        Graphics2D g2d = imagenBlanca.createGraphics();
+                        g2d.setColor(Color.WHITE);
+                        g2d.fillRect(0, 0, imagenBlanca.getWidth(), imagenBlanca.getHeight());
+                        g2d.dispose();
+                        lblImagen.setIcon(new ImageIcon(imagenBlanca));
+                    }
+                } else {
+                    BufferedImage imagenBlanca = new BufferedImage(lblImagen.getWidth(), lblImagen.getHeight(),
+                            BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g2d = imagenBlanca.createGraphics();
+                    g2d.setColor(Color.WHITE);
+                    g2d.fillRect(0, 0, imagenBlanca.getWidth(), imagenBlanca.getHeight());
+                    g2d.dispose();
+                    lblImagen.setIcon(new ImageIcon(imagenBlanca));
+                }
 
-
-                // Llenar los campos
+                // Llenar los campos sin "Me gusta"
                 textFields[0].setText(rs.getString("descripcion"));
                 textFields[1].setText(rs.getString("estado"));
                 textFields[2].setText(rs.getString("edificio"));
@@ -156,20 +246,28 @@ public class _17_DetalleIncidencia extends JFrame {
                 textFields[4].setText(rs.getString("aula"));
                 textFields[5].setText(rs.getString("campus"));
                 textFields[6].setText(rs.getDate("fecha").toString());
-                textFields[7].setText(String.valueOf(rs.getInt("ranking")));
-                textFields[8].setText(rs.getString("USR"));
+                textFields[7].setText(rs.getString("USR"));
+
+                // Setear "Me gusta" en el label abajo
+                int ranking = rs.getInt("ranking");
+                lblMeGusta.setText("Me gusta: " + ranking);
 
             } else {
                 JOptionPane.showMessageDialog(this, "No se encontró la incidencia con ID: " + idIncidencia);
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar los detalles:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al cargar los detalles:\n" + e.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
 
-    public void setControlador(Controlador controlador) {
-        this.controlador = controlador;
-    }
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+
+	public void setControlador(Controlador controlador) {
+		this.controlador = controlador;
+	}
 }

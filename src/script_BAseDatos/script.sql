@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS SEGURIDAD;
 DROP TABLE IF EXISTS PREGUNTAS;
 DROP TABLE IF EXISTS incidencias;
 DROP TABLE IF EXISTS USERS;
-
+DROP TABLE IF EXISTS favoritosCount;
 -- Creamos las tablas
 CREATE TABLE USERS (
     USR VARCHAR(200) PRIMARY KEY,
@@ -73,6 +73,13 @@ CREATE TABLE notificar (
     USERS_USR VARCHAR(200),
     PRIMARY KEY (incidencias_id_incidencia, USERS_USR),
     FOREIGN KEY (USERS_USR) REFERENCES USERS(USR)
+);
+
+CREATE TABLE favoritosCount (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario VARCHAR(100),     -- O INT si usas IDs
+    id_incidencia INT,
+    UNIQUE (id_usuario, id_incidencia)
 );
 
 -- Insertamos datos

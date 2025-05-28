@@ -109,7 +109,7 @@ public class _06_PaginaPrincipal extends JFrame {
                     try {
                         Object valorID = table.getValueAt(fila, 0);
                         int idIncidencia = Integer.parseInt(valorID.toString().trim());
-                        new _17_DetalleIncidencia(idIncidencia).setVisible(true);
+                        new _17_DetalleIncidencia( idIncidencia).setVisible(true);
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(null, "⚠ ID inválido: " + table.getValueAt(fila, 0));
                         ex.printStackTrace();
@@ -139,6 +139,8 @@ public class _06_PaginaPrincipal extends JFrame {
             cargarIncidenciasFiltradas(m);
         });
     }
+    
+    
 
     private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
         try (Connection conexion = modelo.ConexionBD.conectar();
@@ -160,6 +162,7 @@ public class _06_PaginaPrincipal extends JFrame {
                         rs.getInt("ranking"),
                         rs.getString("USR")
                 });
+                
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al cargar incidencias:\n" + e.getMessage(), "Error de base de datos", JOptionPane.ERROR_MESSAGE);

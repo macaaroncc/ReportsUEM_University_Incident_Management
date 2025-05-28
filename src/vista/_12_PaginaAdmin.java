@@ -37,6 +37,20 @@ public class _12_PaginaAdmin extends JFrame {
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(lblTitulo);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        
+        JButton btnEstadisticas = new JButton("Estadísticas");
+        btnEstadisticas.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnEstadisticas.setBackground(new Color(128, 0, 0));
+        btnEstadisticas.setForeground(Color.WHITE);
+        btnEstadisticas.setFocusPainted(false);
+        btnEstadisticas.setPreferredSize(new Dimension(150, 35));
+        btnEstadisticas.addActionListener(e -> {
+        	new _13_Estadisticas().setVisible(true);
+        	dispose(); // Cierra la ventana actual
+        });
+        contentPanel.add(btnEstadisticas);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
 
         JLabel lblIncidencias = new JLabel("INCIDENCIAS");
         lblIncidencias.setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -131,6 +145,34 @@ public class _12_PaginaAdmin extends JFrame {
         panelBtnEditar.add(btnEditarIncidencia);
         contentPanel.add(panelBtnEditar);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+        
+        JButton btnEliminarIncidencia = new JButton("Eliminar");
+        btnEliminarIncidencia.setBackground(new Color(128, 0, 0));
+        btnEliminarIncidencia.setForeground(Color.WHITE);
+        btnEliminarIncidencia.setFocusPainted(false);
+        btnEliminarIncidencia.setPreferredSize(new Dimension(100, 30));
+        btnEliminarIncidencia.addActionListener(e -> {
+            int filaSeleccionada = tablaIncidencias.getSelectedRow();
+            if (filaSeleccionada != -1) {
+                int idIncidencia = Integer.parseInt(tablaIncidencias.getValueAt(filaSeleccionada, 0).toString());
+
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "¿Estás seguro de que quieres eliminar esta incidencia?",
+                        "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (controlador.eliminarIncidencia(idIncidencia)) {
+                        JOptionPane.showMessageDialog(this, "Incidencia eliminada correctamente.");
+                        cargarIncidencias(); // Recarga la tabla
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Error al eliminar la incidencia.");
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Selecciona una incidencia para eliminar.");
+            }
+        });
+        panelBtnEditar.add(btnEliminarIncidencia);
+
 
         // ---- Sección Usuarios ----
         JLabel lblUsuarios = new JLabel("USUARIOS");
