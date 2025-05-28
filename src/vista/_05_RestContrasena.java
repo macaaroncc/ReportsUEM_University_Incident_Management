@@ -14,11 +14,10 @@ public class _05_RestContrasena extends JFrame {
 	private Controlador controlador;
 	private String usuario;
 
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
-	}
+	private String origen;
 
-	public _05_RestContrasena() {
+	public _05_RestContrasena(String origen) {
+		this.origen = origen;
 		setTitle("05. Restablecer contraseña");
 		setSize(1200, 900);
 		setLocationRelativeTo(null);
@@ -47,11 +46,16 @@ public class _05_RestContrasena extends JFrame {
 		btnAtras.setBounds(10, 11, 90, 30);
 		outerPanel.add(btnAtras);
 		btnAtras.addActionListener(e -> {
-			if (controlador != null) {
-				_04_OlvContrasena login = new _04_OlvContrasena();
-				login.setControlador(controlador);
-				login.setVisible(true);
+			if (origen.equals("login")) {
+				_04_OlvContrasena rest = new _04_OlvContrasena(origen);
+				rest.setControlador(controlador);
+				rest.setVisible(true);
+			} else if (origen.equals("perfil")) {
+				_10_PerfilUsuario perfil = new _10_PerfilUsuario();
+				perfil.setControlador(controlador);
+				perfil.setVisible(true);
 			}
+
 			dispose();
 		});
 
@@ -115,5 +119,9 @@ public class _05_RestContrasena extends JFrame {
 
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
+	}
+
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
 	}
 }

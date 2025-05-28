@@ -304,10 +304,10 @@ public class _02_Login extends JFrame {
 		cardPanel.add(olvidoPwd);
 		olvidoPwd.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				_04_OlvContrasena vista = new _04_OlvContrasena();
-				vista.setControlador(controlador);
-				vista.setVisible(true);
-				_02_Login.this.dispose();
+				_04_OlvContrasena olv = new _04_OlvContrasena("login");
+				olv.setControlador(controlador);
+				olv.setVisible(true);
+				dispose();
 			}
 		});
 
