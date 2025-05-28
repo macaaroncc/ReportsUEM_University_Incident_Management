@@ -31,6 +31,7 @@ public class Controlador {
 	private _03_CrearCuenta _03_crearCuenta;
 	private int intentosFallidos = 0;
 	private boolean usuarioLogueado = false;
+	private String usuarioActual;
 
 	public void setModelo(Modelo modelo) {
 		this.modelo = modelo;
@@ -229,11 +230,14 @@ public class Controlador {
 		mostrarVentana(login);
 	}
 
-	public void abrirRestContrasena() {
-		_05_RestContrasena rest = new _05_RestContrasena();
-		rest.setControlador(this);
-		mostrarVentana(rest);
+	public void abrirRestContrasena(String origen) {
+		_05_RestContrasena vista = new _05_RestContrasena(origen);
+		vista.setControlador(this);
+		vista.setUsuario(usuarioActual); 
+		vista.setVisible(true);
 	}
+
+
 
 	public void abrirPerfilUsuario(JFrame ventanaActual) {
 		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
@@ -341,7 +345,7 @@ public class Controlador {
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				_05_RestContrasena rest = new _05_RestContrasena();
+				_05_RestContrasena rest = new _05_RestContrasena(null);
 				rest.setControlador(this);
 				rest.setUsuario(email);
 				rest.setVisible(true);
@@ -372,6 +376,7 @@ public class Controlador {
 
 	/**
 	 * reestablecer contraseña
+	 * 
 	 * @param email
 	 * @param nuevaPwd
 	 * @param vistaActual
@@ -402,6 +407,7 @@ public class Controlador {
 			JOptionPane.showMessageDialog(vistaActual, "Error al actualizar:\n" + ex.getMessage());
 			ex.printStackTrace();
 		}
+		
 	}
 
 	public String[] obtenerDatosPerfil() {
@@ -462,6 +468,14 @@ public class Controlador {
 		_15_Favoritos favoritos = new _15_Favoritos();
 		favoritos.setControlador(this);
 		favoritos.setVisible(true);
+	}
+
+	public void setUsuarioActual(String usuario) {
+		this.usuarioActual = usuario;
+	}
+
+	public String getUsuarioActual() {
+		return this.usuarioActual;
 	}
 
 }

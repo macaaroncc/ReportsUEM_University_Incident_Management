@@ -97,7 +97,10 @@ public class _10_PerfilUsuario extends JFrame {
 		JButton btnCambiarContrasena = new JButton("Cambiar Contraseña");
 		btnCambiarContrasena.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				controlador.abrirRestContrasena();
+				if (controlador != null) {
+					controlador.abrirRestContrasena("perfil");
+				}
+				dispose();
 			}
 		});
 		btnCambiarContrasena.setBounds(fieldX, y + 110, 300, 40);

@@ -1,24 +1,18 @@
-//@autor Aaron y Chen
-
 package vista;
 
 import controlador.Controlador;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.net.URL;
 
 public class _05_RestContrasena extends JFrame {
 	private Controlador controlador;
 	private String usuario;
+	private String origen;
 
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
-	}
+	public _05_RestContrasena(String origen) {
+		this.origen = origen;
 
-	public _05_RestContrasena() {
 		setTitle("05. Restablecer contraseña");
 		setSize(1200, 900);
 		setLocationRelativeTo(null);
@@ -47,11 +41,16 @@ public class _05_RestContrasena extends JFrame {
 		btnAtras.setBounds(10, 11, 90, 30);
 		outerPanel.add(btnAtras);
 		btnAtras.addActionListener(e -> {
-			if (controlador != null) {
+			if (origen.equals("login")) {
 				_04_OlvContrasena login = new _04_OlvContrasena();
 				login.setControlador(controlador);
 				login.setVisible(true);
+			} else if (origen.equals("perfil")) {
+				_10_PerfilUsuario perfil = new _10_PerfilUsuario();
+				perfil.setControlador(controlador);
+				perfil.setVisible(true);
 			}
+
 			dispose();
 		});
 
@@ -113,7 +112,13 @@ public class _05_RestContrasena extends JFrame {
 		outerPanel.add(cardPanel);
 	}
 
+	
+	// SETTERS
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
+	}
+
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
 	}
 }
