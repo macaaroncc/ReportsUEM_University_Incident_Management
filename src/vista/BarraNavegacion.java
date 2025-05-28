@@ -41,7 +41,7 @@ public class BarraNavegacion extends JPanel {
 		lblFavoritos = crearLink("Favoritos", 580);
 		add(lblFavoritos);
 
-		lblAdminPanel = crearLink("Panel Administrador", 680);
+		lblAdminPanel = crearLink("Panel Administrador", 700);
 		lblAdminPanel.setVisible(false);
 		add(lblAdminPanel);
 
