@@ -12,8 +12,12 @@ import java.net.URL;
 
 public class _04_OlvContrasena extends JFrame {
 	private Controlador controlador;
+	private String origen;
+	private String usuario;
 
-	public _04_OlvContrasena() {
+	public _04_OlvContrasena(String origen) {
+		this.origen = origen;
+
 		setTitle("04 - Olvido de contraseña");
 		setSize(1200, 900);
 		setLocationRelativeTo(null);
@@ -41,10 +45,14 @@ public class _04_OlvContrasena extends JFrame {
 		btnAtras.setFocusPainted(false);
 		btnAtras.setBounds(10, 11, 90, 30);
 		btnAtras.addActionListener(e -> {
-			if (controlador != null) {
+			if ("login".equals(origen)) {
 				_02_Login login = new _02_Login();
 				login.setControlador(controlador);
 				login.setVisible(true);
+			} else if ("perfil".equals(origen)) {
+				_10_PerfilUsuario perfil = new _10_PerfilUsuario();
+				perfil.setControlador(controlador);
+				perfil.setVisible(true);
 			}
 			dispose();
 		});
@@ -102,8 +110,8 @@ public class _04_OlvContrasena extends JFrame {
 				JOptionPane.showMessageDialog(this, "Completa todos los campos.");
 				return;
 			}
-
-			controlador.comprobarPreguntasSeguridad(email, respuesta1, respuesta2, this);
+			this.usuario = email; // guardamos el usuario
+			controlador.comprobarPreguntasSeguridad(email, respuesta1, respuesta2, this, origen);
 		});
 
 		outerPanel.add(cardPanel);
@@ -112,4 +120,17 @@ public class _04_OlvContrasena extends JFrame {
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
 	}
+
+	public String getOrigen() {
+		return origen;
+	}
+
+	public String getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+
 }

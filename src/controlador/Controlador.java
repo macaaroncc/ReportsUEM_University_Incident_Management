@@ -14,6 +14,7 @@ import modelo.Modelo;
 import vista._01_PGSinLogin;
 import vista._02_Login;
 import vista._03_CrearCuenta;
+import vista._04_OlvContrasena;
 import vista._05_RestContrasena;
 import vista._06_PaginaPrincipal;
 import vista._07_MisIncidencias;
@@ -233,11 +234,16 @@ public class Controlador {
 	public void abrirRestContrasena(String origen) {
 		_05_RestContrasena vista = new _05_RestContrasena(origen);
 		vista.setControlador(this);
-		vista.setUsuario(usuarioActual); 
+		vista.setUsuario(usuarioActual);
 		vista.setVisible(true);
 	}
 
-
+	public void abrirOlvContrasena(String origen) {
+		_04_OlvContrasena vista = new _04_OlvContrasena(origen);
+		vista.setControlador(this);
+		vista.setUsuario(usuarioActual);
+		vista.setVisible(true);
+	}
 
 	public void abrirPerfilUsuario(JFrame ventanaActual) {
 		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
@@ -335,7 +341,8 @@ public class Controlador {
 		}
 	}
 
-	public void comprobarPreguntasSeguridad(String email, String resp1, String resp2, JFrame vistaActual) {
+	public void comprobarPreguntasSeguridad(String email, String resp1, String resp2, JFrame vistaActual,
+			String origen) {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "SELECT * FROM SEGURIDAD WHERE USERS_USR = ? AND RESP1 = ? AND RESP2 = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -345,7 +352,7 @@ public class Controlador {
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				_05_RestContrasena rest = new _05_RestContrasena(null);
+				_05_RestContrasena rest = new _05_RestContrasena(origen);
 				rest.setControlador(this);
 				rest.setUsuario(email);
 				rest.setVisible(true);
@@ -407,7 +414,7 @@ public class Controlador {
 			JOptionPane.showMessageDialog(vistaActual, "Error al actualizar:\n" + ex.getMessage());
 			ex.printStackTrace();
 		}
-		
+
 	}
 
 	public String[] obtenerDatosPerfil() {

@@ -292,14 +292,12 @@ public class _02_Login extends JFrame {
 		cardPanel.add(olvidoPwd);
 		olvidoPwd.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				_05_RestContrasena restPwd = new _05_RestContrasena("login");
-				restPwd.setControlador(controlador);
-				restPwd.setUsuario(txtEmail.getText()); // CORREGIDO
-				restPwd.setVisible(true);
-				_02_Login.this.dispose(); // no olvides cerrar la ventana actual si hace falta
+				_04_OlvContrasena olv = new _04_OlvContrasena("login");
+				olv.setControlador(controlador);
+				olv.setVisible(true);
+				dispose();
 			}
 		});
-
 
 		// Botón atrás - redondeado
 		btnAtras = new RoundedButton("◀ Atrás", 15, new Color(255, 255, 252), Color.BLACK);

@@ -42,9 +42,9 @@ public class _05_RestContrasena extends JFrame {
 		outerPanel.add(btnAtras);
 		btnAtras.addActionListener(e -> {
 			if (origen.equals("login")) {
-				_04_OlvContrasena login = new _04_OlvContrasena();
-				login.setControlador(controlador);
-				login.setVisible(true);
+				_04_OlvContrasena rest = new _04_OlvContrasena(origen);
+				rest.setControlador(controlador);
+				rest.setVisible(true);
 			} else if (origen.equals("perfil")) {
 				_10_PerfilUsuario perfil = new _10_PerfilUsuario();
 				perfil.setControlador(controlador);
@@ -111,7 +111,6 @@ public class _05_RestContrasena extends JFrame {
 
 		outerPanel.add(cardPanel);
 	}
-
 	
 	// SETTERS
 	public void setControlador(Controlador controlador) {
@@ -121,4 +120,5 @@ public class _05_RestContrasena extends JFrame {
 	public void setUsuario(String usuario) {
 		this.usuario = usuario;
 	}
+	
 }
