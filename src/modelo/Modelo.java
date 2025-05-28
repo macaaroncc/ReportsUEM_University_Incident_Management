@@ -36,4 +36,5 @@ public class Modelo {
 	public String getUsuarioActual() {
 		return usuarioActual;
 	}
+
 }

@@ -4,6 +4,8 @@ import controlador.Controlador;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class _13_Estadisticas extends JFrame {
 	private Controlador controlador;
@@ -18,9 +20,9 @@ public class _13_Estadisticas extends JFrame {
 
 		// ✅ Barra de navegación reutilizable
 		BarraNavegacion barra = new BarraNavegacion();
-		barra.setUsuarioLogueado(true); // Habilita enlaces funcionales
-		barra.setControlador(controlador); // Asigna listeners y lógica
-		barra.setBounds(0, 0, 1200, 59); // Asegura que se vea bien
+		barra.setUsuarioLogueado(true);
+		barra.setControlador(controlador);
+		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
 
 		// --- FILTROS ---
@@ -49,14 +51,41 @@ public class _13_Estadisticas extends JFrame {
 		btnBuscar.setFocusPainted(false);
 		getContentPane().add(btnBuscar);
 
-		// --- GRÁFICOS PLACEHOLDER ---
-		JPanel grafico1 = crearPanelConTitulo("📊 Incidencias por mes", 50, 140, 500, 250);
+		// 【模拟数据】
+		Map<String, Integer> datosPorMes = new LinkedHashMap<>();
+		datosPorMes.put("2025-01", 5);
+		datosPorMes.put("2025-02", 3);
+		datosPorMes.put("2025-03", 8);
+
+		Map<String, Integer> datosPorEstado = new LinkedHashMap<>();
+		datosPorEstado.put("Pendiente", 4);
+		datosPorEstado.put("Resuelto", 6);
+
+		Map<String, Integer> datosPorEdificio = new LinkedHashMap<>();
+		datosPorEdificio.put("Edificio A", 2);
+		datosPorEdificio.put("Edificio B", 5);
+		datosPorEdificio.put("Edificio C", 3);
+
+		// --- GRÁFICOS ---
+		JPanel grafico1 = crearPanelConTituloConIcono("Incidencias por mes", "/img/chart.png", 50, 140, 550, 280);
+		grafico1.setLayout(null);
+		BarChartPanel chart1 = new BarChartPanel(datosPorMes);
+		chart1.setBounds(0, 0, 550, 280);
+		grafico1.add(chart1);
 		getContentPane().add(grafico1);
 
-		JPanel grafico2 = crearPanelConTitulo("✅ Resueltas vs Pendientes", 600, 140, 500, 250);
+		JPanel grafico2 = crearPanelConTituloConIcono("Resueltas vs Pendientes", "/img/check.png", 630, 140, 400, 220);
+		grafico2.setLayout(null);
+		PieChartPanel chart2 = new PieChartPanel(datosPorEstado);
+		chart2.setBounds(0, 0, 400, 220);
+		grafico2.add(chart2);
 		getContentPane().add(grafico2);
 
-		JPanel grafico3 = crearPanelConTitulo("🏫 Distribución por edificio", 50, 420, 1050, 250);
+		JPanel grafico3 = crearPanelConTituloConIcono("Distribución por edificio", "/img/building.png", 50, 450, 880, 260);
+		grafico3.setLayout(null);
+		PieChartPanel chart3 = new PieChartPanel(datosPorEdificio);
+		chart3.setBounds(0, 0, 880, 260);
+		grafico3.add(chart3);
 		getContentPane().add(grafico3);
 
 		// --- Botón ayuda flotante ---
@@ -75,12 +104,22 @@ public class _13_Estadisticas extends JFrame {
 		});
 	}
 
-	private JPanel crearPanelConTitulo(String titulo, int x, int y, int w, int h) {
+	private JPanel crearPanelConTituloConIcono(String texto, String iconPath, int x, int y, int width, int height) {
 		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.setBorder(BorderFactory.createTitledBorder(titulo));
-		panel.setBounds(x, y, w, h);
-		panel.setBackground(new Color(240, 240, 240));
+		panel.setLayout(null);
+		panel.setBounds(x, y, width, height);
+		panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+		ImageIcon icon = new ImageIcon(getClass().getResource(iconPath));
+		Image scaledImage = icon.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH);
+		ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+		JLabel lblTitulo = new JLabel(texto, scaledIcon, JLabel.LEFT);
+		lblTitulo.setFont(new Font("Dialog", Font.BOLD, 15));
+		lblTitulo.setBounds(10, 10, width - 20, 30);
+		lblTitulo.setIconTextGap(10);
+
+		panel.add(lblTitulo);
 		return panel;
 	}
 
@@ -94,3 +133,78 @@ public class _13_Estadisticas extends JFrame {
 		}
 	}
 }
+
+class BarChartPanel extends JPanel {
+	private Map<String, Integer> data;
+
+	public BarChartPanel(Map<String, Integer> data) {
+		this.data = data;
+		setPreferredSize(new Dimension(550, 280));
+	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		if (data == null || data.isEmpty()) return;
+
+		Graphics2D g2 = (Graphics2D) g;
+		int width = getWidth();
+		int height = getHeight();
+		int padding = 40;
+
+		int maxVal = data.values().stream().max(Integer::compare).orElse(1);
+		int barWidth = (width - padding * 2) / data.size();
+
+		int i = 0;
+		for (Map.Entry<String, Integer> entry : data.entrySet()) {
+			int barHeight = (int) ((entry.getValue() / (double) maxVal) * (height - 2 * padding));
+			int x = padding + i * barWidth;
+			int y = height - padding - barHeight;
+
+			g2.setColor(new Color(100, 150, 240));
+			g2.fillRect(x, y, barWidth - 10, barHeight);
+
+			g2.setColor(Color.BLACK);
+			g2.drawString(entry.getKey(), x + 5, height - 20);
+			g2.drawString(String.valueOf(entry.getValue()), x + 5, y - 5);
+
+			i++;
+		}
+	}
+}
+
+class PieChartPanel extends JPanel {
+	private Map<String, Integer> data;
+
+	public PieChartPanel(Map<String, Integer> data) {
+		this.data = data;
+		setPreferredSize(new Dimension(400, 220));
+	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		if (data == null || data.isEmpty()) return;
+
+		Graphics2D g2 = (Graphics2D) g;
+		int width = getWidth();
+		int height = getHeight();
+		int diameter = Math.min(width, height) - 40;
+		int x = (width - diameter) / 2;
+		int y = (height - diameter) / 2;
+
+		int total = data.values().stream().mapToInt(Integer::intValue).sum();
+		int startAngle = 0;
+		int i = 0;
+		Color[] colors = {Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.MAGENTA, Color.CYAN};
+
+		for (Map.Entry<String, Integer> entry : data.entrySet()) {
+			int arcAngle = (int) Math.round(entry.getValue() * 360.0 / total);
+			g2.setColor(colors[i % colors.length]);
+			g2.fillArc(x, y, diameter, diameter, startAngle, arcAngle);
+			startAngle += arcAngle;
+			i++;
+		}
+	}
+}
+
