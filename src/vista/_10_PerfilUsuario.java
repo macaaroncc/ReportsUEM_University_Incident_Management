@@ -99,6 +99,7 @@ public class _10_PerfilUsuario extends JFrame {
 		btnCambiarContrasena.setForeground(Color.WHITE);
 		btnCambiarContrasena.setFont(new Font("Tahoma", Font.BOLD, 14));
 		panel.add(btnCambiarContrasena);
+		
 
 		JButton btnCerrarSesion = new JButton("Cerrar Sesión");
 		btnCerrarSesion.setBounds(590, 398, 300, 40);
