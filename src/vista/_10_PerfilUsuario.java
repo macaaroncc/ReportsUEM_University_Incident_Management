@@ -6,6 +6,8 @@ import modelo.Modelo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class _10_PerfilUsuario extends JFrame {
 	private Controlador controlador;
@@ -30,7 +32,6 @@ public class _10_PerfilUsuario extends JFrame {
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
 		lblTitulo.setBounds(0, 80, 1200, 30);
 		getContentPane().add(lblTitulo);
-		
 
 		JPanel panel = new JPanel(null);
 		panel.setBounds(150, 140, 900, 500);
@@ -94,6 +95,11 @@ public class _10_PerfilUsuario extends JFrame {
 		});
 
 		JButton btnCambiarContrasena = new JButton("Cambiar Contraseña");
+		btnCambiarContrasena.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controlador.abrirRestContrasena();
+			}
+		});
 		btnCambiarContrasena.setBounds(fieldX, y + 110, 300, 40);
 		btnCambiarContrasena.setBackground(Color.GRAY);
 		btnCambiarContrasena.setForeground(Color.WHITE);
@@ -143,7 +149,7 @@ public class _10_PerfilUsuario extends JFrame {
 
 		if (controlador != null && Modelo.usuarioActual != null) {
 			// Obtener datos del perfil: fecha, campus, email
-			String[] datos = controlador.obtenerDatosPerfil(); 
+			String[] datos = controlador.obtenerDatosPerfil();
 			txtfecha.setText(datos[0]); // Fecha nacimiento
 			txtCampus.setText(datos[1]); // Campus
 			txtNombre.setText(datos[2]); // Correo electrónico

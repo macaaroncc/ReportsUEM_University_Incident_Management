@@ -35,78 +35,61 @@ public class Controlador {
 	public void setModelo(Modelo modelo) {
 		this.modelo = modelo;
 	}
+
 	public static DefaultTableModel cargarUsuarios() {
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.setColumnIdentifiers(new String[]{"Usuario", "Nickname", "Rol", "Campus", "Contraseña", "Fecha", "Foto"});
+		DefaultTableModel modelo = new DefaultTableModel();
+		modelo.setColumnIdentifiers(
+				new String[] { "Usuario", "Nickname", "Rol", "Campus", "Contraseña", "Fecha", "Foto" });
 
-        try (Connection conexion = ConexionBD.conectar();
-             PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM users");
-             ResultSet rs = stmt.executeQuery()) {
+		try (Connection conexion = ConexionBD.conectar();
+				PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM users");
+				ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                modelo.addRow(new Object[]{
-                        rs.getString("USR"),
-                        rs.getString("NICKNAME"),
-                        rs.getString("ROL"),
-                        rs.getString("campus"),
-                        rs.getString("PWD"),
-                        rs.getDate("fecha"),
-                        rs.getString("foto")
-                });
-            }
+			while (rs.next()) {
+				modelo.addRow(new Object[] { rs.getString("USR"), rs.getString("NICKNAME"), rs.getString("ROL"),
+						rs.getString("campus"), rs.getString("PWD"), rs.getDate("fecha"), rs.getString("foto") });
+			}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        return modelo;
-    }
+		return modelo;
+	}
 
-    public static DefaultTableModel cargarIncidencias() {
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.setColumnIdentifiers(new String[]{
-                "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción",
-                "Aula", "Justificación", "Fecha", "Campus", "Ranking", "Usuario"
-        });
+	public static DefaultTableModel cargarIncidencias() {
+		DefaultTableModel modelo = new DefaultTableModel();
+		modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
+				"Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
 
-        try (Connection conexion = ConexionBD.conectar();
-             PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM incidencias");
-             ResultSet rs = stmt.executeQuery()) {
+		try (Connection conexion = ConexionBD.conectar();
+				PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM incidencias");
+				ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                modelo.addRow(new Object[]{
-                        rs.getInt("id_incidencia"),
-                        rs.getString("estado"),
-                        rs.getString("edificio"),
-                        rs.getString("foto"),
-                        rs.getString("piso"),
-                        rs.getString("descripcion"),
-                        rs.getString("aula"),
-                        rs.getString("justificacion"),
-                        rs.getDate("fecha"),
-                        rs.getString("campus"),
-                        rs.getInt("ranking"),
-                        rs.getString("USR")
-                });
-            }
+			while (rs.next()) {
+				modelo.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
+						rs.getString("edificio"), rs.getString("foto"), rs.getString("piso"),
+						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
+						rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
+			}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        return modelo;
-    }
+		return modelo;
+	}
 
-    public boolean eliminarUsuario(String usr) {
-        try (Connection conexion = ConexionBD.conectar();
-             PreparedStatement stmt = conexion.prepareStatement("DELETE FROM users WHERE USR = ?")) {
-            stmt.setString(1, usr);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+	public boolean eliminarUsuario(String usr) {
+		try (Connection conexion = ConexionBD.conectar();
+				PreparedStatement stmt = conexion.prepareStatement("DELETE FROM users WHERE USR = ?")) {
+			stmt.setString(1, usr);
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	public void crearIncidencia(String edificio, String foto, String piso, String descripcion, String aula,
 			String campus) {
@@ -133,8 +116,8 @@ public class Controlador {
 			stmt.setString(9, campus);
 
 			String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
-			stmt.setString(11, user); 
-			stmt.setString(12, user); 
+			stmt.setString(11, user);
+			stmt.setString(12, user);
 
 			int filas = stmt.executeUpdate();
 			if (filas > 0) {
@@ -387,7 +370,20 @@ public class Controlador {
 		return false;
 	}
 
+	/**
+	 * reestablecer contraseña
+	 * @param email
+	 * @param nuevaPwd
+	 * @param vistaActual
+	 */
 	public void restablecerContrasena(String email, String nuevaPwd, JFrame vistaActual) {
+		// Validación de longitud mínima
+		if (nuevaPwd == null || nuevaPwd.length() < 8) {
+			JOptionPane.showMessageDialog(vistaActual, "La contraseña debe tener al menos 8 caracteres.", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "UPDATE USERS SET PWD = ? WHERE USR = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
