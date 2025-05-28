@@ -123,7 +123,7 @@ public class _12_PaginaAdmin extends JFrame {
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(this, "Ranking inválido. Se usará 0.");
                 }
-                new _16_EditarIncidencia(id, estado, justificacion, rankingVal).setVisible(true);
+                new _16_EditarIncidencia(id, estado, justificacion).setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(this, "Selecciona una incidencia para editar.");
             }

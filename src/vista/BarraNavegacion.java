@@ -40,6 +40,16 @@ public class BarraNavegacion extends JPanel {
 
 		lblFavoritos = crearLink("Favoritos", 580);
 		add(lblFavoritos);
+		
+		lblFavoritos = crearLink("Favoritos", 580);
+		lblFavoritos.setBounds(580, 20, 100, 20);  // Más estrecho que 160
+		add(lblFavoritos);
+
+		lblAdminPanel = crearLink("Panel Administrador", 700);
+		lblAdminPanel.setBounds(700, 20, 140, 20); // Puedes ajustar también este ancho si quieres
+		lblAdminPanel.setVisible(false);
+		add(lblAdminPanel);
+
 
 		lblAdminPanel = crearLink("Panel Administrador", 700);
 		lblAdminPanel.setVisible(false);
