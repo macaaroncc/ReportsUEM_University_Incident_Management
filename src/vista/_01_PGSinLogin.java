@@ -39,12 +39,21 @@ public class _01_PGSinLogin extends JFrame {
 		barra.setBackground(new Color(128, 0, 0));
 		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
+		try {
+			ImageIcon icon = new ImageIcon(getClass().getResource("/img/LogoBlanco.png"));
+			Image imagenEscalada = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+			JLabel lblLogo = new JLabel(new ImageIcon(imagenEscalada));
+			lblLogo.setBounds(10, 10, 40, 40); // Alineado a la izquierda
+			barra.add(lblLogo);
+		} catch (Exception e) {
+			System.err.println("Error cargando logo: " + e.getMessage());
+		}
 
 		Font fuente = new Font("Tahoma", Font.BOLD, 13);
 
-		JLabel lblPGNPrincipal = crearNavLabel("Página Principal", 20, fuente);
-		JLabel lblMisIncidencias = crearNavLabel("Mis Incidencias", 180, fuente);
-		JLabel lblNotificaciones = crearNavLabel("Notificaciones", 350, fuente);
+		JLabel lblPGNPrincipal = crearNavLabel("Página Principal", 80, fuente);
+		JLabel lblMisIncidencias = crearNavLabel("Mis Incidencias", 240, fuente);
+		JLabel lblNotificaciones = crearNavLabel("Notificaciones", 410, fuente);
 		JLabel lblUsuario = crearNavLabel("Usuario", 1109, fuente);
 
 		barra.add(lblPGNPrincipal);

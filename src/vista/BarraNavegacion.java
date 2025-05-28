@@ -17,6 +17,7 @@ public class BarraNavegacion extends JPanel {
 	public JLabel lblFavoritos;
 	public JLabel lblUsuario;
 	private JLabel lblAdminPanel;
+	private JLabel label;
 
 	public void setUsuarioLogueado(boolean logueado) {
 		this.usuarioLogueado = logueado;
@@ -24,14 +25,20 @@ public class BarraNavegacion extends JPanel {
 
 	public BarraNavegacion() {
 		setLayout(null);
+		ImageIcon icon = new ImageIcon(getClass().getResource("/img/LogoBlanco.png")); // Asegúrate de que la ruta sea correcta
+		Image imagenEscalada = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+		JLabel lblLogo = new JLabel(new ImageIcon(imagenEscalada));
+		
+		lblLogo.setBounds(10, 10, 40, 40); // Posición y tamaño
+		add(lblLogo);
 		setBackground(new Color(128, 0, 0));
 		setBounds(0, 0, 1200, 59);
+		
+		lblPGNPrincipal = crearLink("Página Principal", 80);
+		lblMisIncidencias = crearLink("Mis Incidencias", 240);
+		lblNotificaciones = crearLink("Notificaciones", 410);
 
-		lblPGNPrincipal = crearLink("Página Principal", 20);
-		lblMisIncidencias = crearLink("Mis Incidencias", 180);
-		lblNotificaciones = crearLink("Notificaciones", 350);
-
-		lblFavoritos = crearLink("Favoritos", 520);
+		lblFavoritos = crearLink("Favoritos", 580);
 		add(lblFavoritos);
 
 		lblAdminPanel = crearLink("Panel Administrador", 680);
@@ -98,7 +105,7 @@ public class BarraNavegacion extends JPanel {
 	}
 
 	private JLabel crearLink(String texto, int x) {
-		JLabel label = new JLabel(texto);
+		label = new JLabel(texto);
 		label.setFont(new Font("Tahoma", Font.BOLD, 14));
 		label.setForeground(Color.WHITE);
 		label.setBounds(x, 20, 160, 20);
