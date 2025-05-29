@@ -3,6 +3,7 @@
 package vista;
 
 import controlador.Controlador;
+import modelo.Modelo;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,6 +19,13 @@ public class _05_RestContrasena extends JFrame {
 
 	public _05_RestContrasena(String origen) {
 		this.origen = origen;
+		
+		if (origen.equals("perfil")) {
+			usuario = Modelo.usuarioActual;
+		}
+			
+		
+		
 		setTitle("05. Restablecer contraseña");
 		setSize(1200, 900);
 		setLocationRelativeTo(null);

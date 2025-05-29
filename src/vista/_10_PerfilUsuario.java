@@ -8,11 +8,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 public class _10_PerfilUsuario extends JFrame {
 	private Controlador controlador;
 	private JTextField txtNombre, txtfecha, txtCampus;
-
+	private byte[] imagenBytes = null;
+	
 	public _10_PerfilUsuario() {
 		setTitle("10 . Perfil de Usuario");
 		setSize(1200, 900);
@@ -48,6 +50,31 @@ public class _10_PerfilUsuario extends JFrame {
 		JButton btnEditarFoto = new JButton("Editar Foto");
 		btnEditarFoto.setBounds(60, 232, 140, 30);
 		panel.add(btnEditarFoto);
+		
+
+		// En el constructor, reemplaza o modifica el botón btnEditarFoto así:
+
+		btnEditarFoto.addActionListener(e -> {
+		    JFileChooser chooser = new JFileChooser();
+		    int result = chooser.showOpenDialog(this);
+		    if (result == JFileChooser.APPROVE_OPTION) {
+		        File archivo = chooser.getSelectedFile();
+		        try {
+		            imagenBytes = java.nio.file.Files.readAllBytes(archivo.toPath());
+		            java.awt.image.BufferedImage imagen = javax.imageio.ImageIO.read(archivo);
+		            if (imagen != null) {
+		                Image imagenEscalada = imagen.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(), Image.SCALE_SMOOTH);
+		                lblFoto.setIcon(new ImageIcon(imagenEscalada));
+		            } else {
+		                lblFoto.setIcon(null);
+		                JOptionPane.showMessageDialog(this, "El archivo seleccionado no es una imagen válida.");
+		            }
+		        } catch (Exception ex) {
+		            JOptionPane.showMessageDialog(this, "Error al leer la imagen: " + ex.getMessage());
+		        }
+		    }
+		});
+
 
 		int labelX = 250, fieldX = 370, rowHeight = 40, y = 40;
 

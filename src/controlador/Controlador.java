@@ -1,5 +1,11 @@
 package controlador;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -9,11 +15,19 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ImageIcon;
 
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
@@ -88,31 +102,30 @@ public class Controlador {
 
 		return modelo;
 	}
-	
-	
+
 	public boolean eliminarIncidencia(int idIncidencia) {
-	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root", "")) {
-	        // Si no tienes ON DELETE CASCADE, elimina relaciones primero
-	        PreparedStatement ps1 = conn.prepareStatement("DELETE FROM favoritos WHERE incidencias_id_incidencia = ?");
-	        ps1.setInt(1, idIncidencia);
-	        ps1.executeUpdate();
+		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root",
+				"")) {
+			// Si no tienes ON DELETE CASCADE, elimina relaciones primero
+			PreparedStatement ps1 = conn.prepareStatement("DELETE FROM favoritos WHERE incidencias_id_incidencia = ?");
+			ps1.setInt(1, idIncidencia);
+			ps1.executeUpdate();
 
-	        PreparedStatement ps2 = conn.prepareStatement("DELETE FROM notificar WHERE incidencias_id_incidencia = ?");
-	        ps2.setInt(1, idIncidencia);
-	        ps2.executeUpdate();
+			PreparedStatement ps2 = conn.prepareStatement("DELETE FROM notificar WHERE incidencias_id_incidencia = ?");
+			ps2.setInt(1, idIncidencia);
+			ps2.executeUpdate();
 
-	        // Elimina la incidencia
-	        PreparedStatement ps3 = conn.prepareStatement("DELETE FROM incidencias WHERE id_incidencia = ?");
-	        ps3.setInt(1, idIncidencia);
-	        int filasAfectadas = ps3.executeUpdate();
+			// Elimina la incidencia
+			PreparedStatement ps3 = conn.prepareStatement("DELETE FROM incidencias WHERE id_incidencia = ?");
+			ps3.setInt(1, idIncidencia);
+			int filasAfectadas = ps3.executeUpdate();
 
-	        return filasAfectadas > 0;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+			return filasAfectadas > 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
-
 
 	public static DefaultTableModel buscarIncidencias(String estado, String usuario, String orden) {
 		DefaultTableModel modelo = new DefaultTableModel();
@@ -280,24 +293,87 @@ public class Controlador {
 	}
 
 	public void crearIncidencia(String edificio, byte[] fotoBytes, String piso, String descripcion, String aula,
-			String campus) {
+			String campus, JFrame ventana) {
 		if (descripcion.isEmpty() || aula.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
 			return;
 		}
 
 		try (Connection conn = ConexionBD.conectar()) {
+
+			// 1. Verificar incidencias existentes en ese aula
+			String consulta = "SELECT DESCRIPCION, FOTO FROM INCIDENCIAS WHERE AULA = ?";
+			PreparedStatement checkStmt = conn.prepareStatement(consulta);
+			checkStmt.setString(1, aula);
+			ResultSet rs = checkStmt.executeQuery();
+
+			boolean hayCoincidencias = false;
+			JPanel panelLista = new JPanel();
+			panelLista.setLayout(new BoxLayout(panelLista, BoxLayout.Y_AXIS));
+
+			while (rs.next()) {
+				hayCoincidencias = true;
+				String descExistente = rs.getString("DESCRIPCION");
+				byte[] fotoExistente = rs.getBytes("FOTO");
+
+				JPanel panel = new JPanel();
+				panel.setLayout(new BorderLayout(5, 5));
+				panel.setPreferredSize(new Dimension(350, 200));
+
+				JTextArea descArea = new JTextArea(descExistente);
+				descArea.setWrapStyleWord(true);
+				descArea.setLineWrap(true);
+				descArea.setEditable(false);
+				descArea.setBorder(BorderFactory.createTitledBorder("Descripción"));
+				panel.add(new JScrollPane(descArea), BorderLayout.CENTER);
+
+				if (fotoExistente != null && fotoExistente.length > 0) {
+					try {
+						BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(fotoExistente));
+						if (bufferedImage != null) {
+							Image imagenEscalada = bufferedImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+							JLabel lblImg = new JLabel(new ImageIcon(imagenEscalada));
+							lblImg.setBorder(BorderFactory.createTitledBorder("Imagen"));
+							panel.add(lblImg, BorderLayout.WEST);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+
+				panelLista.add(panel);
+				panelLista.add(Box.createRigidArea(new Dimension(0, 10)));
+			}
+
+			rs.close();
+			checkStmt.close();
+
+			// 2. Mostrar coincidencias si existen
+			if (hayCoincidencias) {
+				JScrollPane scroll = new JScrollPane(panelLista);
+				scroll.setPreferredSize(new Dimension(500, 350));
+
+				Object[] opciones = { "No está entre ellas", "Ya aparece ahí" };
+				int seleccion = JOptionPane.showOptionDialog(null, scroll, "Incidencias ya existentes en este aula",
+						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[0]);
+
+				if (seleccion != JOptionPane.YES_OPTION) {
+					return;
+				}
+			}
+
+			// 3. Insertar nueva incidencia
 			int nuevoId = obtenerMaxIdIncidencia() + 1;
 
 			String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement stmt = conn.prepareStatement(sql);
 
-			stmt.setInt(1, nuevoId); // id_incidencia
+			stmt.setInt(1, nuevoId);
 			stmt.setString(2, "En revisión");
 			stmt.setString(3, edificio);
 
 			if (fotoBytes != null) {
-				stmt.setBytes(4, fotoBytes); // FOTO como bytes
+				stmt.setBytes(4, fotoBytes);
 			} else {
 				stmt.setNull(4, java.sql.Types.BLOB);
 			}
@@ -309,16 +385,19 @@ public class Controlador {
 			stmt.setString(9, campus);
 
 			String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
-			stmt.setLong(10, 0); // RANKING, si no usas, lo pones null o 0
+			stmt.setLong(10, 0); // RANKING
 			stmt.setString(11, user);
 			stmt.setString(12, user);
 
 			int filas = stmt.executeUpdate();
 			if (filas > 0) {
 				JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
+				ventana.dispose(); // Cierra la ventana que pasaste como parámetro
+				new _07_MisIncidencias().setVisible(true); // Abre la ventana _07_MisIncidencias
 			} else {
 				JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
 			}
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
@@ -645,18 +724,17 @@ public class Controlador {
 	}
 
 	public boolean eliminarFavorito(String idIncidencia, String usuario) {
-	    String sql = "DELETE FROM favoritos WHERE incidencias_id_incidencia = ? AND USERS_USR = ?";
-	    try (Connection conexion = ConexionBD.conectar();
-	         PreparedStatement ps = conexion.prepareStatement(sql)) {
-	        ps.setInt(1, Integer.parseInt(idIncidencia));
-	        ps.setString(2, usuario);
-	        int filas = ps.executeUpdate();
-	        System.out.println("Filas eliminadas: " + filas);
-	        return filas > 0;
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+		String sql = "DELETE FROM favoritos WHERE incidencias_id_incidencia = ? AND USERS_USR = ?";
+		try (Connection conexion = ConexionBD.conectar(); PreparedStatement ps = conexion.prepareStatement(sql)) {
+			ps.setInt(1, Integer.parseInt(idIncidencia));
+			ps.setString(2, usuario);
+			int filas = ps.executeUpdate();
+			System.out.println("Filas eliminadas: " + filas);
+			return filas > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	public void actualizarPerfilUsuario(String fecha, String campus) {
