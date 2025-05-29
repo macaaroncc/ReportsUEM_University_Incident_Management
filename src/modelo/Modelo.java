@@ -1,6 +1,10 @@
 // @Author: Beatriz
 package modelo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 /**
  * Clase Modelo.
  * Representa la clase Modelo.
@@ -36,5 +40,21 @@ public class Modelo {
 	public String getUsuarioActual() {
 		return usuarioActual;
 	}
+	
+	public static byte[] obtenerFotoUsuario() {
+	    try (Connection conn = ConexionBD.conectar()) {
+	        String sql = "SELECT FOTO FROM USERS WHERE USR = ?";
+	        PreparedStatement stmt = conn.prepareStatement(sql);
+	        stmt.setString(1, usuarioActual + "@ueuropea.es");
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getBytes("FOTO");
+	        }
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+	    return null;
+	}
+
 
 }

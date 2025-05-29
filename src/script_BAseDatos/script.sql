@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS PREGUNTAS;
 DROP TABLE IF EXISTS incidencias;
 DROP TABLE IF EXISTS USERS;
 DROP TABLE IF EXISTS favoritosCount;
+
 -- Creamos las tablas
 CREATE TABLE USERS (
     USR VARCHAR(200) PRIMARY KEY,
@@ -175,5 +176,6 @@ INSERT INTO notificar (incidencias_id_incidencia, USERS_USR) VALUES
 -- Reactivamos las claves foráneas
 SET foreign_key_checks = 1;
 ALTER TABLE INCIDENCIAS MODIFY FOTO MEDIUMBLOB;
+ALTER TABLE USERS MODIFY FOTO MEDIUMBLOB;
 
 

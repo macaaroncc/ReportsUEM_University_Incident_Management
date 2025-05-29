@@ -4,17 +4,20 @@ package vista;
 import controlador.Controlador;
 import modelo.Modelo;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.awt.image.BufferedImage;
 
 public class _10_PerfilUsuario extends JFrame {
 	private Controlador controlador;
 	private JTextField txtNombre, txtfecha, txtCampus;
 	private byte[] imagenBytes = null;
-	
+	private JLabel lblFoto;
+
 	public _10_PerfilUsuario() {
 		setTitle("10 . Perfil de Usuario");
 		setSize(1200, 900);
@@ -41,7 +44,7 @@ public class _10_PerfilUsuario extends JFrame {
 		panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		getContentPane().add(panel);
 
-		JLabel lblFoto = new JLabel("Foto");
+		lblFoto = new JLabel("Foto");
 		lblFoto.setBounds(40, 40, 182, 181);
 		lblFoto.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
@@ -50,31 +53,28 @@ public class _10_PerfilUsuario extends JFrame {
 		JButton btnEditarFoto = new JButton("Editar Foto");
 		btnEditarFoto.setBounds(60, 232, 140, 30);
 		panel.add(btnEditarFoto);
-		
-
-		// En el constructor, reemplaza o modifica el botón btnEditarFoto así:
 
 		btnEditarFoto.addActionListener(e -> {
-		    JFileChooser chooser = new JFileChooser();
-		    int result = chooser.showOpenDialog(this);
-		    if (result == JFileChooser.APPROVE_OPTION) {
-		        File archivo = chooser.getSelectedFile();
-		        try {
-		            imagenBytes = java.nio.file.Files.readAllBytes(archivo.toPath());
-		            java.awt.image.BufferedImage imagen = javax.imageio.ImageIO.read(archivo);
-		            if (imagen != null) {
-		                Image imagenEscalada = imagen.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(), Image.SCALE_SMOOTH);
-		                lblFoto.setIcon(new ImageIcon(imagenEscalada));
-		            } else {
-		                lblFoto.setIcon(null);
-		                JOptionPane.showMessageDialog(this, "El archivo seleccionado no es una imagen válida.");
-		            }
-		        } catch (Exception ex) {
-		            JOptionPane.showMessageDialog(this, "Error al leer la imagen: " + ex.getMessage());
-		        }
-		    }
+			JFileChooser chooser = new JFileChooser();
+			int result = chooser.showOpenDialog(this);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File archivo = chooser.getSelectedFile();
+				try {
+					imagenBytes = java.nio.file.Files.readAllBytes(archivo.toPath());
+					BufferedImage imagen = ImageIO.read(archivo);
+					if (imagen != null) {
+						Image imagenEscalada = imagen.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(), Image.SCALE_SMOOTH);
+						lblFoto.setText("");
+						lblFoto.setIcon(new ImageIcon(imagenEscalada));
+					} else {
+						lblFoto.setIcon(null);
+						JOptionPane.showMessageDialog(this, "El archivo seleccionado no es una imagen válida.");
+					}
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(this, "Error al leer la imagen: " + ex.getMessage());
+				}
+			}
 		});
-
 
 		int labelX = 250, fieldX = 370, rowHeight = 40, y = 40;
 
@@ -83,8 +83,8 @@ public class _10_PerfilUsuario extends JFrame {
 		panel.add(lblNombre);
 
 		txtNombre = new JTextField();
-		txtNombre.setBounds(370, 40, 300, 30);
-		txtNombre.setEditable(false); // Solo lectura
+		txtNombre.setBounds(fieldX, y, 300, 30);
+		txtNombre.setEditable(false);
 		panel.add(txtNombre);
 
 		y += rowHeight;
@@ -116,25 +116,23 @@ public class _10_PerfilUsuario extends JFrame {
 			if (controlador != null) {
 				String fecha = txtfecha.getText();
 				String campus = txtCampus.getText();
-				controlador.actualizarPerfilUsuario(fecha, campus);
+				controlador.actualizarPerfilUsuario(fecha, campus, imagenBytes); // 👈 pasa imagenBytes
 				JOptionPane.showMessageDialog(this, "Perfil actualizado correctamente.");
 			}
 		});
 
 		JButton btnCambiarContrasena = new JButton("Cambiar Contraseña");
-		btnCambiarContrasena.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (controlador != null) {
-					controlador.abrirRestContrasena("perfil");
-				}
-				dispose();
-			}
-		});
 		btnCambiarContrasena.setBounds(10, 449, 300, 40);
 		btnCambiarContrasena.setBackground(Color.GRAY);
 		btnCambiarContrasena.setForeground(Color.WHITE);
 		btnCambiarContrasena.setFont(new Font("Tahoma", Font.BOLD, 14));
 		panel.add(btnCambiarContrasena);
+		btnCambiarContrasena.addActionListener(e -> {
+			if (controlador != null) {
+				controlador.abrirRestContrasena("perfil");
+			}
+			dispose();
+		});
 
 		JButton btnCerrarSesion = new JButton("Cerrar Sesión");
 		btnCerrarSesion.setBounds(590, 398, 300, 40);
@@ -148,9 +146,9 @@ public class _10_PerfilUsuario extends JFrame {
 					"Confirmar cierre de sesión", JOptionPane.YES_NO_OPTION);
 			if (confirm == JOptionPane.YES_OPTION) {
 				if (controlador != null) {
-					controlador.cerrarSesion(); // Abrirá el login
+					controlador.cerrarSesion();
 				}
-				dispose(); // Cierra esta ventana
+				dispose();
 			}
 		});
 
@@ -178,11 +176,27 @@ public class _10_PerfilUsuario extends JFrame {
 		}
 
 		if (controlador != null && Modelo.usuarioActual != null) {
-			// Obtener datos del perfil: fecha, campus, email
 			String[] datos = controlador.obtenerDatosPerfil();
-			txtfecha.setText(datos[0]); // Fecha nacimiento
-			txtCampus.setText(datos[1]); // Campus
-			txtNombre.setText(datos[2]); // Correo electrónico
+			txtfecha.setText(datos[0]);
+			txtCampus.setText(datos[1]);
+			txtNombre.setText(datos[2]);
+
+			// ✅ Cargar y mostrar foto del usuario
+			imagenBytes = Modelo.obtenerFotoUsuario();
+			if (imagenBytes != null && imagenBytes.length > 0) {
+				try {
+					ByteArrayInputStream bis = new ByteArrayInputStream(imagenBytes);
+					BufferedImage img = ImageIO.read(bis);
+					if (img != null) {
+						Image imagenEscalada = img.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(), Image.SCALE_SMOOTH);
+						lblFoto.setText("");
+						lblFoto.setIcon(new ImageIcon(imagenEscalada));
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(this, "Error al cargar la imagen del perfil.");
+				}
+			}
 		}
 	}
 }

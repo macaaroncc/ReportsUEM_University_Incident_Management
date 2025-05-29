@@ -737,30 +737,42 @@ public class Controlador {
 		}
 	}
 
-	public void actualizarPerfilUsuario(String fecha, String campus) {
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ? WHERE USR = ?";
-			PreparedStatement stmt = conn.prepareStatement(sql);
+	public void actualizarPerfilUsuario(String fecha, String campus, byte[] imagen) {
+	    try (Connection conn = ConexionBD.conectar()) {
+	        String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ?, FOTO = ? WHERE USR = ?";
+	        PreparedStatement stmt = conn.prepareStatement(sql);
 
-			if (fecha == null || fecha.trim().isEmpty()) {
-				stmt.setNull(1, java.sql.Types.DATE);
-			} else {
-				stmt.setDate(1, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
-			}
+	        // Fecha
+	        if (fecha == null || fecha.trim().isEmpty()) {
+	            stmt.setNull(1, java.sql.Types.DATE);
+	        } else {
+	            stmt.setDate(1, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
+	        }
 
-			if (campus == null || campus.trim().isEmpty()) {
-				stmt.setNull(2, java.sql.Types.VARCHAR);
-			} else {
-				stmt.setString(2, campus);
-			}
+	        // Campus
+	        if (campus == null || campus.trim().isEmpty()) {
+	            stmt.setNull(2, java.sql.Types.VARCHAR);
+	        } else {
+	            stmt.setString(2, campus);
+	        }
 
-			stmt.setString(3, Modelo.usuarioActual + "@ueuropea.es");
-			stmt.executeUpdate();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
-		}
+	        // Imagen
+	        if (imagen != null) {
+	            stmt.setBytes(3, imagen);
+	        } else {
+	            stmt.setNull(3, java.sql.Types.BLOB);
+	        }
+
+	        // Usuario
+	        stmt.setString(4, Modelo.usuarioActual + "@ueuropea.es");
+
+	        stmt.executeUpdate();
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
+	    }
 	}
+
 
 	public void abrirFavoritos(JFrame ventanaActual) {
 		ventanaActual.dispose();
