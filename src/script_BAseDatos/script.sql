@@ -65,6 +65,7 @@ CREATE TABLE favoritos (
     incidencias_id_incidencia INT,
     USERS_USR VARCHAR(200),
     PRIMARY KEY (incidencias_id_incidencia, USERS_USR),
+    FOREIGN KEY (incidencias_id_incidencia) REFERENCES incidencias(id_incidencia),
     FOREIGN KEY (USERS_USR) REFERENCES USERS(USR)
 );
 
@@ -140,30 +141,9 @@ VALUES
 
 -- Favoritos
 INSERT INTO favoritos (incidencias_id_incidencia, USERS_USR) VALUES
-(103, 'juan001@ueuropea.es'),
 (104, 'sofia002@ueuropea.es'),
 (105, 'lucia004@ueuropea.es'),
-(106, 'mario005@ueuropea.es'),
-(107, 'juan001@ueuropea.es'),
-(108, 'sofia002@ueuropea.es'),
-(109, 'ana789@ueuropea.es'),
-(110, 'luis321@ueuropea.es'),
-(111, 'maria456@ueuropea.es'),
-(112, 'mario005@ueuropea.es'),
-(113, 'juan001@ueuropea.es'),
-(114, 'sofia002@ueuropea.es'),
-(115, 'ana789@ueuropea.es'),
-(116, 'luis321@ueuropea.es'),
-(117, 'maria456@ueuropea.es'),
-(118, 'mario005@ueuropea.es'),
-(119, 'juan001@ueuropea.es'),
-(120, 'sofia002@ueuropea.es'),
-(121, 'ana789@ueuropea.es'),
-(122, 'luis321@ueuropea.es'),
-(123, 'maria456@ueuropea.es'),
-(124, 'mario005@ueuropea.es'),
-(125, 'juan001@ueuropea.es'),
-(126, 'sofia002@ueuropea.es');
+(106, 'mario005@ueuropea.es');
 
 -- Notificar
 INSERT INTO notificar (incidencias_id_incidencia, USERS_USR) VALUES

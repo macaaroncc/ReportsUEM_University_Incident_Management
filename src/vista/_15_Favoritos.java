@@ -41,28 +41,27 @@ public class _15_Favoritos extends JFrame {
         getContentPane().add(scrollPane);
 
         modelo = new DefaultTableModel(new Object[][] {},
-        	    new String[] { "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula", "Fecha", "Campus", "Ranking", "Usuario" }) {
-        	    @Override
-        	    public boolean isCellEditable(int row, int column) {
-        	        return false;
-        	    }
+            new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula", "Fecha", "Campus", "Ranking", "Usuario" }) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
 
-        	    @Override
-        	    public Class<?> getColumnClass(int columnIndex) {
-        	        if (columnIndex == 2) { // Foto - podrías usar ImageIcon.class si manejas imágenes
-        	            return String.class; // O ImageIcon.class si quieres mostrar imagen
-        	        }
-        	        return String.class;
-        	    }
-        	};
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return String.class;
+            }
+        };
+
         table = new JTable(modelo);
         table.setRowHeight(40);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        // Ancho y alineación de columnas
-        table.getColumnModel().getColumn(0).setPreferredWidth(200); // incidencias_id_incidencia
-        table.getColumnModel().getColumn(1).setPreferredWidth(200); // USERS_USR
+        // Ocultar columna ID
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
 
         scrollPane.setViewportView(table);
 
@@ -107,7 +106,7 @@ public class _15_Favoritos extends JFrame {
 
         String usuarioConDominio = usuario + "@ueuropea.es";
 
-        String sql = "SELECT i.estado, i.edificio, i.foto, i.piso, i.descripcion, i.aula, i.fecha, i.campus, i.ranking, i.USR " +
+        String sql = "SELECT i.id_incidencia, i.estado, i.edificio, i.foto, i.piso, i.descripcion, i.aula, i.fecha, i.campus, i.ranking, i.USR " +
                      "FROM favoritos f " +
                      "JOIN incidencias i ON f.incidencias_id_incidencia = i.id_incidencia " +
                      "WHERE f.USERS_USR = ?";
@@ -121,10 +120,10 @@ public class _15_Favoritos extends JFrame {
             modelo.setRowCount(0);
 
             while (rs.next()) {
-                // Obtener cada campo según el SELECT
+                int idIncidencia = rs.getInt("id_incidencia");
                 String estado = rs.getString("estado");
                 String edificio = rs.getString("edificio");
-                String foto = rs.getString("foto");         // Aquí podrías manejar cómo mostrar la foto en la tabla
+                String foto = rs.getString("foto");
                 String piso = rs.getString("piso");
                 String descripcion = rs.getString("descripcion");
                 String aula = rs.getString("aula");
@@ -133,7 +132,9 @@ public class _15_Favoritos extends JFrame {
                 String ranking = rs.getString("ranking");
                 String usr = rs.getString("USR");
 
-                modelo.addRow(new Object[]{estado, edificio, foto, piso, descripcion, aula, fecha, campus, ranking, usr});
+                modelo.addRow(new Object[] {
+                    idIncidencia, estado, edificio, foto, piso, descripcion, aula, fecha, campus, ranking, usr
+                });
             }
             rs.close();
         } catch (SQLException e) {
@@ -144,7 +145,6 @@ public class _15_Favoritos extends JFrame {
         }
     }
 
-
     private void eliminarFavorito() {
         int fila = table.getSelectedRow();
         if (fila != -1) {
@@ -153,12 +153,10 @@ public class _15_Favoritos extends JFrame {
                     JOptionPane.YES_NO_OPTION);
 
             if (confirmacion == JOptionPane.YES_OPTION) {
-                // Obtener datos para eliminar de la BD
-                String incidenciaId = (String) modelo.getValueAt(fila, 0);
-                String usuario = (String) modelo.getValueAt(fila, 1);
+                int idIncidencia = (int) modelo.getValueAt(fila, 0); // Columna 0: ID
+                String usuario = Modelo.usuarioActual + "@ueuropea.es";
 
-                // Llamar método del controlador para eliminar favorito en BD
-                if (controlador != null && controlador.eliminarFavorito(incidenciaId, usuario)) {
+                if (controlador != null && controlador.eliminarFavorito(String.valueOf(idIncidencia), usuario)) {
                     modelo.removeRow(fila);
                 } else {
                     JOptionPane.showMessageDialog(this,

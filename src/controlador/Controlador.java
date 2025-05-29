@@ -644,22 +644,19 @@ public class Controlador {
 		login.setVisible(true);
 	}
 
-	public boolean eliminarFavorito(String incidenciaId, String usuario) {
-		String sql = "DELETE FROM favoritos WHERE incidencias_id_incidencia = ? AND USERS_USR = ?";
-
-		try (Connection conexion = ConexionBD.conectar(); PreparedStatement stmt = conexion.prepareStatement(sql)) {
-
-			stmt.setString(1, incidenciaId);
-			stmt.setString(2, usuario);
-
-			int filasAfectadas = stmt.executeUpdate();
-
-			return filasAfectadas > 0;
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
+	public boolean eliminarFavorito(String idIncidencia, String usuario) {
+	    String sql = "DELETE FROM favoritos WHERE incidencias_id_incidencia = ? AND USERS_USR = ?";
+	    try (Connection conexion = ConexionBD.conectar();
+	         PreparedStatement ps = conexion.prepareStatement(sql)) {
+	        ps.setInt(1, Integer.parseInt(idIncidencia));
+	        ps.setString(2, usuario);
+	        int filas = ps.executeUpdate();
+	        System.out.println("Filas eliminadas: " + filas);
+	        return filas > 0;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
 
 	public void actualizarPerfilUsuario(String fecha, String campus) {
