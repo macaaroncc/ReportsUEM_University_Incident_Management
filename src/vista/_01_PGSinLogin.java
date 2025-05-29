@@ -264,18 +264,38 @@ public class _01_PGSinLogin extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Fondo circular perfecto
                 g2.setColor(getBackground());
                 g2.fillOval(0, 0, getWidth(), getHeight());
-                super.paintComponent(g2);
+                
+                // Texto centrado perfectamente
+                g2.setColor(getForeground());
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth(getText());
+                int textHeight = fm.getAscent();
+                g2.drawString(getText(), 
+                             (getWidth() - textWidth) / 2, 
+                             (getHeight() + textHeight) / 2 - 2); // -2 para ajuste visual
+                
                 g2.dispose();
             }
+            
+            @Override
+            protected void paintBorder(Graphics g) {
+                // Sin borde para un círculo perfecto
+            }
         };
+        
         btnAyuda.setBounds(1120, 740, 50, 50);
         btnAyuda.setBackground(new Color(128, 0, 0));
         btnAyuda.setForeground(Color.WHITE);
-        btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
+        btnAyuda.setFont(new Font("Arial", Font.BOLD, 24)); // Tamaño aumentado
         btnAyuda.setFocusPainted(false);
         btnAyuda.setBorder(BorderFactory.createEmptyBorder());
+        btnAyuda.setContentAreaFilled(false);
+        btnAyuda.setOpaque(false);
         getContentPane().add(btnAyuda);
         btnAyuda.addActionListener(e -> {
             if (controlador != null) controlador.abrirAyuda();
