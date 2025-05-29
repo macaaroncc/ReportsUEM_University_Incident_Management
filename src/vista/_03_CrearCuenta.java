@@ -1,216 +1,343 @@
-// @Autor Beatriz
-
 package vista;
 
 import controlador.Controlador;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class _03_CrearCuenta extends JFrame {
-	private Controlador controlador;
-	private JPanel outerPanel;
-	private JButton btnAtras;
-	private JPanel cardPanel;
-	private JLabel lblTitulo;
-	private JLabel lblEmail;
-	private JTextField txtEmail;
-	private JLabel lblPwd;
-	private JPasswordField txtPwd;
-	private JLabel lblRepPwd;
-	private JPasswordField txtRepPwd;
-	private JComboBox<String> pregunta1;
-	private JTextField respuesta1;
-	private JComboBox<String> pregunta2;
-	private JTextField respuesta2;
-	private JCheckBox checkEdad;
-	private JCheckBox checkCaptcha;
-	private JCheckBox checkAdmin;
-	private JLabel lblAdmin;
-	private JTextField txtCodigo;
-	private JButton btnCrear;
+    private Controlador controlador;
+    private JPanel outerPanel;
+    private RoundedButton btnAtras;
+    private RoundedPanel cardPanel;
+    private JLabel lblTitulo;
+    private JLabel lblEmail;
+    private RoundedTextField txtEmail;
+    private JLabel lblPwd;
+    private RoundedPasswordField txtPwd;
+    private JLabel lblRepPwd;
+    private RoundedPasswordField txtRepPwd;
+    private JComboBox<String> pregunta1;
+    private RoundedTextField respuesta1;
+    private JComboBox<String> pregunta2;
+    private RoundedTextField respuesta2;
+    private JCheckBox checkEdad;
+    private JCheckBox checkCaptcha;
+    private JCheckBox checkAdmin;
+    private JLabel lblAdmin;
+    private RoundedTextField txtCodigo;
+    private RoundedButton btnCrear;
 
-	public _03_CrearCuenta() {
-		setTitle("03 . Crear cuenta");
-		setSize(1200, 900);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+    // Clases internas para componentes redondeados (iguales a _02_Login)
+    static class RoundedButton extends JButton {
+        private final int radius;
+        private Color backgroundColor;
+        private Color borderColor;
 
-		JLabel backgroundLabel = new JLabel(new ImageIcon(_02_Login.class.getResource("/img/fondo.jpg")));
-		backgroundLabel.setLayout(new BorderLayout());
-		setContentPane(backgroundLabel);
+        public RoundedButton(String text, int radius, Color backgroundColor, Color borderColor) {
+            super(text);
+            this.radius = radius;
+            this.backgroundColor = backgroundColor;
+            this.borderColor = borderColor;
+            setContentAreaFilled(false);
+            setFocusPainted(false);
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+            setForeground(Color.BLACK);
+        }
 
-		getContentPane().setLayout(new BorderLayout());
-		outerPanel = new JPanel(null);
-		outerPanel.setOpaque(false);
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(backgroundColor);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+            super.paintComponent(g2);
+            g2.dispose();
+        }
 
-		cardPanel = new JPanel(null);
-		cardPanel.setBounds(420, 100, 360, 620);
-		cardPanel.setBackground(new Color(255, 255, 252, 230));
-		cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        @Override
+        protected void paintBorder(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(borderColor);
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+            g2.dispose();
+        }
+    }
 
-		btnAtras = new JButton("◀ Atrás");
-		btnAtras.setForeground(Color.BLACK);
-		btnAtras.setBackground(new Color(255, 255, 252));
-		btnAtras.setFocusPainted(false);
-		btnAtras.setBounds(10, 11, 90, 30);
-		outerPanel.add(btnAtras);
-		btnAtras.addActionListener(e -> {
-			if (controlador != null) {
-				controlador.abrirLogin();
-			}
-			_03_CrearCuenta.this.dispose();
-		});
+    static class RoundedTextField extends JTextField {
+        private final int radius;
 
-		lblTitulo = new JLabel("Crear Cuenta", SwingConstants.CENTER);
-		lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
-		lblTitulo.setBounds(80, 20, 200, 30);
-		cardPanel.add(lblTitulo);
+        public RoundedTextField(int radius) {
+            super();
+            this.radius = radius;
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        }
 
-		int x = 40;
-		int width = 280;
-		int alturaCampo = 30;
-		int y = 70;
-		int espacio = 40;
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground() != null ? getBackground() : Color.WHITE);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+            super.paintComponent(g2);
+            g2.dispose();
+        }
 
-		lblEmail = new JLabel("Email:");
-		lblEmail.setBounds(x, y, width, 20);
-		cardPanel.add(lblEmail);
+        @Override
+        protected void paintBorder(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getForeground());
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+            g2.dispose();
+        }
+    }
 
-		txtEmail = new JTextField();
-		txtEmail.setBounds(x, y += 20, width, alturaCampo);
-		cardPanel.add(txtEmail);
+    static class RoundedPasswordField extends JPasswordField {
+        private final int radius;
 
-		lblPwd = new JLabel("Contraseña:");
-		lblPwd.setBounds(x, y += espacio, width, 20);
-		cardPanel.add(lblPwd);
+        public RoundedPasswordField(int radius) {
+            super();
+            this.radius = radius;
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        }
 
-		txtPwd = new JPasswordField();
-		txtPwd.setBounds(x, y += 20, width, alturaCampo);
-		cardPanel.add(txtPwd);
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground() != null ? getBackground() : Color.WHITE);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+            super.paintComponent(g2);
+            g2.dispose();
+        }
 
-		lblRepPwd = new JLabel("Repetir contraseña:");
-		lblRepPwd.setBounds(x, y += espacio, width, 20);
-		cardPanel.add(lblRepPwd);
+        @Override
+        protected void paintBorder(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getForeground());
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+            g2.dispose();
+        }
+    }
 
-		txtRepPwd = new JPasswordField();
-		txtRepPwd.setBounds(x, y += 20, width, alturaCampo);
-		cardPanel.add(txtRepPwd);
+    static class RoundedPanel extends JPanel {
+        private final int radius;
 
-		pregunta1 = new JComboBox<>(
-				new String[] { "¿Nombre de tu primera mascota?", "¿Ciudad donde naciste?", "¿Comida favorita?" });
-		pregunta1.setBounds(x, y += espacio + 10, width, alturaCampo);
-		cardPanel.add(pregunta1);
+        public RoundedPanel(int radius) {
+            super(null);
+            this.radius = radius;
+            setOpaque(false);
+        }
 
-		respuesta1 = new JTextField();
-		respuesta1.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				respuesta1.setText("");
-			}
-		});
-		respuesta1.setBounds(x, y += espacio, width, alturaCampo);
-		cardPanel.add(respuesta1);
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+            super.paintComponent(g2);
+            g2.dispose();
+        }
 
-		pregunta2 = new JComboBox<>(
-				new String[] { "¿Nombre de tu mejor amigo?", "¿Color favorito?", "¿Nombre de tu escuela primaria?" });
-		pregunta2.setBounds(x, y += espacio, width, alturaCampo);
-		cardPanel.add(pregunta2);
+        @Override
+        protected void paintBorder(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(Color.BLACK);
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+            g2.dispose();
+        }
+    }
 
-		respuesta2 = new JTextField();
-		respuesta2.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				respuesta2.setText("");
-			}
-		});
-		respuesta2.setBounds(x, y += espacio, width, alturaCampo);
-		cardPanel.add(respuesta2);
+    public _03_CrearCuenta() {
+        setTitle("03 . Crear cuenta");
+        setSize(1200, 900);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-		checkEdad = new JCheckBox("Soy mayor de 16 años");
-		checkEdad.setBounds(x, y += espacio, 180, 30);
-		cardPanel.add(checkEdad);
+        JLabel backgroundLabel = new JLabel(new ImageIcon(_02_Login.class.getResource("/img/fondo.jpg")));
+        backgroundLabel.setLayout(new BorderLayout());
+        setContentPane(backgroundLabel);
 
-		checkCaptcha = new JCheckBox("CAPTCHA");
-		checkCaptcha.setBounds(x + 180, y, 120, 30);
-		cardPanel.add(checkCaptcha);
+        getContentPane().setLayout(new BorderLayout());
+        outerPanel = new JPanel(null);
+        outerPanel.setOpaque(false);
 
-		checkAdmin = new JCheckBox("Soy administrador");
-		checkAdmin.setBounds(x, y += espacio, 180, 30);
-		cardPanel.add(checkAdmin);
+        // Panel principal redondeado
+        cardPanel = new RoundedPanel(25);
+        cardPanel.setBounds(420, 100, 360, 620);
+        cardPanel.setBackground(new Color(255, 255, 252));
+        cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-		lblAdmin = new JLabel("Código Admin:");
-		lblAdmin.setBounds(x, y += espacio, 100, 20);
-		lblAdmin.setVisible(false); // Invisible al inicio
-		cardPanel.add(lblAdmin);
+        // Botón Atrás redondeado
+        btnAtras = new RoundedButton("◀ Atrás", 15, new Color(255, 255, 252), Color.BLACK);
+        btnAtras.setBounds(10, 11, 90, 30);
+        outerPanel.add(btnAtras);
+        btnAtras.addActionListener(e -> {
+            if (controlador != null) {
+                controlador.abrirLogin();
+            }
+            _03_CrearCuenta.this.dispose();
+        });
 
-		txtCodigo = new JTextField();
-		txtCodigo.setBounds(x + 100, y, 100, alturaCampo);
-		txtCodigo.setVisible(false); // Invisible al inicio
-		cardPanel.add(txtCodigo);
+        lblTitulo = new JLabel("Crear Cuenta", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
+        lblTitulo.setBounds(80, 20, 200, 30);
+        cardPanel.add(lblTitulo);
 
-		checkAdmin.addActionListener(e -> {
-			boolean isSelected = checkAdmin.isSelected();
-			lblAdmin.setVisible(isSelected);
-			txtCodigo.setVisible(isSelected);
+        int x = 40;
+        int width = 280;
+        int alturaCampo = 30;
+        int y = 70;
+        int espacio = 40;
 
-			if (!isSelected) {
-				txtCodigo.setText("");
-			}
-		});
+        lblEmail = new JLabel("Email:");
+        lblEmail.setBounds(x, y, width, 20);
+        cardPanel.add(lblEmail);
 
-		btnCrear = new JButton("Crear Cuenta");
-		btnCrear.setForeground(Color.WHITE);
-		btnCrear.setBackground(new Color(128, 0, 0));
-		btnCrear.setFont(new Font("Tahoma", Font.BOLD, 13));
-		btnCrear.setFocusPainted(false);
-		btnCrear.setBounds(x + 20, y + 50, 240, 35);
-		cardPanel.add(btnCrear);
+        txtEmail = new RoundedTextField(15);
+        txtEmail.setBounds(x, y += 20, width, alturaCampo);
+        txtEmail.setBackground(Color.WHITE);
+        cardPanel.add(txtEmail);
 
-		// Lógica al pulsar "Crear Cuenta"
-		btnCrear.addActionListener(e -> {
-			String email = txtEmail.getText().trim();
-			String pwd = new String(txtPwd.getPassword());
-			String repPwd = new String(txtRepPwd.getPassword());
-			String codigo = txtCodigo.getText().trim();
+        lblPwd = new JLabel("Contraseña:");
+        lblPwd.setBounds(x, y += espacio, width, 20);
+        cardPanel.add(lblPwd);
 
-			int preg1 = pregunta1.getSelectedIndex() + 1;
-			int preg2 = pregunta2.getSelectedIndex() + 1;
+        txtPwd = new RoundedPasswordField(15);
+        txtPwd.setBounds(x, y += 20, width, alturaCampo);
+        txtPwd.setBackground(Color.WHITE);
+        txtPwd.setEchoChar('•');
+        cardPanel.add(txtPwd);
 
-			String resp1 = respuesta1.getText().trim();
-			String resp2 = respuesta2.getText().trim();
-			
-			if (!email.endsWith("@ueuropea.es")) {
-				JOptionPane.showMessageDialog(this, "Solo se admiten correos proporcionados por la universidad (@ueuropea.es)", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+        lblRepPwd = new JLabel("Repetir contraseña:");
+        lblRepPwd.setBounds(x, y += espacio, width, 20);
+        cardPanel.add(lblRepPwd);
 
+        txtRepPwd = new RoundedPasswordField(15);
+        txtRepPwd.setBounds(x, y += 20, width, alturaCampo);
+        txtRepPwd.setBackground(Color.WHITE);
+        txtRepPwd.setEchoChar('•');
+        cardPanel.add(txtRepPwd);
 
-			if (!pwd.equals(repPwd)) {
-				JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+        pregunta1 = new JComboBox<>(
+                new String[] { "¿Nombre de tu primera mascota?", "¿Ciudad donde naciste?", "¿Comida favorita?" });
+        pregunta1.setBounds(x, y += espacio + 10, width, alturaCampo);
+        cardPanel.add(pregunta1);
 
-			if (!checkEdad.isSelected()) {
-				JOptionPane.showMessageDialog(this, "Debes ser mayor de 16 años", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+        respuesta1 = new RoundedTextField(15);
+        respuesta1.setBounds(x, y += espacio, width, alturaCampo);
+        respuesta1.setBackground(Color.WHITE);
+        respuesta1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                respuesta1.setText("");
+            }
+        });
+        cardPanel.add(respuesta1);
 
-			if (!checkCaptcha.isSelected()) {
-				JOptionPane.showMessageDialog(this, "Debes marcar el CAPTCHA", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+        pregunta2 = new JComboBox<>(
+                new String[] { "¿Nombre de tu mejor amigo?", "¿Color favorito?", "¿Nombre de tu escuela primaria?" });
+        pregunta2.setBounds(x, y += espacio, width, alturaCampo);
+        cardPanel.add(pregunta2);
 
-			controlador.registrarUsuario(email, pwd, codigo, preg1, preg2, resp1, resp2, this);
-		});
+        respuesta2 = new RoundedTextField(15);
+        respuesta2.setBounds(x, y += espacio, width, alturaCampo);
+        respuesta2.setBackground(Color.WHITE);
+        respuesta2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                respuesta2.setText("");
+            }
+        });
+        cardPanel.add(respuesta2);
 
-		outerPanel.add(cardPanel);
-		getContentPane().add(outerPanel, BorderLayout.CENTER);
-	}
+        checkEdad = new JCheckBox("Soy mayor de 16 años");
+        checkEdad.setBounds(x, y += espacio, 180, 30);
+        cardPanel.add(checkEdad);
 
-	public void setControlador(Controlador controlador) {
-		this.controlador = controlador;
-	}
+        checkCaptcha = new JCheckBox("CAPTCHA");
+        checkCaptcha.setBounds(x + 180, y, 120, 30);
+        cardPanel.add(checkCaptcha);
+
+        checkAdmin = new JCheckBox("Soy administrador");
+        checkAdmin.setBounds(x, y += espacio, 180, 30);
+        cardPanel.add(checkAdmin);
+
+        lblAdmin = new JLabel("Código Admin:");
+        lblAdmin.setBounds(x, y += espacio, 100, 20);
+        lblAdmin.setVisible(false);
+        cardPanel.add(lblAdmin);
+
+        txtCodigo = new RoundedTextField(15);
+        txtCodigo.setBounds(x + 100, y, 100, alturaCampo);
+        txtCodigo.setVisible(false);
+        txtCodigo.setBackground(Color.WHITE);
+        cardPanel.add(txtCodigo);
+
+        checkAdmin.addActionListener(e -> {
+            boolean isSelected = checkAdmin.isSelected();
+            lblAdmin.setVisible(isSelected);
+            txtCodigo.setVisible(isSelected);
+            if (!isSelected) {
+                txtCodigo.setText("");
+            }
+        });
+
+        // Botón Crear Cuenta redondeado
+        btnCrear = new RoundedButton("Crear Cuenta", 20, new Color(128, 0, 0), new Color(128, 0, 0));
+        btnCrear.setForeground(Color.WHITE);
+        btnCrear.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnCrear.setBounds(x + 20, y + 50, 240, 35);
+        cardPanel.add(btnCrear);
+
+        btnCrear.addActionListener(e -> {
+            String email = txtEmail.getText().trim();
+            String pwd = new String(txtPwd.getPassword());
+            String repPwd = new String(txtRepPwd.getPassword());
+            String codigo = txtCodigo.getText().trim();
+
+            int preg1 = pregunta1.getSelectedIndex() + 1;
+            int preg2 = pregunta2.getSelectedIndex() + 1;
+
+            String resp1 = respuesta1.getText().trim();
+            String resp2 = respuesta2.getText().trim();
+            
+            if (!email.endsWith("@ueuropea.es")) {
+                JOptionPane.showMessageDialog(this, "Solo se admiten correos proporcionados por la universidad (@ueuropea.es)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!pwd.equals(repPwd)) {
+                JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!checkEdad.isSelected()) {
+                JOptionPane.showMessageDialog(this, "Debes ser mayor de 16 años", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!checkCaptcha.isSelected()) {
+                JOptionPane.showMessageDialog(this, "Debes marcar el CAPTCHA", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            controlador.registrarUsuario(email, pwd, codigo, preg1, preg2, resp1, resp2, this);
+        });
+
+        outerPanel.add(cardPanel);
+        getContentPane().add(outerPanel, BorderLayout.CENTER);
+    }
+
+    public void setControlador(Controlador controlador) {
+        this.controlador = controlador;
+    }
 }
