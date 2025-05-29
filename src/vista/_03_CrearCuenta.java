@@ -104,7 +104,7 @@ public class _03_CrearCuenta extends JFrame {
 		pregunta1.setBounds(x, y += espacio + 10, width, alturaCampo);
 		cardPanel.add(pregunta1);
 
-		respuesta1 = new JTextField("Su respuesta");
+		respuesta1 = new JTextField();
 		respuesta1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -119,7 +119,7 @@ public class _03_CrearCuenta extends JFrame {
 		pregunta2.setBounds(x, y += espacio, width, alturaCampo);
 		cardPanel.add(pregunta2);
 
-		respuesta2 = new JTextField("Su respuesta");
+		respuesta2 = new JTextField();
 		respuesta2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

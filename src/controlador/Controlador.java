@@ -575,8 +575,17 @@ public class Controlador {
 
 	public void registrarUsuario(String email, String password, String codigoAdmin, int preg1, int preg2, String resp1,
 			String resp2, JFrame vistaActual) {
-		if (email.isEmpty() || password.isEmpty() || resp1.isEmpty() || resp2.isEmpty()) {
-			JOptionPane.showMessageDialog(vistaActual, "Debe rellenar todos los campos");
+
+// Validación de campos vacíos
+		if (email.isEmpty() || password.isEmpty() || resp1.trim().isEmpty() || resp2.trim().isEmpty()) {
+			JOptionPane.showMessageDialog(vistaActual,
+					"Debe rellenar todos los campos, incluyendo las respuestas de seguridad.");
+			return;
+		}
+
+// Validación de longitud de la contraseña
+		if (password.length() < 8) {
+			JOptionPane.showMessageDialog(vistaActual, "La contraseña debe tener al menos 8 caracteres.");
 			return;
 		}
 
@@ -604,9 +613,9 @@ public class Controlador {
 				PreparedStatement insertSeguridadStmt = conn.prepareStatement(insertSeguridadSQL);
 				insertSeguridadStmt.setString(1, email);
 				insertSeguridadStmt.setInt(2, preg1);
+				insertSeguridadStmt.setString(3, resp1.trim());
 				insertSeguridadStmt.setInt(4, preg2);
-				insertSeguridadStmt.setString(3, resp1);
-				insertSeguridadStmt.setString(5, resp2);
+				insertSeguridadStmt.setString(5, resp2.trim());
 				insertSeguridadStmt.executeUpdate();
 
 				JOptionPane.showMessageDialog(vistaActual, "Cuenta creada correctamente");
@@ -738,41 +747,40 @@ public class Controlador {
 	}
 
 	public void actualizarPerfilUsuario(String fecha, String campus, byte[] imagen) {
-	    try (Connection conn = ConexionBD.conectar()) {
-	        String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ?, FOTO = ? WHERE USR = ?";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+		try (Connection conn = ConexionBD.conectar()) {
+			String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ?, FOTO = ? WHERE USR = ?";
+			PreparedStatement stmt = conn.prepareStatement(sql);
 
-	        // Fecha
-	        if (fecha == null || fecha.trim().isEmpty()) {
-	            stmt.setNull(1, java.sql.Types.DATE);
-	        } else {
-	            stmt.setDate(1, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
-	        }
+			// Fecha
+			if (fecha == null || fecha.trim().isEmpty()) {
+				stmt.setNull(1, java.sql.Types.DATE);
+			} else {
+				stmt.setDate(1, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
+			}
 
-	        // Campus
-	        if (campus == null || campus.trim().isEmpty()) {
-	            stmt.setNull(2, java.sql.Types.VARCHAR);
-	        } else {
-	            stmt.setString(2, campus);
-	        }
+			// Campus
+			if (campus == null || campus.trim().isEmpty()) {
+				stmt.setNull(2, java.sql.Types.VARCHAR);
+			} else {
+				stmt.setString(2, campus);
+			}
 
-	        // Imagen
-	        if (imagen != null) {
-	            stmt.setBytes(3, imagen);
-	        } else {
-	            stmt.setNull(3, java.sql.Types.BLOB);
-	        }
+			// Imagen
+			if (imagen != null) {
+				stmt.setBytes(3, imagen);
+			} else {
+				stmt.setNull(3, java.sql.Types.BLOB);
+			}
 
-	        // Usuario
-	        stmt.setString(4, Modelo.usuarioActual + "@ueuropea.es");
+			// Usuario
+			stmt.setString(4, Modelo.usuarioActual + "@ueuropea.es");
 
-	        stmt.executeUpdate();
-	    } catch (Exception ex) {
-	        ex.printStackTrace();
-	        JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
-	    }
+			stmt.executeUpdate();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
+		}
 	}
-
 
 	public void abrirFavoritos(JFrame ventanaActual) {
 		ventanaActual.dispose();
