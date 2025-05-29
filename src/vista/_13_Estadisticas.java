@@ -51,7 +51,6 @@ public class _13_Estadisticas extends JFrame {
 		btnBuscar.setFocusPainted(false);
 		getContentPane().add(btnBuscar);
 
-		// 【模拟数据】
 		Map<String, Integer> datosPorMes = new LinkedHashMap<>();
 		datosPorMes.put("2025-01", 5);
 		datosPorMes.put("2025-02", 3);
@@ -67,24 +66,24 @@ public class _13_Estadisticas extends JFrame {
 		datosPorEdificio.put("Edificio C", 3);
 
 		// --- GRÁFICOS ---
-		JPanel grafico1 = crearPanelConTituloConIcono("Incidencias por mes", "/img/chart.png", 50, 140, 550, 280);
+		JPanel grafico1 = crearPanelConTituloConIcono("Incidencias por mes", "/img/chart.png", 50, 140, 500, 250);
 		grafico1.setLayout(null);
 		BarChartPanel chart1 = new BarChartPanel(datosPorMes);
-		chart1.setBounds(0, 0, 550, 280);
+		chart1.setBounds(0, 0, 500, 250);
 		grafico1.add(chart1);
 		getContentPane().add(grafico1);
 
-		JPanel grafico2 = crearPanelConTituloConIcono("Resueltas vs Pendientes", "/img/check.png", 630, 140, 400, 220);
+		JPanel grafico2 = crearPanelConTituloConIcono("Resueltas vs Pendientes", "/img/check.png", 600, 140, 500, 250);
 		grafico2.setLayout(null);
 		PieChartPanel chart2 = new PieChartPanel(datosPorEstado);
-		chart2.setBounds(0, 0, 400, 220);
+		chart2.setBounds(0, 0, 500, 250);
 		grafico2.add(chart2);
 		getContentPane().add(grafico2);
 
-		JPanel grafico3 = crearPanelConTituloConIcono("Distribución por edificio", "/img/building.png", 50, 450, 880, 260);
+		JPanel grafico3 = crearPanelConTituloConIcono("Distribución por edificio", "/img/building.png", 50, 420, 1050, 250);
 		grafico3.setLayout(null);
 		PieChartPanel chart3 = new PieChartPanel(datosPorEdificio);
-		chart3.setBounds(0, 0, 880, 260);
+		chart3.setBounds(0, 0, 1050, 250);
 		grafico3.add(chart3);
 		getContentPane().add(grafico3);
 
@@ -139,7 +138,7 @@ class BarChartPanel extends JPanel {
 
 	public BarChartPanel(Map<String, Integer> data) {
 		this.data = data;
-		setPreferredSize(new Dimension(550, 280));
+		setPreferredSize(new Dimension(500, 250));
 	}
 
 	@Override
@@ -178,7 +177,7 @@ class PieChartPanel extends JPanel {
 
 	public PieChartPanel(Map<String, Integer> data) {
 		this.data = data;
-		setPreferredSize(new Dimension(400, 220));
+		setPreferredSize(new Dimension(500, 250));
 	}
 
 	@Override
@@ -207,4 +206,3 @@ class PieChartPanel extends JPanel {
 		}
 	}
 }
-
