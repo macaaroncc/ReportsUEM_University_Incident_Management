@@ -10,7 +10,8 @@ import java.util.Map;
 public class _13_Estadisticas extends JFrame {
 	private Controlador controlador;
 
-	public _13_Estadisticas() {
+	public _13_Estadisticas(Controlador controlador) {
+		this.controlador = controlador;
 		setTitle("13 . Estadísticas - Admin");
 		setSize(1200, 900);
 		setLocationRelativeTo(null);

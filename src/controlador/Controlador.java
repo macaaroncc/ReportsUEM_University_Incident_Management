@@ -520,7 +520,7 @@ public class Controlador {
 	}
 
 	public void abrirEstadisticas(JFrame ventanaActual) {
-		_13_Estadisticas vista = new _13_Estadisticas();
+		_13_Estadisticas vista = new _13_Estadisticas(this);
 		vista.setVisible(true);
 		if (ventanaActual != null) {
 			ventanaActual.dispose();

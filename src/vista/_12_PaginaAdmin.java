@@ -45,7 +45,7 @@ public class _12_PaginaAdmin extends JFrame {
         btnEstadisticas.setFocusPainted(false);
         btnEstadisticas.setPreferredSize(new Dimension(150, 35));
         btnEstadisticas.addActionListener(e -> {
-        	new _13_Estadisticas().setVisible(true);
+        	new _13_Estadisticas(controlador).setVisible(true);
         	dispose(); // Cierra la ventana actual
         });
         contentPanel.add(btnEstadisticas);
