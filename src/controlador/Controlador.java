@@ -451,8 +451,7 @@ public class Controlador {
             int filas = stmt.executeUpdate();
             if (filas > 0) {
                 JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
-                ventana.dispose();
-                new _07_MisIncidencias().setVisible(true);
+                abrirMisIncidencias(ventana);
             } else {
                 JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
             }
