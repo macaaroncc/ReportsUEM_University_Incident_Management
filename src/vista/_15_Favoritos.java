@@ -1,3 +1,5 @@
+// @Autor: Bea
+
 package vista;
 
 import controlador.Controlador;
@@ -6,7 +8,10 @@ import modelo.Modelo;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.*;
 
 public class _15_Favoritos extends JFrame {
@@ -67,6 +72,23 @@ public class _15_Favoritos extends JFrame {
 
         // Cargar datos de favoritos
         cargarFavoritosDesdeBD();
+
+        // Abrir detalles al hacer clic
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int fila = table.getSelectedRow();
+                if (fila != -1) {
+                    try {
+                        Object valorID = table.getValueAt(fila, 0);
+                        int idIncidencia = Integer.parseInt(valorID.toString().trim());
+                        new _17_DetalleIncidencia(idIncidencia).setVisible(true);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "⚠ ID inválido: " + table.getValueAt(fila, 0));
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
 
         // Botón Eliminar
         JButton btnEliminar = new JButton("Eliminar");
