@@ -34,6 +34,7 @@ import javax.swing.table.DefaultTableModel;
 
 import modelo.ConexionBD;
 import modelo.Modelo;
+import util.HashUtil;
 import vista._01_PGSinLogin;
 import vista._02_Login;
 import vista._03_CrearCuenta;
@@ -532,11 +533,19 @@ public class Controlador {
 		try {
 			ConexionBD.recargarConfiguracion();
 
+			
+			
+			
+			
+			
 			try (Connection conn = ConexionBD.conectar()) {
+				
+				String passwordHasheada = HashUtil.hashSHA256(password); // Convertimos la que escribió el usuario
+
 				String sql = "SELECT ROL FROM USERS WHERE USR = ? AND PWD = ?";
 				PreparedStatement stmt = conn.prepareStatement(sql);
 				stmt.setString(1, email);
-				stmt.setString(2, password);
+				stmt.setString(2, passwordHasheada); // Comparamos hash con hash
 				ResultSet rs = stmt.executeQuery();
 
 				if (rs.next()) {
@@ -616,7 +625,7 @@ public class Controlador {
 				String insertUserSQL = "INSERT INTO USERS (USR, PWD, ROL, NICKNAME) VALUES (?, ?, ?, ?)";
 				PreparedStatement insertUserStmt = conn.prepareStatement(insertUserSQL);
 				insertUserStmt.setString(1, email);
-				insertUserStmt.setString(2, password);
+				insertUserStmt.setString(2, HashUtil.hashSHA256(password));
 				insertUserStmt.setString(3, rol);
 				insertUserStmt.setString(4, nickname);
 				insertUserStmt.executeUpdate();
@@ -703,7 +712,8 @@ public class Controlador {
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "UPDATE USERS SET PWD = ? WHERE USR = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, nuevaPwd);
+			stmt.setString(1, HashUtil.hashSHA256(nuevaPwd));
+			System.out.println(HashUtil.hashSHA256(nuevaPwd));
 			stmt.setString(2, email);
 			int filas = stmt.executeUpdate();
 

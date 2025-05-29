@@ -89,13 +89,13 @@ CREATE TABLE favoritosCount (
 -- Usuarios
 INSERT INTO USERS (USR, NICKNAME, ROL, campus, PWD, fecha, foto) 
 VALUES 
-('juan001@ueuropea.es', 'juan001', 'N', 'Villaviciosa', 'clave123', '2005-01-15', 'FOTOJUAN(SALE FEO)'),
-('sofia002@ueuropea.es', 'sofia002', 'Y', 'Alcobendas', 'clave456', NULL, NULL),
-('lucia004@ueuropea.es', 'lucia004', 'N', 'Alcobendas', 'clave321', NULL, NULL),
-('mario005@ueuropea.es', 'mario005', 'Y', 'Villaviciosa', 'clave654', NULL, NULL),
-('ana789@ueuropea.es', 'ana789', 'N', 'Villaviciosa', 'clave888', NULL, NULL),
-('luis321@ueuropea.es', 'luis321', 'N', 'Alcobendas', 'clave999', NULL, NULL),
-('maria456@ueuropea.es', 'maria456', 'N', 'Alcobendas', 'clave777', NULL, NULL);
+('juan001@ueuropea.es', 'juan001', 'N', 'Villaviciosa', '1718c24b10aeb8099e3fc44960ab6949ab76a267352459f203ea1036bec382c2', '2005-01-15', 'FOTOJUAN(SALE FEO)'),
+('sofia002@ueuropea.es', 'sofia002', 'Y', 'Alcobendas', '1718c24b10aeb8099e3fc44960ab6949ab76a267352459f203ea1036bec382c2', NULL, NULL),
+('lucia004@ueuropea.es', 'lucia004', 'N', 'Alcobendas', '1718c24b10aeb8099e3fc44960ab6949ab76a267352459f203ea1036bec382c2', NULL, NULL),
+('mario005@ueuropea.es', 'mario005', 'Y', 'Villaviciosa', '1718c24b10aeb8099e3fc44960ab6949ab76a267352459f203ea1036bec382c2', NULL, NULL),
+('ana789@ueuropea.es', 'ana789', 'N', 'Villaviciosa', '1718c24b10aeb8099e3fc44960ab6949ab76a267352459f203ea1036bec382c2', NULL, NULL),
+('luis321@ueuropea.es', 'luis321', 'N', 'Alcobendas', '1718c24b10aeb8099e3fc44960ab6949ab76a267352459f203ea1036bec382c2', NULL, NULL),
+('maria456@ueuropea.es', 'maria456', 'N', 'Alcobendas', '1718c24b10aeb8099e3fc44960ab6949ab76a267352459f203ea1036bec382c2', NULL, NULL);
 
 -- Preguntas de seguridad
 INSERT INTO PREGUNTAS (id_pregunta, TEXTO) VALUES

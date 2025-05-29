@@ -25,31 +25,31 @@ public class BarraNavegacion extends JPanel {
 
 	public BarraNavegacion() {
 		setLayout(null);
-		ImageIcon icon = new ImageIcon(getClass().getResource("/img/LogoBlanco.png")); // Asegúrate de que la ruta sea correcta
+		ImageIcon icon = new ImageIcon(getClass().getResource("/img/LogoBlanco.png")); // Asegúrate de que la ruta sea
+																						// correcta
 		Image imagenEscalada = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
 		JLabel lblLogo = new JLabel(new ImageIcon(imagenEscalada));
-		
+
 		lblLogo.setBounds(10, 10, 40, 40); // Posición y tamaño
 		add(lblLogo);
 		setBackground(new Color(128, 0, 0));
 		setBounds(0, 0, 1200, 59);
-		
+
 		lblPGNPrincipal = crearLink("Página Principal", 80);
 		lblMisIncidencias = crearLink("Mis Incidencias", 240);
 		lblNotificaciones = crearLink("Notificaciones", 410);
 
 		lblFavoritos = crearLink("Favoritos", 580);
 		add(lblFavoritos);
-		
+
 		lblFavoritos = crearLink("Favoritos", 580);
-		lblFavoritos.setBounds(580, 20, 100, 20);  // Más estrecho que 160
+		lblFavoritos.setBounds(580, 20, 100, 20); // Más estrecho que 160
 		add(lblFavoritos);
 
 		lblAdminPanel = crearLink("Panel Administrador", 700);
 		lblAdminPanel.setBounds(700, 20, 140, 20); // Puedes ajustar también este ancho si quieres
 		lblAdminPanel.setVisible(false);
 		add(lblAdminPanel);
-
 
 		lblAdminPanel = crearLink("Panel Administrador", 700);
 		lblAdminPanel.setVisible(false);
