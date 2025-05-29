@@ -1,6 +1,7 @@
 package controlador;
 
 import java.awt.BorderLayout;
+
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -45,6 +46,8 @@ import vista._10_PerfilUsuario;
 import vista._12_PaginaAdmin;
 import vista._14_Ayuda;
 import vista._15_Favoritos;
+import vista._13_Estadisticas;
+
 
 public class Controlador {
 
@@ -515,6 +518,15 @@ public class Controlador {
 		if (ventanaActual != null)
 			ventanaActual.dispose();
 	}
+	public void abrirEstadisticas(JFrame ventanaActual) {
+	    _13_Estadisticas vista = new _13_Estadisticas();
+	    vista.setVisible(true);
+	    if (ventanaActual != null) {
+	        ventanaActual.dispose();
+	    }
+	}
+
+
 
 	public void validarLogin(String email, String password, JFrame vistaActual) {
 		try {
