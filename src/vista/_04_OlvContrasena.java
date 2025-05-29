@@ -5,6 +5,8 @@ import controlador.Controlador;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class _04_OlvContrasena extends JFrame {
 	private Controlador controlador;
@@ -175,6 +177,33 @@ public class _04_OlvContrasena extends JFrame {
 			}
 			controlador.comprobarPreguntasSeguridad(email, resp1, resp2, this, origen);
 		});
+		// KeyAdapter para validar correo con Enter
+		KeyAdapter enterValidarCorreo = new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER && btnValidarCorreo.isEnabled()) {
+					btnValidarCorreo.doClick();
+				}
+			}
+		};
+
+		// KeyAdapter para comprobar respuestas con Enter
+		KeyAdapter enterComprobarRespuestas = new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER && btnComprobar.isEnabled()) {
+					btnComprobar.doClick();
+				}
+			}
+		};
+
+		// Añadir key listeners
+		txtCorreo.addKeyListener(enterValidarCorreo);
+
+		// Sólo añadir para respuestas y botón comprobar si las preguntas están visibles
+		txtRespuesta1.addKeyListener(enterComprobarRespuestas);
+		txtRespuesta2.addKeyListener(enterComprobarRespuestas);
+
 	}
 
 	public void setControlador(Controlador controlador) {

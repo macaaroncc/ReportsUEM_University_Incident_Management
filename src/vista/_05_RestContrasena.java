@@ -8,6 +8,8 @@ import modelo.Modelo;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URL;
 
@@ -19,13 +21,11 @@ public class _05_RestContrasena extends JFrame {
 
 	public _05_RestContrasena(String origen) {
 		this.origen = origen;
-		
+
 		if (origen.equals("perfil")) {
 			usuario = Modelo.usuarioActual;
 		}
-			
-		
-		
+
 		setTitle("05. Restablecer contraseña");
 		setSize(1200, 900);
 		setLocationRelativeTo(null);
@@ -121,6 +121,17 @@ public class _05_RestContrasena extends JFrame {
 				JOptionPane.showMessageDialog(this, "Error interno: usuario no definido.");
 			}
 		});
+		KeyAdapter enterRestablecer = new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER && btnRestablecer.isEnabled()) {
+					btnRestablecer.doClick();
+				}
+			}
+		};
+
+		txtNueva.addKeyListener(enterRestablecer);
+		txtRepetir.addKeyListener(enterRestablecer);
 
 		outerPanel.add(cardPanel);
 	}
