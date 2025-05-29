@@ -683,6 +683,11 @@ public class Controlador {
 			return;
 		}
 
+		// Si hay un usuario logueado, usar ese correo
+		if (Modelo.usuarioActual != null && !Modelo.usuarioActual.trim().isEmpty()) {
+			email = Modelo.usuarioActual + "@ueuropea.es";
+		}
+
 		try (Connection conn = ConexionBD.conectar()) {
 			String sql = "UPDATE USERS SET PWD = ? WHERE USR = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -701,7 +706,6 @@ public class Controlador {
 			JOptionPane.showMessageDialog(vistaActual, "Error al actualizar:\n" + ex.getMessage());
 			ex.printStackTrace();
 		}
-
 	}
 
 	public String[] obtenerDatosPerfil() {
