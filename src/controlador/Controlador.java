@@ -675,7 +675,8 @@ public class Controlador {
                     // Verifica si hay notificaciones pendientes
                     String sqlIncidenciasPendientes = "SELECT COUNT(*) FROM incidencias i "
                             + "JOIN notificar n ON i.id_incidencia = n.incidencias_id_incidencia "
-                            + "WHERE n.USERS_USR = ? AND i.estado = 'Solucionada'";
+                            + "WHERE n.USERS_USR = ? AND (i.estado = 'Solucionada' OR i.estado = 'Rechazada')";
+                    
                     try (PreparedStatement stmtIncPend = conn.prepareStatement(sqlIncidenciasPendientes)) {
                         stmtIncPend.setString(1, email);
                         ResultSet rsIncPend = stmtIncPend.executeQuery();

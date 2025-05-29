@@ -92,8 +92,10 @@ public class _09_Notificaciones extends JFrame {
         String sql = "SELECT i.estado, i.descripcion, i.justificacion "
                    + "FROM notificar n "
                    + "JOIN incidencias i ON n.incidencias_id_incidencia = i.id_incidencia "
-                   + "WHERE n.USERS_USR = ? AND i.estado = 'Solucionada'";
+                   + "WHERE n.USERS_USR = ? AND (i.estado = 'Solucionada' OR i.estado = 'Rechazada')";
 
+        
+        
         try (Connection conexion = modelo.ConexionBD.conectar();
              PreparedStatement stmt = conexion.prepareStatement(sql)) {
 
