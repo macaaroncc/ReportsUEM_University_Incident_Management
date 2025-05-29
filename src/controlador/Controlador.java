@@ -49,7 +49,6 @@ import vista._14_Ayuda;
 import vista._15_Favoritos;
 import vista._13_Estadisticas;
 
-
 public class Controlador {
 
 	private Modelo modelo;
@@ -519,27 +518,21 @@ public class Controlador {
 		if (ventanaActual != null)
 			ventanaActual.dispose();
 	}
+
 	public void abrirEstadisticas(JFrame ventanaActual) {
-	    _13_Estadisticas vista = new _13_Estadisticas();
-	    vista.setVisible(true);
-	    if (ventanaActual != null) {
-	        ventanaActual.dispose();
-	    }
+		_13_Estadisticas vista = new _13_Estadisticas();
+		vista.setVisible(true);
+		if (ventanaActual != null) {
+			ventanaActual.dispose();
+		}
 	}
-
-
 
 	public void validarLogin(String email, String password, JFrame vistaActual) {
 		try {
 			ConexionBD.recargarConfiguracion();
 
-			
-			
-			
-			
-			
 			try (Connection conn = ConexionBD.conectar()) {
-				
+
 				String passwordHasheada = HashUtil.hashSHA256(password); // Convertimos la que escribió el usuario
 
 				String sql = "SELECT ROL FROM USERS WHERE USR = ? AND PWD = ?";
@@ -607,6 +600,13 @@ public class Controlador {
 // Validación de longitud de la contraseña
 		if (password.length() < 8) {
 			JOptionPane.showMessageDialog(vistaActual, "La contraseña debe tener al menos 8 caracteres.");
+			return;
+		}
+
+		// Validación del código admin (si se ha escrito alguno)
+		if (!codigoAdmin.isEmpty() && !codigoAdmin.equals("ADMIN123")) {
+			JOptionPane.showMessageDialog(vistaActual,
+					"Código de administrador incorrecto. No se ha creado la cuenta.");
 			return;
 		}
 
