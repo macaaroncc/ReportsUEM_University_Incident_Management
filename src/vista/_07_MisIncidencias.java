@@ -45,14 +45,16 @@ public class _07_MisIncidencias extends JFrame {
 
 		// 👇 Se agregó la columna "ID" para abrir los detalles
 		modelo = new DefaultTableModel(new Object[][] {},
-			new String[] { "ID", "Descripción", "Estado", "Edificio", "Aula", "Fecha" }) {
+				new String[] { "ID", "Descripción", "Estado", "Edificio", "Aula", "Fecha" }) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
+
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
-				if (columnIndex == 5) return Date.class;
+				if (columnIndex == 5)
+					return Date.class;
 				return String.class;
 			}
 		};
@@ -62,11 +64,11 @@ public class _07_MisIncidencias extends JFrame {
 		table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-		table.getColumnModel().getColumn(0).setPreferredWidth(40);  // ID
+		table.getColumnModel().getColumn(0).setPreferredWidth(40); // ID
 		table.getColumnModel().getColumn(1).setPreferredWidth(400); // Descripción
 		table.getColumnModel().getColumn(2).setPreferredWidth(100); // Estado
-		table.getColumnModel().getColumn(3).setPreferredWidth(80);  // Edificio
-		table.getColumnModel().getColumn(4).setPreferredWidth(80);  // Aula
+		table.getColumnModel().getColumn(3).setPreferredWidth(80); // Edificio
+		table.getColumnModel().getColumn(4).setPreferredWidth(80); // Aula
 		table.getColumnModel().getColumn(5).setPreferredWidth(100); // Fecha
 
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -91,11 +93,24 @@ public class _07_MisIncidencias extends JFrame {
 
 		cargarIncidenciasDesdeBD();
 
-		JButton btnNuevaIncidencia = new JButton("Crear Incidencia");
+		// Botón Crear Incidencia redondeado
+		JButton btnNuevaIncidencia = new JButton("Crear Incidencia") {
+			@Override
+			protected void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g.create();
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(getBackground());
+				g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+				super.paintComponent(g2);
+				g2.dispose();
+			}
+		};
 		btnNuevaIncidencia.setBounds(40, 720, 150, 30);
 		btnNuevaIncidencia.setBackground(new Color(128, 0, 0));
 		btnNuevaIncidencia.setForeground(Color.WHITE);
 		btnNuevaIncidencia.setFont(new Font("Arial", Font.BOLD, 14));
+		btnNuevaIncidencia.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+		btnNuevaIncidencia.setContentAreaFilled(false);
 		btnNuevaIncidencia.addActionListener(e -> {
 			if (controlador != null) {
 				controlador.abrirCrearIncidencia(this);
@@ -104,12 +119,31 @@ public class _07_MisIncidencias extends JFrame {
 		});
 		getContentPane().add(btnNuevaIncidencia);
 
-		JButton btnAyuda = new JButton("?");
+		// Botón Ayuda redondeado (círculo perfecto)
+		JButton btnAyuda = new JButton("?") {
+			@Override
+			protected void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g.create();
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(getBackground());
+				g2.fillOval(0, 0, getWidth(), getHeight());
+
+				// Texto centrado
+				g2.setColor(getForeground());
+				FontMetrics fm = g2.getFontMetrics();
+				int textWidth = fm.stringWidth(getText());
+				int textHeight = fm.getAscent();
+				g2.drawString(getText(), (getWidth() - textWidth) / 2, (getHeight() + textHeight) / 2 - 2);
+				g2.dispose();
+			}
+		};
 		btnAyuda.setBounds(1120, 740, 50, 50);
 		btnAyuda.setBackground(new Color(128, 0, 0));
 		btnAyuda.setForeground(Color.WHITE);
-		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
+		btnAyuda.setFont(new Font("Arial", Font.BOLD, 24));
 		btnAyuda.setFocusPainted(false);
+		btnAyuda.setBorder(BorderFactory.createEmptyBorder());
+		btnAyuda.setContentAreaFilled(false);
 		btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnAyuda.addActionListener(e -> {
 			if (controlador != null) {
@@ -130,8 +164,7 @@ public class _07_MisIncidencias extends JFrame {
 
 		String sql = "SELECT id_incidencia, descripcion, estado, edificio, aula, fecha FROM incidencias WHERE USERS_USR = ?";
 
-		try (Connection conexion = ConexionBD.conectar();
-			 PreparedStatement stmt = conexion.prepareStatement(sql)) {
+		try (Connection conexion = ConexionBD.conectar(); PreparedStatement stmt = conexion.prepareStatement(sql)) {
 
 			stmt.setString(1, usuarioConDominio);
 			ResultSet rs = stmt.executeQuery();
@@ -149,8 +182,7 @@ public class _07_MisIncidencias extends JFrame {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this,
-					"Error al cargar incidencias: " + e.getMessage(),
+			JOptionPane.showMessageDialog(this, "Error al cargar incidencias: " + e.getMessage(),
 					"Error de base de datos", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}

@@ -72,45 +72,84 @@ public class _15_Favoritos extends JFrame {
 
 		// Cargar datos de favoritos
 		cargarFavoritosDesdeBD();
-
+		JButton btnEliminar = new JButton("Eliminar") {
+			@Override
+			protected void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g.create();
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(getBackground());
+				g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+				super.paintComponent(g2);
+				g2.dispose();
+			}
+		};
+		btnEliminar.setBounds(40, 720, 100, 30);
+		btnEliminar.setBackground(new Color(128, 0, 0));
+		btnEliminar.setForeground(Color.WHITE);
+		btnEliminar.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnEliminar.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+		btnEliminar.setContentAreaFilled(false);
+		btnEliminar.setEnabled(false);
+		btnEliminar.addActionListener(e -> eliminarFavorito());
+		getContentPane().add(btnEliminar);
 		// Abrir detalles al hacer clic
+		// Modificación del listener de la tabla
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				int fila = table.getSelectedRow();
 				if (fila != -1) {
-					try {
-						Object valorID = table.getValueAt(fila, 0);
-						int idIncidencia = Integer.parseInt(valorID.toString().trim());
-						new _17_DetalleIncidencia(idIncidencia).setVisible(true);
-					} catch (NumberFormatException ex) {
-						JOptionPane.showMessageDialog(null, "⚠ ID inválido: " + table.getValueAt(fila, 0));
-						ex.printStackTrace();
+					if (e.getClickCount() == 1) {
+						// Un clic - seleccionar para eliminar
+						btnEliminar.setEnabled(true);
+					} else if (e.getClickCount() == 2) {
+						// Doble clic - abrir detalles
+						try {
+							Object valorID = table.getValueAt(fila, 0);
+							int idIncidencia = Integer.parseInt(valorID.toString().trim());
+							new _17_DetalleIncidencia(idIncidencia).setVisible(true);
+						} catch (NumberFormatException ex) {
+							JOptionPane.showMessageDialog(null, "⚠ ID inválido: " + table.getValueAt(fila, 0));
+							ex.printStackTrace();
+						}
 					}
 				}
 			}
 		});
 
-		// Botón Eliminar
-		JButton btnEliminar = new JButton("Eliminar");
-		btnEliminar.setBounds(40, 720, 100, 30);
-		btnEliminar.setBackground(new Color(128, 0, 0));
-		btnEliminar.setForeground(Color.WHITE);
-
-		btnEliminar.setEnabled(false);
-		btnEliminar.addActionListener(e -> eliminarFavorito());
-		getContentPane().add(btnEliminar);
-
+		// Eliminar el listener de selección anterior (si existe)
 		table.getSelectionModel().addListSelectionListener(e -> {
-			btnEliminar.setEnabled(table.getSelectedRow() != -1);
+			// Esta parte ya no es necesaria porque manejamos la selección en el
+			// mouseClicked
 		});
 
-		// Botón ayuda flotante
-		JButton btnAyuda = new JButton("?");
+		// Botón Eliminar
+		// Botón Eliminar redondeado
+
+		// Botón Ayuda redondeado (círculo perfecto)
+		JButton btnAyuda = new JButton("?") {
+			@Override
+			protected void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g.create();
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(getBackground());
+				g2.fillOval(0, 0, getWidth(), getHeight());
+
+				// Texto centrado
+				g2.setColor(getForeground());
+				FontMetrics fm = g2.getFontMetrics();
+				int textWidth = fm.stringWidth(getText());
+				int textHeight = fm.getAscent();
+				g2.drawString(getText(), (getWidth() - textWidth) / 2, (getHeight() + textHeight) / 2 - 2);
+				g2.dispose();
+			}
+		};
 		btnAyuda.setBounds(1120, 740, 50, 50);
 		btnAyuda.setBackground(new Color(128, 0, 0));
 		btnAyuda.setForeground(Color.WHITE);
-		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
+		btnAyuda.setFont(new Font("Arial", Font.BOLD, 24));
 		btnAyuda.setFocusPainted(false);
+		btnAyuda.setBorder(BorderFactory.createEmptyBorder());
+		btnAyuda.setContentAreaFilled(false);
 		btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnAyuda.addActionListener(e -> {
 			if (controlador != null) {

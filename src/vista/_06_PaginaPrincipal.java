@@ -1,5 +1,3 @@
-//@autor: aaron
-
 package vista;
 
 import controlador.Controlador;
@@ -34,6 +32,11 @@ public class _06_PaginaPrincipal extends JFrame {
         setContentPane(contentPane);
         contentPane.setBackground(new Color(255, 255, 252));
 
+        // Configurar bordes redondeados
+        UIManager.put("Button.arc", 20);
+        UIManager.put("TextComponent.arc", 15);
+        UIManager.put("ComboBox.arc", 15);
+
         BarraNavegacion barra = new BarraNavegacion();
         barra.setUsuarioLogueado(true);
         barra.setControlador(controlador);
@@ -59,16 +62,41 @@ public class _06_PaginaPrincipal extends JFrame {
         }
         contentPane.add(comboBoxFecha);
 
-        campoBusqueda = new JTextField();
+        // Campo de búsqueda redondeado
+        campoBusqueda = new JTextField() {
+            @Override
+            protected void paintBorder(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(200, 200, 200));
+                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 15, 15);
+                g2.dispose();
+            }
+        };
         campoBusqueda.setBounds(750, 70, 250, 30);
+        campoBusqueda.setOpaque(false);
+        campoBusqueda.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         contentPane.add(campoBusqueda);
 
-        botonBuscar = new JButton("Buscar");
+        // Botón Buscar redondeado
+        botonBuscar = new JButton("Buscar") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                super.paintComponent(g2);
+                g2.dispose();
+            }
+        };
         botonBuscar.setBounds(1010, 70, 138, 30);
         botonBuscar.setBackground(new Color(128, 0, 0));
         botonBuscar.setForeground(Color.WHITE);
         botonBuscar.setFont(new Font("Tahoma", Font.BOLD, 12));
         botonBuscar.setFocusPainted(false);
+        botonBuscar.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        botonBuscar.setContentAreaFilled(false);
         contentPane.add(botonBuscar);
 
         DefaultTableModel model = new DefaultTableModel() {
@@ -109,7 +137,7 @@ public class _06_PaginaPrincipal extends JFrame {
                     try {
                         Object valorID = table.getValueAt(fila, 0);
                         int idIncidencia = Integer.parseInt(valorID.toString().trim());
-                        new _17_DetalleIncidencia( idIncidencia).setVisible(true);
+                        new _17_DetalleIncidencia(idIncidencia).setVisible(true);
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(null, "⚠ ID inválido: " + table.getValueAt(fila, 0));
                         ex.printStackTrace();
@@ -122,12 +150,25 @@ public class _06_PaginaPrincipal extends JFrame {
         scrollPane.setBounds(40, 120, 1110, 600);
         contentPane.add(scrollPane);
 
-        btnAyuda = new JButton("?");
+        // Botón Ayuda redondeado
+        btnAyuda = new JButton("?") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillOval(0, 0, getWidth(), getHeight());
+                super.paintComponent(g2);
+                g2.dispose();
+            }
+        };
         btnAyuda.setBounds(1120, 740, 50, 50);
         btnAyuda.setBackground(new Color(128, 0, 0));
         btnAyuda.setForeground(Color.WHITE);
-        btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
+        btnAyuda.setFont(new Font("Arial", Font.BOLD, 24));
         btnAyuda.setFocusPainted(false);
+        btnAyuda.setBorder(BorderFactory.createEmptyBorder());
+        btnAyuda.setContentAreaFilled(false);
         btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnAyuda.addActionListener(e -> {
             if (controlador != null) controlador.abrirAyuda();
@@ -139,8 +180,6 @@ public class _06_PaginaPrincipal extends JFrame {
             cargarIncidenciasFiltradas(m);
         });
     }
-    
-    
 
     private void cargarIncidenciasDesdeBD(DefaultTableModel model) {
         try (Connection conexion = modelo.ConexionBD.conectar();
@@ -162,7 +201,6 @@ public class _06_PaginaPrincipal extends JFrame {
                         rs.getInt("ranking"),
                         rs.getString("USR")
                 });
-                
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al cargar incidencias:\n" + e.getMessage(), "Error de base de datos", JOptionPane.ERROR_MESSAGE);
