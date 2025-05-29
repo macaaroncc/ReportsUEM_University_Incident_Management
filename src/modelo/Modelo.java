@@ -6,55 +6,43 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
- * Clase Modelo.
- * Representa la clase Modelo.
+ * Clase Modelo que representa la capa de datos de la aplicación.
+ * Gestiona la autenticación de usuarios y el acceso a sus datos.
  */
 public class Modelo {
+    // Contador de intentos fallidos de autenticación
     private int intentosFallidos = 0;
     
-	public static String usuarioActual = null;
+    // Variable estática que almacena el usuario actualmente logueado
+    public static String usuarioActual = null;
     
-/**
- * Realiza la acción correspondiente.
- * @param email Correo electrónico del usuario.
- * @param pwd Cadena de texto.
- */
-    public String autenticar(String email, String pwd) {
-        // Simulación de base de datos con roles
-        if (email.equalsIgnoreCase("admin@ejemplo.com") && pwd.equals("1234")) {
-            intentosFallidos = 0;
-            return "admin";
-        }
-        if (email.equalsIgnoreCase("usuario@ejemplo.com") && pwd.equals("1234")) {
-            intentosFallidos = 0;
-            return "usuario";
-        }
-        
-        intentosFallidos++;
-        if (intentosFallidos >= 3) {
-            return "bloqueado";
-        }
-        return "incorrecto";
+    /**
+     * Obtiene el nombre de usuario actualmente logueado.
+     * 
+     * @return String con el nombre de usuario o null si no hay sesión activa
+     */
+    public String getUsuarioActual() {
+        return usuarioActual;
     }
     
-	public String getUsuarioActual() {
-		return usuarioActual;
-	}
-	
-	public static byte[] obtenerFotoUsuario() {
-	    try (Connection conn = ConexionBD.conectar()) {
-	        String sql = "SELECT FOTO FROM USERS WHERE USR = ?";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
-	        stmt.setString(1, usuarioActual + "@ueuropea.es");
-	        ResultSet rs = stmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getBytes("FOTO");
-	        }
-	    } catch (Exception ex) {
-	        ex.printStackTrace();
-	    }
-	    return null;
-	}
-
-
+    /**
+     * Obtiene la foto de perfil del usuario actual desde la base de datos.
+     * 
+     * @return byte[] con los bytes de la imagen o null si no hay foto o ocurre error
+     */
+    public static byte[] obtenerFotoUsuario() {
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "SELECT FOTO FROM USERS WHERE USR = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, usuarioActual + "@ueuropea.es");
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getBytes("FOTO");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -1,7 +1,6 @@
 package controlador;
 
 import java.awt.BorderLayout;
-
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -17,7 +16,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
-
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -49,777 +47,956 @@ import vista._14_Ayuda;
 import vista._15_Favoritos;
 import vista._13_Estadisticas;
 
+/**
+ * Controlador principal de la aplicación que maneja la lógica de negocio,
+ * coordinación entre vistas y acceso a datos.
+ */
 public class Controlador {
 
-	private Modelo modelo;
-	private _02_Login _02_login;
-	private _03_CrearCuenta _03_crearCuenta;
-	private int intentosFallidos = 0;
-	private boolean usuarioLogueado = false;
-	private String usuarioActual;
-
-	public void setModelo(Modelo modelo) {
-		this.modelo = modelo;
-	}
-
-	public static DefaultTableModel cargarUsuarios() {
-		DefaultTableModel modelo = new DefaultTableModel();
-		modelo.setColumnIdentifiers(
-				new String[] { "Usuario", "Nickname", "Rol", "Campus", "Contraseña", "Fecha", "Foto" });
-
-		try (Connection conexion = ConexionBD.conectar();
-				PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM users");
-				ResultSet rs = stmt.executeQuery()) {
-
-			while (rs.next()) {
-				modelo.addRow(new Object[] { rs.getString("USR"), rs.getString("NICKNAME"), rs.getString("ROL"),
-						rs.getString("campus"), rs.getString("PWD"), rs.getDate("fecha"), rs.getString("foto") });
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return modelo;
-	}
-
-	public static DefaultTableModel cargarIncidencias() {
-		DefaultTableModel modelo = new DefaultTableModel();
-		modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
-				"Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
-
-		try (Connection conexion = ConexionBD.conectar();
-				PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM incidencias");
-				ResultSet rs = stmt.executeQuery()) {
-
-			while (rs.next()) {
-				modelo.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
-						rs.getString("edificio"), rs.getString("foto"), rs.getString("piso"),
-						rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
-						rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return modelo;
-	}
-
-	public boolean eliminarIncidencia(int idIncidencia) {
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root",
-				"")) {
-			// Si no tienes ON DELETE CASCADE, elimina relaciones primero
-			PreparedStatement ps1 = conn.prepareStatement("DELETE FROM favoritos WHERE incidencias_id_incidencia = ?");
-			ps1.setInt(1, idIncidencia);
-			ps1.executeUpdate();
-
-			PreparedStatement ps2 = conn.prepareStatement("DELETE FROM notificar WHERE incidencias_id_incidencia = ?");
-			ps2.setInt(1, idIncidencia);
-			ps2.executeUpdate();
-
-			// Elimina la incidencia
-			PreparedStatement ps3 = conn.prepareStatement("DELETE FROM incidencias WHERE id_incidencia = ?");
-			ps3.setInt(1, idIncidencia);
-			int filasAfectadas = ps3.executeUpdate();
-
-			return filasAfectadas > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	public static DefaultTableModel buscarIncidencias(String estado, String usuario, String orden) {
-		DefaultTableModel modelo = new DefaultTableModel();
-		modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
-				"Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
-
-		StringBuilder query = new StringBuilder("SELECT * FROM incidencias WHERE 1=1");
-		List<Object> parametros = new ArrayList<>();
-
-		if (estado != null && !estado.isEmpty()) {
-			query.append(" AND estado LIKE ?");
-			parametros.add("%" + estado + "%");
-		}
-
-		if (usuario != null && !usuario.isEmpty()) {
-			query.append(" AND USR LIKE ?");
-			parametros.add("%" + usuario + "%");
-		}
-
-		// Orden según el valor de 'orden'
-		if (orden != null) {
-			switch (orden) {
-			case "Más votaciones":
-				query.append(" ORDER BY ranking DESC");
-				break;
-			case "Menos votaciones":
-				query.append(" ORDER BY ranking ASC");
-				break;
-			case "Más reciente":
-				query.append(" ORDER BY fecha DESC");
-				break;
-			case "Orden de Relevancia":
-				query.append(" ORDER BY fecha DESC"); // O el orden que definas como relevancia
-				break;
-			default:
-				query.append(" ORDER BY fecha DESC"); // Orden por defecto
-				break;
-			}
-		} else {
-			query.append(" ORDER BY fecha DESC"); // Orden por defecto si orden es null
-		}
-
-		try (Connection conexion = ConexionBD.conectar();
-				PreparedStatement stmt = conexion.prepareStatement(query.toString())) {
-
-			for (int i = 0; i < parametros.size(); i++) {
-				stmt.setObject(i + 1, parametros.get(i));
-			}
-
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					modelo.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
-							rs.getString("edificio"), rs.getString("foto"), rs.getString("piso"),
-							rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
-							rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return modelo;
-	}
-
-	public boolean eliminarUsuario(String usr) {
-		try (Connection conexion = ConexionBD.conectar()) {
-			// Desactivamos autocommit para hacer todo en una transacción
-			conexion.setAutoCommit(false);
-
-			// 1. Eliminar entradas en favoritos
-			try (PreparedStatement stmtFav = conexion.prepareStatement("DELETE FROM favoritos WHERE USERS_USR = ?")) {
-				stmtFav.setString(1, usr);
-				stmtFav.executeUpdate();
-			}
-
-			// 2. Eliminar entradas en notificar
-			try (PreparedStatement stmtNot = conexion.prepareStatement("DELETE FROM notificar WHERE USERS_USR = ?")) {
-				stmtNot.setString(1, usr);
-				stmtNot.executeUpdate();
-			}
-
-			// 3. Eliminar entradas en SEGURIDAD
-			try (PreparedStatement stmtSeg = conexion.prepareStatement("DELETE FROM SEGURIDAD WHERE USERS_USR = ?")) {
-				stmtSeg.setString(1, usr);
-				stmtSeg.executeUpdate();
-			}
-
-			// 4. Actualizar la tabla incidencias para eliminar referencia del usuario o
-			// poner a NULL
-			// Si no quieres perder la incidencia, puedes poner USERS_USR a NULL si es
-			// nullable
-			try (PreparedStatement stmtInc = conexion
-					.prepareStatement("UPDATE incidencias SET USERS_USR = NULL WHERE USERS_USR = ?")) {
-				stmtInc.setString(1, usr);
-				stmtInc.executeUpdate();
-			}
-
-			// 5. Finalmente eliminar el usuario
-			try (PreparedStatement stmtUsr = conexion.prepareStatement("DELETE FROM USERS WHERE USR = ?")) {
-				stmtUsr.setString(1, usr);
-				int rows = stmtUsr.executeUpdate();
-
-				conexion.commit(); // Confirmamos los cambios si todo va bien
-
-				return rows > 0;
-			} catch (SQLException e) {
-				conexion.rollback(); // Si hay error, revertimos todo
-				throw e;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	public void obtenerPreguntasSeguridad(String email, JLabel lblP1, JLabel lblP2, JTextField r1, JTextField r2,
-			JButton btnComprobar) {
-		try (Connection conn = ConexionBD.conectar();
-				PreparedStatement stmt = conn
-						.prepareStatement("SELECT PREG1, PREG2 FROM SEGURIDAD WHERE USERS_USR = ?")) {
-
-			stmt.setString(1, email);
-			ResultSet rs = stmt.executeQuery();
-
-			if (rs.next()) {
-				int codigoPreg1 = rs.getInt("PREG1");
-				int codigoPreg2 = rs.getInt("PREG2");
-
-				lblP1.setText(mapearCodigoPregunta(codigoPreg1));
-				lblP2.setText(mapearCodigoPregunta(codigoPreg2));
-
-				lblP1.setVisible(true);
-				lblP2.setVisible(true);
-				r1.setVisible(true);
-				r2.setVisible(true);
-				btnComprobar.setVisible(true);
-			} else {
-				JOptionPane.showMessageDialog(null, "Correo no encontrado o sin preguntas de seguridad.");
-			}
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, "Error al cargar preguntas:\n" + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Traduce código numérico a texto descriptivo para las preguntas de seguridad.
-	 */
-	private String mapearCodigoPregunta(int codigo) {
-		switch (codigo) {
-		case 1:
-			return "¿Cuál es el nombre de tu primera mascota?";
-		case 2:
-			return "¿En qué ciudad naciste?";
-		case 3:
-			return "¿Cuál es el nombre de tu escuela primaria?";
-		case 4:
-			return "¿Cuál es tu película favorita?";
-		case 5:
-			return "¿Cómo se llama tu mejor amigo de la infancia?";
-		default:
-			return "Pregunta desconocida";
-		}
-	}
-
-	public void crearIncidencia(String edificio, byte[] fotoBytes, String piso, String descripcion, String aula,
-			String campus, JFrame ventana) {
-		if (descripcion.isEmpty() || aula.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
-			return;
-		}
-
-		try (Connection conn = ConexionBD.conectar()) {
-
-			// 1. Verificar incidencias existentes en ese aula
-			String consulta = "SELECT DESCRIPCION, FOTO FROM INCIDENCIAS WHERE AULA = ?";
-			PreparedStatement checkStmt = conn.prepareStatement(consulta);
-			checkStmt.setString(1, aula);
-			ResultSet rs = checkStmt.executeQuery();
-
-			boolean hayCoincidencias = false;
-			JPanel panelLista = new JPanel();
-			panelLista.setLayout(new BoxLayout(panelLista, BoxLayout.Y_AXIS));
-
-			while (rs.next()) {
-				hayCoincidencias = true;
-				String descExistente = rs.getString("DESCRIPCION");
-				byte[] fotoExistente = rs.getBytes("FOTO");
-
-				JPanel panel = new JPanel();
-				panel.setLayout(new BorderLayout(5, 5));
-				panel.setPreferredSize(new Dimension(350, 200));
-
-				JTextArea descArea = new JTextArea(descExistente);
-				descArea.setWrapStyleWord(true);
-				descArea.setLineWrap(true);
-				descArea.setEditable(false);
-				descArea.setBorder(BorderFactory.createTitledBorder("Descripción"));
-				panel.add(new JScrollPane(descArea), BorderLayout.CENTER);
-
-				if (fotoExistente != null && fotoExistente.length > 0) {
-					try {
-						BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(fotoExistente));
-						if (bufferedImage != null) {
-							Image imagenEscalada = bufferedImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-							JLabel lblImg = new JLabel(new ImageIcon(imagenEscalada));
-							lblImg.setBorder(BorderFactory.createTitledBorder("Imagen"));
-							panel.add(lblImg, BorderLayout.WEST);
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-
-				panelLista.add(panel);
-				panelLista.add(Box.createRigidArea(new Dimension(0, 10)));
-			}
-
-			rs.close();
-			checkStmt.close();
-
-			// 2. Mostrar coincidencias si existen
-			if (hayCoincidencias) {
-				JScrollPane scroll = new JScrollPane(panelLista);
-				scroll.setPreferredSize(new Dimension(500, 350));
-
-				Object[] opciones = { "No está entre ellas", "Ya aparece ahí" };
-				int seleccion = JOptionPane.showOptionDialog(null, scroll, "Incidencias ya existentes en este aula",
-						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[0]);
-
-				if (seleccion != JOptionPane.YES_OPTION) {
-					return;
-				}
-			}
-
-			// 3. Insertar nueva incidencia
-			int nuevoId = obtenerMaxIdIncidencia() + 1;
-
-			String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
-			stmt.setInt(1, nuevoId);
-			stmt.setString(2, "En revisión");
-			stmt.setString(3, edificio);
-
-			if (fotoBytes != null) {
-				stmt.setBytes(4, fotoBytes);
-			} else {
-				stmt.setNull(4, java.sql.Types.BLOB);
-			}
-
-			stmt.setString(5, piso);
-			stmt.setString(6, descripcion);
-			stmt.setString(7, aula);
-			stmt.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
-			stmt.setString(9, campus);
-
-			String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
-			stmt.setLong(10, 0); // RANKING
-			stmt.setString(11, user);
-			stmt.setString(12, user);
-
-			int filas = stmt.executeUpdate();
-			if (filas > 0) {
-				JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
-				ventana.dispose(); // Cierra la ventana que pasaste como parámetro
-				new _07_MisIncidencias().setVisible(true); // Abre la ventana _07_MisIncidencias
-			} else {
-				JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
-		}
-	}
-
-	public int obtenerMaxIdIncidencia() {
-		int maxId = 0;
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "SELECT MAX(id_incidencia) AS max_id FROM incidencias";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			ResultSet rs = stmt.executeQuery();
-
-			if (rs.next()) {
-				maxId = rs.getInt("max_id");
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return maxId;
-	}
-
-	public void setVista(_02_Login vista, _03_CrearCuenta crearCuenta) {
-		this._02_login = vista;
-		this._03_crearCuenta = crearCuenta;
-	}
-
-	public void setUsuarioLogueado(boolean logueado) {
-		this.usuarioLogueado = logueado;
-	}
-
-	private void mostrarVentana(JFrame vista) {
-		vista.setVisible(true);
-	}
-
-	public void volverAtras(JFrame ventanaActual) {
-		if (usuarioLogueado) {
-			_06_PaginaPrincipal vista = new _06_PaginaPrincipal();
-			vista.setControlador(this);
-			vista.setVisible(true);
-		} else {
-			_01_PGSinLogin vista = new _01_PGSinLogin();
-			vista.setControlador(this);
-			vista.setVisible(true);
-		}
-		if (ventanaActual != null) {
-			ventanaActual.dispose();
-		}
-	}
-
-	public void abrirPaginaPrincipal(JFrame ventanaActual) {
-		_06_PaginaPrincipal pagina = new _06_PaginaPrincipal();
-		pagina.setControlador(this);
-		pagina.setVisible(true);
-		if (ventanaActual != null) {
-			ventanaActual.dispose();
-		}
-	}
-
-	public void abrirMisIncidencias(JFrame ventanaActual) {
-		_07_MisIncidencias vista = new _07_MisIncidencias();
-		vista.setControlador(this);
-		vista.setVisible(true);
-		if (ventanaActual != null) {
-			ventanaActual.dispose();
-		}
-	}
-
-	public void abrirCrearIncidencia(JFrame ventanaActual) {
-		_08_CrearIncidencia vista = new _08_CrearIncidencia();
-		vista.setControlador(this);
-		vista.setVisible(true);
-		if (ventanaActual != null) {
-			ventanaActual.dispose();
-		}
-	}
-
-	public void abrirPaginaAdmin(JFrame ventanaActual) {
-		_12_PaginaAdmin vista = new _12_PaginaAdmin();
-		vista.setControlador(this);
-		mostrarVentana(vista);
-		ventanaActual.dispose();
-	}
-
-	public void abrirNotificaciones(JFrame ventanaActual) {
-		_09_Notificaciones vista = new _09_Notificaciones();
-		vista.setControlador(this);
-		vista.setVisible(true);
-		ventanaActual.dispose();
-	}
-
-	public void abrirAyuda() {
-		_14_Ayuda vista = new _14_Ayuda();
-		vista.setControlador(this);
-		mostrarVentana(vista);
-	}
-
-	public void abrirLogin() {
-		_02_Login login = new _02_Login();
-		login.setControlador(this);
-		setVista(login, null);
-		mostrarVentana(login);
-	}
-
-	public void abrirRestContrasena(String origen) {
-		_05_RestContrasena rest = new _05_RestContrasena(origen);
-		rest.setControlador(this);
-		mostrarVentana(rest);
-	}
-
-	public void abrirPerfilUsuario(JFrame ventanaActual) {
-		_10_PerfilUsuario perfil = new _10_PerfilUsuario();
-		perfil.setControlador(this);
-		perfil.setVisible(true);
-		if (ventanaActual != null)
-			ventanaActual.dispose();
-	}
-
-	public void abrirEstadisticas(JFrame ventanaActual) {
-		_13_Estadisticas vista = new _13_Estadisticas(this);
-		vista.setVisible(true);
-		if (ventanaActual != null) {
-			ventanaActual.dispose();
-		}
-	}
-
-	public void validarLogin(String email, String password, JFrame vistaActual) {
-		try {
-			ConexionBD.recargarConfiguracion();
-
-			try (Connection conn = ConexionBD.conectar()) {
-
-				String passwordHasheada = HashUtil.hashSHA256(password); // Convertimos la que escribió el usuario
-
-				String sql = "SELECT ROL FROM USERS WHERE USR = ? AND PWD = ?";
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				stmt.setString(1, email);
-				stmt.setString(2, passwordHasheada); // Comparamos hash con hash
-				ResultSet rs = stmt.executeQuery();
-
-				if (rs.next()) {
-					intentosFallidos = 0;
-
-					setUsuarioLogueado(true);
-
-					if (email.contains("@")) {
-						Modelo.usuarioActual = email.substring(0, email.indexOf('@'));
-					} else {
-						Modelo.usuarioActual = email;
-					}
-
-					// ** NUEVO: comprobar incidencias "Solucionada" para mostrar notificación **
-					String sqlIncidenciasPendientes = "SELECT COUNT(*) FROM incidencias i "
-							+ "JOIN notificar n ON i.id_incidencia = n.incidencias_id_incidencia "
-							+ "WHERE n.USERS_USR = ? AND i.estado = 'Solucionada'";
-					try (PreparedStatement stmtIncPend = conn.prepareStatement(sqlIncidenciasPendientes)) {
-						stmtIncPend.setString(1, email);
-						ResultSet rsIncPend = stmtIncPend.executeQuery();
-						if (rsIncPend.next() && rsIncPend.getInt(1) > 0) {
-							JOptionPane.showMessageDialog(vistaActual, "Tienes notificaciones pendientes",
-									"Notificación", JOptionPane.INFORMATION_MESSAGE);
-						}
-						rsIncPend.close();
-					}
-
-					vistaActual.dispose();
-
-					abrirPaginaPrincipal(vistaActual);
-
-				} else {
-					intentosFallidos++;
-					JOptionPane.showMessageDialog(vistaActual,
-							"Usuario o contraseña incorrectos. Intento " + intentosFallidos + " de 3.");
-					if (intentosFallidos >= 3) {
-						JOptionPane.showMessageDialog(vistaActual,
-								"Demasiados intentos fallidos. Cerrando aplicación.");
-						System.exit(0);
-					}
-				}
-			}
-		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(vistaActual, "Error de conexión:\n" + ex.getMessage());
-			ex.printStackTrace();
-		}
-	}
-
-	public void registrarUsuario(String email, String password, String codigoAdmin, int preg1, int preg2, String resp1,
-			String resp2, JFrame vistaActual) {
-
-// Validación de campos vacíos
-		if (email.isEmpty() || password.isEmpty() || resp1.trim().isEmpty() || resp2.trim().isEmpty()) {
-			JOptionPane.showMessageDialog(vistaActual,
-					"Debe rellenar todos los campos, incluyendo las respuestas de seguridad.");
-			return;
-		}
-
-// Validación de longitud de la contraseña
-		if (password.length() < 8) {
-			JOptionPane.showMessageDialog(vistaActual, "La contraseña debe tener al menos 8 caracteres.");
-			return;
-		}
-
-		// Validación del código admin (si se ha escrito alguno)
-		if (!codigoAdmin.isEmpty() && !codigoAdmin.equals("ADMIN123")) {
-			JOptionPane.showMessageDialog(vistaActual,
-					"Código de administrador incorrecto. No se ha creado la cuenta.");
-			return;
-		}
-
-		try (Connection conn = ConexionBD.conectar()) {
-			String checkSQL = "SELECT USR FROM USERS WHERE USR = ?";
-			PreparedStatement checkStmt = conn.prepareStatement(checkSQL);
-			checkStmt.setString(1, email);
-			ResultSet rs = checkStmt.executeQuery();
-
-			if (rs.next()) {
-				JOptionPane.showMessageDialog(vistaActual, "El usuario ya existe");
-			} else {
-				String rol = codigoAdmin.equals("ADMIN123") ? "Y" : "N";
-				String nickname = email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
-
-				String insertUserSQL = "INSERT INTO USERS (USR, PWD, ROL, NICKNAME) VALUES (?, ?, ?, ?)";
-				PreparedStatement insertUserStmt = conn.prepareStatement(insertUserSQL);
-				insertUserStmt.setString(1, email);
-				insertUserStmt.setString(2, HashUtil.hashSHA256(password));
-				insertUserStmt.setString(3, rol);
-				insertUserStmt.setString(4, nickname);
-				insertUserStmt.executeUpdate();
-
-				String insertSeguridadSQL = "INSERT INTO SEGURIDAD (USERS_USR, PREG1, RESP1, PREG2, RESP2) VALUES (?, ?, ?, ?, ?)";
-				PreparedStatement insertSeguridadStmt = conn.prepareStatement(insertSeguridadSQL);
-				insertSeguridadStmt.setString(1, email);
-				insertSeguridadStmt.setInt(2, preg1);
-				insertSeguridadStmt.setString(3, resp1.trim());
-				insertSeguridadStmt.setInt(4, preg2);
-				insertSeguridadStmt.setString(5, resp2.trim());
-				insertSeguridadStmt.executeUpdate();
-
-				JOptionPane.showMessageDialog(vistaActual, "Cuenta creada correctamente");
-				abrirLogin();
-				vistaActual.dispose();
-			}
-		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(vistaActual, "Error al registrar:\n" + ex.getMessage());
-			ex.printStackTrace();
-		}
-	}
-
-	public void comprobarPreguntasSeguridad(String email, String resp1, String resp2, JFrame vistaActual,
-			String origen) {
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "SELECT * FROM SEGURIDAD WHERE USERS_USR = ? AND RESP1 = ? AND RESP2 = ?";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, email);
-			stmt.setString(2, resp1);
-			stmt.setString(3, resp2);
-			ResultSet rs = stmt.executeQuery();
-
-			if (rs.next()) {
-				_05_RestContrasena rest = new _05_RestContrasena(origen);
-				rest.setControlador(this);
-				rest.setUsuario(email);
-				rest.setVisible(true);
-				vistaActual.dispose();
-			} else {
-				JOptionPane.showMessageDialog(vistaActual, "Datos incorrectos. No se puede recuperar la contraseña.");
-			}
-		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(vistaActual, "Error de conexión:\n" + ex.getMessage());
-			ex.printStackTrace();
-		}
-	}
-
-	public boolean usuarioEsAdmin() {
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "SELECT ROL FROM USERS WHERE NICKNAME = ?";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, Modelo.usuarioActual);
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-				return "Y".equalsIgnoreCase(rs.getString("ROL"));
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return false;
-	}
-
-	/**
-	 * reestablecer contraseña
-	 * 
-	 * @param email
-	 * @param nuevaPwd
-	 * @param vistaActual
-	 */
-	public void restablecerContrasena(String email, String nuevaPwd, JFrame vistaActual) {
-		// Validación de longitud mínima
-		if (nuevaPwd == null || nuevaPwd.length() < 8) {
-			JOptionPane.showMessageDialog(vistaActual, "La contraseña debe tener al menos 8 caracteres.", "Error",
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-
-		// Si hay un usuario logueado, usar ese correo
-		if (Modelo.usuarioActual != null && !Modelo.usuarioActual.trim().isEmpty()) {
-			email = Modelo.usuarioActual + "@ueuropea.es";
-		}
-
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "UPDATE USERS SET PWD = ? WHERE USR = ?";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, HashUtil.hashSHA256(nuevaPwd));
-			System.out.println(HashUtil.hashSHA256(nuevaPwd));
-			stmt.setString(2, email);
-			int filas = stmt.executeUpdate();
-
-			if (filas > 0) {
-				JOptionPane.showMessageDialog(vistaActual, "¡Contraseña actualizada correctamente!");
-				abrirLogin();
-				vistaActual.dispose();
-			} else {
-				JOptionPane.showMessageDialog(vistaActual, "No se pudo actualizar la contraseña.");
-			}
-		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(vistaActual, "Error al actualizar:\n" + ex.getMessage());
-			ex.printStackTrace();
-		}
-	}
-
-	public String[] obtenerDatosPerfil() {
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "SELECT FECHA, CAMPUS, USR FROM USERS WHERE USR = ?";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.setString(1, Modelo.usuarioActual + "@ueuropea.es"); // El nickname
-
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-				String fecha = rs.getString("FECHA");
-				String campus = rs.getString("CAMPUS");
-				String email = rs.getString("USR");
-				return new String[] { fecha, campus, email };
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return new String[] { "", "", "" }; // Valores por defecto si falla
-	}
-
-	public void cerrarSesion() {
-		setUsuarioLogueado(false);
-		Modelo.usuarioActual = null;
-
-		_02_Login login = new _02_Login();
-		login.setControlador(this);
-		login.setVisible(true);
-	}
-
-	public boolean eliminarFavorito(String idIncidencia, String usuario) {
-		String sql = "DELETE FROM favoritos WHERE incidencias_id_incidencia = ? AND USERS_USR = ?";
-		try (Connection conexion = ConexionBD.conectar(); PreparedStatement ps = conexion.prepareStatement(sql)) {
-			ps.setInt(1, Integer.parseInt(idIncidencia));
-			ps.setString(2, usuario);
-			int filas = ps.executeUpdate();
-			System.out.println("Filas eliminadas: " + filas);
-			return filas > 0;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	public void actualizarPerfilUsuario(String fecha, String campus, byte[] imagen) {
-		try (Connection conn = ConexionBD.conectar()) {
-			String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ?, FOTO = ? WHERE USR = ?";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
-			// Fecha
-			if (fecha == null || fecha.trim().isEmpty()) {
-				stmt.setNull(1, java.sql.Types.DATE);
-			} else {
-				stmt.setDate(1, java.sql.Date.valueOf(fecha)); // formato YYYY-MM-DD
-			}
-
-			// Campus
-			if (campus == null || campus.trim().isEmpty()) {
-				stmt.setNull(2, java.sql.Types.VARCHAR);
-			} else {
-				stmt.setString(2, campus);
-			}
-
-			// Imagen
-			if (imagen != null) {
-				stmt.setBytes(3, imagen);
-			} else {
-				stmt.setNull(3, java.sql.Types.BLOB);
-			}
-
-			// Usuario
-			stmt.setString(4, Modelo.usuarioActual + "@ueuropea.es");
-
-			stmt.executeUpdate();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
-		}
-	}
-
-	public void abrirFavoritos(JFrame ventanaActual) {
-		ventanaActual.dispose();
-		_15_Favoritos favoritos = new _15_Favoritos();
-		favoritos.setControlador(this);
-		favoritos.setVisible(true);
-	}
-
-	public void setUsuarioActual(String usuario) {
-		this.usuarioActual = usuario;
-	}
-
-	public String getUsuarioActual() {
-		return this.usuarioActual;
-	}
+    // Modelo de datos y vistas asociadas
+    private Modelo modelo;
+    private _02_Login _02_login;
+    private _03_CrearCuenta _03_crearCuenta;
+    
+    // Variables de estado de la sesión
+    private int intentosFallidos = 0;
+    private boolean usuarioLogueado = false;
+    private String usuarioActual;
+
+    /**
+     * Establece el modelo de datos para el controlador.
+     * @param modelo Instancia del modelo de datos
+     */
+    public void setModelo(Modelo modelo) {
+        this.modelo = modelo;
+    }
+
+    /**
+     * Carga todos los usuarios de la base de datos en un modelo de tabla.
+     * @return DefaultTableModel con los datos de los usuarios
+     */
+    public static DefaultTableModel cargarUsuarios() {
+        DefaultTableModel modelo = new DefaultTableModel();
+        modelo.setColumnIdentifiers(
+                new String[] { "Usuario", "Nickname", "Rol", "Campus", "Contraseña", "Fecha", "Foto" });
+
+        try (Connection conexion = ConexionBD.conectar();
+                PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM users");
+                ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                modelo.addRow(new Object[] { rs.getString("USR"), rs.getString("NICKNAME"), rs.getString("ROL"),
+                        rs.getString("campus"), rs.getString("PWD"), rs.getDate("fecha"), rs.getString("foto") });
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return modelo;
+    }
+
+    /**
+     * Carga todas las incidencias de la base de datos en un modelo de tabla.
+     * @return DefaultTableModel con los datos de las incidencias
+     */
+    public static DefaultTableModel cargarIncidencias() {
+        DefaultTableModel modelo = new DefaultTableModel();
+        modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
+                "Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
+
+        try (Connection conexion = ConexionBD.conectar();
+                PreparedStatement stmt = conexion.prepareStatement("SELECT * FROM incidencias");
+                ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                modelo.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
+                        rs.getString("edificio"), rs.getString("foto"), rs.getString("piso"),
+                        rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
+                        rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return modelo;
+    }
+
+    /**
+     * Elimina una incidencia de la base de datos.
+     * @param idIncidencia ID de la incidencia a eliminar
+     * @return true si la eliminación fue exitosa, false en caso contrario
+     */
+    public boolean eliminarIncidencia(int idIncidencia) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto_integrador", "root",
+                "")) {
+            // Elimina primero las relaciones en tablas dependientes
+            PreparedStatement ps1 = conn.prepareStatement("DELETE FROM favoritos WHERE incidencias_id_incidencia = ?");
+            ps1.setInt(1, idIncidencia);
+            ps1.executeUpdate();
+
+            PreparedStatement ps2 = conn.prepareStatement("DELETE FROM notificar WHERE incidencias_id_incidencia = ?");
+            ps2.setInt(1, idIncidencia);
+            ps2.executeUpdate();
+
+            // Elimina la incidencia principal
+            PreparedStatement ps3 = conn.prepareStatement("DELETE FROM incidencias WHERE id_incidencia = ?");
+            ps3.setInt(1, idIncidencia);
+            int filasAfectadas = ps3.executeUpdate();
+
+            return filasAfectadas > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Busca incidencias según criterios de filtrado y ordenación.
+     * @param estado Estado de la incidencia a filtrar
+     * @param usuario Usuario que reportó la incidencia
+     * @param orden Criterio de ordenación
+     * @return DefaultTableModel con las incidencias que coinciden con los criterios
+     */
+    public static DefaultTableModel buscarIncidencias(String estado, String usuario, String orden) {
+        DefaultTableModel modelo = new DefaultTableModel();
+        modelo.setColumnIdentifiers(new String[] { "ID", "Estado", "Edificio", "Foto", "Piso", "Descripción", "Aula",
+                "Justificación", "Fecha", "Campus", "Ranking", "Usuario" });
+
+        StringBuilder query = new StringBuilder("SELECT * FROM incidencias WHERE 1=1");
+        List<Object> parametros = new ArrayList<>();
+
+        // Añade condiciones de filtrado según los parámetros
+        if (estado != null && !estado.isEmpty()) {
+            query.append(" AND estado LIKE ?");
+            parametros.add("%" + estado + "%");
+        }
+
+        if (usuario != null && !usuario.isEmpty()) {
+            query.append(" AND USR LIKE ?");
+            parametros.add("%" + usuario + "%");
+        }
+
+        // Añade ordenación según el criterio seleccionado
+        if (orden != null) {
+            switch (orden) {
+            case "Más votaciones":
+                query.append(" ORDER BY ranking DESC");
+                break;
+            case "Menos votaciones":
+                query.append(" ORDER BY ranking ASC");
+                break;
+            case "Más reciente":
+                query.append(" ORDER BY fecha DESC");
+                break;
+            case "Orden de Relevancia":
+                query.append(" ORDER BY fecha DESC");
+                break;
+            default:
+                query.append(" ORDER BY fecha DESC");
+                break;
+            }
+        } else {
+            query.append(" ORDER BY fecha DESC");
+        }
+
+        try (Connection conexion = ConexionBD.conectar();
+                PreparedStatement stmt = conexion.prepareStatement(query.toString())) {
+
+            // Establece los parámetros de la consulta
+            for (int i = 0; i < parametros.size(); i++) {
+                stmt.setObject(i + 1, parametros.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    modelo.addRow(new Object[] { rs.getInt("id_incidencia"), rs.getString("estado"),
+                            rs.getString("edificio"), rs.getString("foto"), rs.getString("piso"),
+                            rs.getString("descripcion"), rs.getString("aula"), rs.getString("justificacion"),
+                            rs.getDate("fecha"), rs.getString("campus"), rs.getInt("ranking"), rs.getString("USR") });
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return modelo;
+    }
+
+    /**
+     * Elimina un usuario de la base de datos y todas sus relaciones.
+     * @param usr Nombre de usuario a eliminar
+     * @return true si la eliminación fue exitosa, false en caso contrario
+     */
+    public boolean eliminarUsuario(String usr) {
+        try (Connection conexion = ConexionBD.conectar()) {
+            // Desactiva autocommit para manejar como transacción
+            conexion.setAutoCommit(false);
+
+            // Elimina entradas en tablas relacionadas
+            try (PreparedStatement stmtFav = conexion.prepareStatement("DELETE FROM favoritos WHERE USERS_USR = ?")) {
+                stmtFav.setString(1, usr);
+                stmtFav.executeUpdate();
+            }
+
+            try (PreparedStatement stmtNot = conexion.prepareStatement("DELETE FROM notificar WHERE USERS_USR = ?")) {
+                stmtNot.setString(1, usr);
+                stmtNot.executeUpdate();
+            }
+
+            try (PreparedStatement stmtSeg = conexion.prepareStatement("DELETE FROM SEGURIDAD WHERE USERS_USR = ?")) {
+                stmtSeg.setString(1, usr);
+                stmtSeg.executeUpdate();
+            }
+
+            // Actualiza incidencias para eliminar referencia al usuario
+            try (PreparedStatement stmtInc = conexion
+                    .prepareStatement("UPDATE incidencias SET USERS_USR = NULL WHERE USERS_USR = ?")) {
+                stmtInc.setString(1, usr);
+                stmtInc.executeUpdate();
+            }
+
+            // Finalmente elimina el usuario
+            try (PreparedStatement stmtUsr = conexion.prepareStatement("DELETE FROM USERS WHERE USR = ?")) {
+                stmtUsr.setString(1, usr);
+                int rows = stmtUsr.executeUpdate();
+
+                conexion.commit(); // Confirma la transacción
+                return rows > 0;
+            } catch (SQLException e) {
+                conexion.rollback(); // Revierte en caso de error
+                throw e;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene y muestra las preguntas de seguridad asociadas a un usuario.
+     * @param email Correo del usuario
+     * @param lblP1 JLabel para mostrar la primera pregunta
+     * @param lblP2 JLabel para mostrar la segunda pregunta
+     * @param r1 Campo de texto para la respuesta 1
+     * @param r2 Campo de texto para la respuesta 2
+     * @param btnComprobar Botón para comprobar respuestas
+     */
+    public void obtenerPreguntasSeguridad(String email, JLabel lblP1, JLabel lblP2, JTextField r1, JTextField r2,
+            JButton btnComprobar) {
+        try (Connection conn = ConexionBD.conectar();
+                PreparedStatement stmt = conn
+                        .prepareStatement("SELECT PREG1, PREG2 FROM SEGURIDAD WHERE USERS_USR = ?")) {
+
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // Obtiene códigos de preguntas y las traduce a texto
+                int codigoPreg1 = rs.getInt("PREG1");
+                int codigoPreg2 = rs.getInt("PREG2");
+
+                lblP1.setText(mapearCodigoPregunta(codigoPreg1));
+                lblP2.setText(mapearCodigoPregunta(codigoPreg2));
+
+                // Muestra los componentes de preguntas
+                lblP1.setVisible(true);
+                lblP2.setVisible(true);
+                r1.setVisible(true);
+                r2.setVisible(true);
+                btnComprobar.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(null, "Correo no encontrado o sin preguntas de seguridad.");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al cargar preguntas:\n" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Traduce códigos numéricos de preguntas a texto legible.
+     * @param codigo Código numérico de la pregunta
+     * @return Texto de la pregunta correspondiente
+     */
+    private String mapearCodigoPregunta(int codigo) {
+        switch (codigo) {
+        case 1:
+            return "¿Cuál es el nombre de tu primera mascota?";
+        case 2:
+            return "¿En qué ciudad naciste?";
+        case 3:
+            return "¿Cuál es el nombre de tu escuela primaria?";
+        case 4:
+            return "¿Cuál es tu película favorita?";
+        case 5:
+            return "¿Cómo se llama tu mejor amigo de la infancia?";
+        default:
+            return "Pregunta desconocida";
+        }
+    }
+
+    /**
+     * Crea una nueva incidencia en el sistema.
+     * @param edificio Edificio donde ocurre la incidencia
+     * @param fotoBytes Imagen de la incidencia en bytes
+     * @param piso Piso donde ocurre la incidencia
+     * @param descripcion Descripción detallada
+     * @param aula Aula específica
+     * @param campus Campus universitario
+     * @param ventana Ventana actual para cierre y notificaciones
+     */
+    public void crearIncidencia(String edificio, byte[] fotoBytes, String piso, String descripcion, String aula,
+            String campus, JFrame ventana) {
+        // Validación de campos obligatorios
+        if (descripcion.isEmpty() || aula.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos obligatorios (descripción, aula) ");
+            return;
+        }
+
+        try (Connection conn = ConexionBD.conectar()) {
+
+            // Verifica si ya existen incidencias en el mismo aula
+            String consulta = "SELECT DESCRIPCION, FOTO FROM INCIDENCIAS WHERE AULA = ?";
+            PreparedStatement checkStmt = conn.prepareStatement(consulta);
+            checkStmt.setString(1, aula);
+            ResultSet rs = checkStmt.executeQuery();
+
+            boolean hayCoincidencias = false;
+            JPanel panelLista = new JPanel();
+            panelLista.setLayout(new BoxLayout(panelLista, BoxLayout.Y_AXIS));
+
+            // Muestra las incidencias existentes en el aula
+            while (rs.next()) {
+                hayCoincidencias = true;
+                String descExistente = rs.getString("DESCRIPCION");
+                byte[] fotoExistente = rs.getBytes("FOTO");
+
+                JPanel panel = new JPanel();
+                panel.setLayout(new BorderLayout(5, 5));
+                panel.setPreferredSize(new Dimension(350, 200));
+
+                JTextArea descArea = new JTextArea(descExistente);
+                descArea.setWrapStyleWord(true);
+                descArea.setLineWrap(true);
+                descArea.setEditable(false);
+                descArea.setBorder(BorderFactory.createTitledBorder("Descripción"));
+                panel.add(new JScrollPane(descArea), BorderLayout.CENTER);
+
+                // Muestra la imagen si existe
+                if (fotoExistente != null && fotoExistente.length > 0) {
+                    try {
+                        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(fotoExistente));
+                        if (bufferedImage != null) {
+                            Image imagenEscalada = bufferedImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                            JLabel lblImg = new JLabel(new ImageIcon(imagenEscalada));
+                            lblImg.setBorder(BorderFactory.createTitledBorder("Imagen"));
+                            panel.add(lblImg, BorderLayout.WEST);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                panelLista.add(panel);
+                panelLista.add(Box.createRigidArea(new Dimension(0, 10)));
+            }
+
+            rs.close();
+            checkStmt.close();
+
+            // Pregunta al usuario si su incidencia ya está reportada
+            if (hayCoincidencias) {
+                JScrollPane scroll = new JScrollPane(panelLista);
+                scroll.setPreferredSize(new Dimension(500, 350));
+
+                Object[] opciones = { "No está entre ellas", "Ya aparece ahí" };
+                int seleccion = JOptionPane.showOptionDialog(null, scroll, "Incidencias ya existentes en este aula",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[0]);
+
+                if (seleccion != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+
+            // Inserta la nueva incidencia
+            int nuevoId = obtenerMaxIdIncidencia() + 1;
+
+            String sql = "INSERT INTO INCIDENCIAS (id_incidencia, ESTADO, EDIFICIO, FOTO, PISO, DESCRIPCION, AULA, FECHA, CAMPUS, RANKING, USERS_USR, USR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, nuevoId);
+            stmt.setString(2, "En revisión");
+            stmt.setString(3, edificio);
+
+            if (fotoBytes != null) {
+                stmt.setBytes(4, fotoBytes);
+            } else {
+                stmt.setNull(4, java.sql.Types.BLOB);
+            }
+
+            stmt.setString(5, piso);
+            stmt.setString(6, descripcion);
+            stmt.setString(7, aula);
+            stmt.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
+            stmt.setString(9, campus);
+
+            String user = Modelo.usuarioActual != null ? Modelo.usuarioActual + "@ueuropea.es" : null;
+            stmt.setLong(10, 0); // RANKING inicial
+            stmt.setString(11, user);
+            stmt.setString(12, user);
+
+            int filas = stmt.executeUpdate();
+            if (filas > 0) {
+                JOptionPane.showMessageDialog(null, "Incidencia creada correctamente");
+                ventana.dispose();
+                new _07_MisIncidencias().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(null, "Error al crear la incidencia.");
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al crear incidencia:\n" + ex.getMessage());
+        }
+    }
+
+    /**
+     * Obtiene el máximo ID de incidencia para generar el siguiente.
+     * @return El máximo ID de incidencia encontrado
+     */
+    public int obtenerMaxIdIncidencia() {
+        int maxId = 0;
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "SELECT MAX(id_incidencia) AS max_id FROM incidencias";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                maxId = rs.getInt("max_id");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return maxId;
+    }
+
+    /**
+     * Establece las vistas asociadas al controlador.
+     * @param vista Vista de login
+     * @param crearCuenta Vista de creación de cuenta
+     */
+    public void setVista(_02_Login vista, _03_CrearCuenta crearCuenta) {
+        this._02_login = vista;
+        this._03_crearCuenta = crearCuenta;
+    }
+
+    /**
+     * Establece el estado de sesión del usuario.
+     * @param logueado true si el usuario está logueado, false si no
+     */
+    public void setUsuarioLogueado(boolean logueado) {
+        this.usuarioLogueado = logueado;
+    }
+
+    /**
+     * Muestra una ventana específica.
+     * @param vista Ventana a mostrar
+     */
+    private void mostrarVentana(JFrame vista) {
+        vista.setVisible(true);
+    }
+
+    /**
+     * Navega hacia atrás según el estado de sesión.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void volverAtras(JFrame ventanaActual) {
+        if (usuarioLogueado) {
+            _06_PaginaPrincipal vista = new _06_PaginaPrincipal();
+            vista.setControlador(this);
+            vista.setVisible(true);
+        } else {
+            _01_PGSinLogin vista = new _01_PGSinLogin();
+            vista.setControlador(this);
+            vista.setVisible(true);
+        }
+        if (ventanaActual != null) {
+            ventanaActual.dispose();
+        }
+    }
+
+    /**
+     * Abre la página principal.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirPaginaPrincipal(JFrame ventanaActual) {
+        _06_PaginaPrincipal pagina = new _06_PaginaPrincipal();
+        pagina.setControlador(this);
+        pagina.setVisible(true);
+        if (ventanaActual != null) {
+            ventanaActual.dispose();
+        }
+    }
+
+    /**
+     * Abre la vista de mis incidencias.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirMisIncidencias(JFrame ventanaActual) {
+        _07_MisIncidencias vista = new _07_MisIncidencias();
+        vista.setControlador(this);
+        vista.setVisible(true);
+        if (ventanaActual != null) {
+            ventanaActual.dispose();
+        }
+    }
+
+    /**
+     * Abre la vista para crear una nueva incidencia.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirCrearIncidencia(JFrame ventanaActual) {
+        _08_CrearIncidencia vista = new _08_CrearIncidencia();
+        vista.setControlador(this);
+        vista.setVisible(true);
+        if (ventanaActual != null) {
+            ventanaActual.dispose();
+        }
+    }
+
+    /**
+     * Abre la página de administración.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirPaginaAdmin(JFrame ventanaActual) {
+        _12_PaginaAdmin vista = new _12_PaginaAdmin();
+        vista.setControlador(this);
+        mostrarVentana(vista);
+        ventanaActual.dispose();
+    }
+
+    /**
+     * Abre la vista de notificaciones.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirNotificaciones(JFrame ventanaActual) {
+        _09_Notificaciones vista = new _09_Notificaciones();
+        vista.setControlador(this);
+        vista.setVisible(true);
+        ventanaActual.dispose();
+    }
+
+    /**
+     * Abre la vista de ayuda.
+     */
+    public void abrirAyuda() {
+        _14_Ayuda vista = new _14_Ayuda();
+        vista.setControlador(this);
+        mostrarVentana(vista);
+    }
+
+    /**
+     * Abre la vista de login.
+     */
+    public void abrirLogin() {
+        _02_Login login = new _02_Login();
+        login.setControlador(this);
+        setVista(login, null);
+        mostrarVentana(login);
+    }
+
+    /**
+     * Abre la vista para restablecer contraseña.
+     * @param origen Vista desde la que se originó la acción
+     */
+    public void abrirRestContrasena(String origen) {
+        _05_RestContrasena rest = new _05_RestContrasena(origen);
+        rest.setControlador(this);
+        mostrarVentana(rest);
+    }
+
+    /**
+     * Abre el perfil del usuario.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirPerfilUsuario(JFrame ventanaActual) {
+        _10_PerfilUsuario perfil = new _10_PerfilUsuario();
+        perfil.setControlador(this);
+        perfil.setVisible(true);
+        if (ventanaActual != null)
+            ventanaActual.dispose();
+    }
+
+    /**
+     * Abre la vista de estadísticas.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirEstadisticas(JFrame ventanaActual) {
+        _13_Estadisticas vista = new _13_Estadisticas(this);
+        vista.setVisible(true);
+        if (ventanaActual != null) {
+            ventanaActual.dispose();
+        }
+    }
+
+    /**
+     * Valida las credenciales de login de un usuario.
+     * @param email Correo del usuario
+     * @param password Contraseña del usuario
+     * @param vistaActual Ventana actual para mostrar mensajes
+     */
+    public void validarLogin(String email, String password, JFrame vistaActual) {
+        try {
+            ConexionBD.recargarConfiguracion();
+
+            try (Connection conn = ConexionBD.conectar()) {
+
+                String passwordHasheada = HashUtil.hashSHA256(password);
+
+                String sql = "SELECT ROL FROM USERS WHERE USR = ? AND PWD = ?";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setString(1, email);
+                stmt.setString(2, passwordHasheada);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    intentosFallidos = 0;
+                    setUsuarioLogueado(true);
+
+                    // Extrae el nombre de usuario del correo
+                    if (email.contains("@")) {
+                        Modelo.usuarioActual = email.substring(0, email.indexOf('@'));
+                    } else {
+                        Modelo.usuarioActual = email;
+                    }
+
+                    // Verifica si hay notificaciones pendientes
+                    String sqlIncidenciasPendientes = "SELECT COUNT(*) FROM incidencias i "
+                            + "JOIN notificar n ON i.id_incidencia = n.incidencias_id_incidencia "
+                            + "WHERE n.USERS_USR = ? AND i.estado = 'Solucionada'";
+                    try (PreparedStatement stmtIncPend = conn.prepareStatement(sqlIncidenciasPendientes)) {
+                        stmtIncPend.setString(1, email);
+                        ResultSet rsIncPend = stmtIncPend.executeQuery();
+                        if (rsIncPend.next() && rsIncPend.getInt(1) > 0) {
+                            JOptionPane.showMessageDialog(vistaActual, "Tienes notificaciones pendientes",
+                                    "Notificación", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        rsIncPend.close();
+                    }
+
+                    vistaActual.dispose();
+                    abrirPaginaPrincipal(vistaActual);
+
+                } else {
+                    intentosFallidos++;
+                    JOptionPane.showMessageDialog(vistaActual,
+                            "Usuario o contraseña incorrectos. Intento " + intentosFallidos + " de 3.");
+                    if (intentosFallidos >= 3) {
+                        JOptionPane.showMessageDialog(vistaActual,
+                                "Demasiados intentos fallidos. Cerrando aplicación.");
+                        System.exit(0);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(vistaActual, "Error de conexión:\n" + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Registra un nuevo usuario en el sistema.
+     * @param email Correo del nuevo usuario
+     * @param password Contraseña del nuevo usuario
+     * @param codigoAdmin Código de administrador (opcional)
+     * @param preg1 Código de la primera pregunta de seguridad
+     * @param preg2 Código de la segunda pregunta de seguridad
+     * @param resp1 Respuesta a la primera pregunta
+     * @param resp2 Respuesta a la segunda pregunta
+     * @param vistaActual Ventana actual para mostrar mensajes
+     */
+    public void registrarUsuario(String email, String password, String codigoAdmin, int preg1, int preg2, String resp1,
+            String resp2, JFrame vistaActual) {
+
+        // Validación de campos vacíos
+        if (email.isEmpty() || password.isEmpty() || resp1.trim().isEmpty() || resp2.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(vistaActual,
+                    "Debe rellenar todos los campos, incluyendo las respuestas de seguridad.");
+            return;
+        }
+
+        // Validación de longitud de contraseña
+        if (password.length() < 8) {
+            JOptionPane.showMessageDialog(vistaActual, "La contraseña debe tener al menos 8 caracteres.");
+            return;
+        }
+
+        // Validación del código de administrador
+        if (!codigoAdmin.isEmpty() && !codigoAdmin.equals("ADMIN123")) {
+            JOptionPane.showMessageDialog(vistaActual,
+                    "Código de administrador incorrecto. No se ha creado la cuenta.");
+            return;
+        }
+
+        try (Connection conn = ConexionBD.conectar()) {
+            // Verifica si el usuario ya existe
+            String checkSQL = "SELECT USR FROM USERS WHERE USR = ?";
+            PreparedStatement checkStmt = conn.prepareStatement(checkSQL);
+            checkStmt.setString(1, email);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                JOptionPane.showMessageDialog(vistaActual, "El usuario ya existe");
+            } else {
+                // Determina el rol del usuario
+                String rol = codigoAdmin.equals("ADMIN123") ? "Y" : "N";
+                String nickname = email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
+
+                // Inserta el nuevo usuario
+                String insertUserSQL = "INSERT INTO USERS (USR, PWD, ROL, NICKNAME) VALUES (?, ?, ?, ?)";
+                PreparedStatement insertUserStmt = conn.prepareStatement(insertUserSQL);
+                insertUserStmt.setString(1, email);
+                insertUserStmt.setString(2, HashUtil.hashSHA256(password));
+                insertUserStmt.setString(3, rol);
+                insertUserStmt.setString(4, nickname);
+                insertUserStmt.executeUpdate();
+
+                // Inserta las preguntas de seguridad
+                String insertSeguridadSQL = "INSERT INTO SEGURIDAD (USERS_USR, PREG1, RESP1, PREG2, RESP2) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement insertSeguridadStmt = conn.prepareStatement(insertSeguridadSQL);
+                insertSeguridadStmt.setString(1, email);
+                insertSeguridadStmt.setInt(2, preg1);
+                insertSeguridadStmt.setString(3, resp1.trim());
+                insertSeguridadStmt.setInt(4, preg2);
+                insertSeguridadStmt.setString(5, resp2.trim());
+                insertSeguridadStmt.executeUpdate();
+
+                JOptionPane.showMessageDialog(vistaActual, "Cuenta creada correctamente");
+                abrirLogin();
+                vistaActual.dispose();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(vistaActual, "Error al registrar:\n" + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Comprueba las respuestas a las preguntas de seguridad.
+     * @param email Correo del usuario
+     * @param resp1 Respuesta a la primera pregunta
+     * @param resp2 Respuesta a la segunda pregunta
+     * @param vistaActual Ventana actual para mostrar mensajes
+     * @param origen Vista desde la que se originó la acción
+     */
+    public void comprobarPreguntasSeguridad(String email, String resp1, String resp2, JFrame vistaActual,
+            String origen) {
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "SELECT * FROM SEGURIDAD WHERE USERS_USR = ? AND RESP1 = ? AND RESP2 = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, email);
+            stmt.setString(2, resp1);
+            stmt.setString(3, resp2);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                _05_RestContrasena rest = new _05_RestContrasena(origen);
+                rest.setControlador(this);
+                rest.setUsuario(email);
+                rest.setVisible(true);
+                vistaActual.dispose();
+            } else {
+                JOptionPane.showMessageDialog(vistaActual, "Datos incorrectos. No se puede recuperar la contraseña.");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(vistaActual, "Error de conexión:\n" + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Verifica si el usuario actual es administrador.
+     * @return true si es administrador, false si no
+     */
+    public boolean usuarioEsAdmin() {
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "SELECT ROL FROM USERS WHERE NICKNAME = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, Modelo.usuarioActual);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return "Y".equalsIgnoreCase(rs.getString("ROL"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Restablece la contraseña de un usuario.
+     * @param email Correo del usuario
+     * @param nuevaPwd Nueva contraseña
+     * @param vistaActual Ventana actual para mostrar mensajes
+     */
+    public void restablecerContrasena(String email, String nuevaPwd, JFrame vistaActual) {
+        // Validación de longitud mínima
+        if (nuevaPwd == null || nuevaPwd.length() < 8) {
+            JOptionPane.showMessageDialog(vistaActual, "La contraseña debe tener al menos 8 caracteres.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Usa el correo del usuario logueado si existe
+        if (Modelo.usuarioActual != null && !Modelo.usuarioActual.trim().isEmpty()) {
+            email = Modelo.usuarioActual + "@ueuropea.es";
+        }
+
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "UPDATE USERS SET PWD = ? WHERE USR = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, HashUtil.hashSHA256(nuevaPwd));
+            System.out.println(HashUtil.hashSHA256(nuevaPwd));
+            stmt.setString(2, email);
+            int filas = stmt.executeUpdate();
+
+            if (filas > 0) {
+                JOptionPane.showMessageDialog(vistaActual, "¡Contraseña actualizada correctamente!");
+                abrirLogin();
+                vistaActual.dispose();
+            } else {
+                JOptionPane.showMessageDialog(vistaActual, "No se pudo actualizar la contraseña.");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(vistaActual, "Error al actualizar:\n" + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Obtiene los datos del perfil del usuario actual.
+     * @return Array con fecha, campus y email del usuario
+     */
+    public String[] obtenerDatosPerfil() {
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "SELECT FECHA, CAMPUS, USR FROM USERS WHERE USR = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, Modelo.usuarioActual + "@ueuropea.es");
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String fecha = rs.getString("FECHA");
+                String campus = rs.getString("CAMPUS");
+                String email = rs.getString("USR");
+                return new String[] { fecha, campus, email };
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return new String[] { "", "", "" };
+    }
+
+    /**
+     * Cierra la sesión del usuario actual.
+     */
+    public void cerrarSesion() {
+        setUsuarioLogueado(false);
+        Modelo.usuarioActual = null;
+
+        _02_Login login = new _02_Login();
+        login.setControlador(this);
+        login.setVisible(true);
+    }
+
+    /**
+     * Elimina una incidencia de favoritos.
+     * @param idIncidencia ID de la incidencia a eliminar
+     * @param usuario Usuario que realiza la acción
+     * @return true si la eliminación fue exitosa, false en caso contrario
+     */
+    public boolean eliminarFavorito(String idIncidencia, String usuario) {
+        String sql = "DELETE FROM favoritos WHERE incidencias_id_incidencia = ? AND USERS_USR = ?";
+        try (Connection conexion = ConexionBD.conectar(); PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, Integer.parseInt(idIncidencia));
+            ps.setString(2, usuario);
+            int filas = ps.executeUpdate();
+            System.out.println("Filas eliminadas: " + filas);
+            return filas > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza los datos del perfil del usuario.
+     * @param fecha Fecha de nacimiento
+     * @param campus Campus universitario
+     * @param imagen Foto de perfil en bytes
+     */
+    public void actualizarPerfilUsuario(String fecha, String campus, byte[] imagen) {
+        try (Connection conn = ConexionBD.conectar()) {
+            String sql = "UPDATE USERS SET FECHA = ?, CAMPUS = ?, FOTO = ? WHERE USR = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            // Fecha
+            if (fecha == null || fecha.trim().isEmpty()) {
+                stmt.setNull(1, java.sql.Types.DATE);
+            } else {
+                stmt.setDate(1, java.sql.Date.valueOf(fecha));
+            }
+
+            // Campus
+            if (campus == null || campus.trim().isEmpty()) {
+                stmt.setNull(2, java.sql.Types.VARCHAR);
+            } else {
+                stmt.setString(2, campus);
+            }
+
+            // Imagen
+            if (imagen != null) {
+                stmt.setBytes(3, imagen);
+            } else {
+                stmt.setNull(3, java.sql.Types.BLOB);
+            }
+
+            // Usuario
+            stmt.setString(4, Modelo.usuarioActual + "@ueuropea.es");
+
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al actualizar perfil:\n" + ex.getMessage());
+        }
+    }
+
+    /**
+     * Abre la vista de favoritos.
+     * @param ventanaActual Ventana actual que se cerrará
+     */
+    public void abrirFavoritos(JFrame ventanaActual) {
+        ventanaActual.dispose();
+        _15_Favoritos favoritos = new _15_Favoritos();
+        favoritos.setControlador(this);
+        favoritos.setVisible(true);
+    }
+
+    /**
+     * Establece el usuario actual.
+     * @param usuario Nombre de usuario
+     */
+    public void setUsuarioActual(String usuario) {
+        this.usuarioActual = usuario;
+    }
+
+    /**
+     * Obtiene el usuario actual.
+     * @return Nombre del usuario actual
+     */
+    public String getUsuarioActual() {
+        return this.usuarioActual;
+    }
 }
