@@ -160,7 +160,9 @@ public class BarraNavegacion extends JPanel {
         lblUsuario.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                navegar(controlador::abrirPerfilUsuario, lblUsuario);
+                if (controlador != null) {
+                    navegar(controlador::abrirPerfilUsuario, lblUsuario);
+                } 
             }
         });
     }

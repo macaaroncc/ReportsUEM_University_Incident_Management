@@ -44,16 +44,6 @@ public class _14_Ayuda extends JFrame {
 				400);
 		getContentPane().add(panel3);
 
-		// Botón ayuda inferior derecha
-		JButton btnAyuda = new JButton("?");
-		btnAyuda.setBounds(1120, 740, 50, 50);
-		btnAyuda.setBackground(new Color(128, 0, 0));
-		btnAyuda.setForeground(Color.WHITE);
-		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
-		btnAyuda.setFocusPainted(false);
-		btnAyuda.addActionListener(e -> JOptionPane.showMessageDialog(this,
-				"Esta es la sección de ayuda. Elige una sección para ver más detalles."));
-		getContentPane().add(btnAyuda);
 	}
 
 	private JPanel crearPanelAyuda(String titulo, String contenido, int y) {

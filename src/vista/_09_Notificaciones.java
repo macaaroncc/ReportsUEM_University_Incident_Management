@@ -1,6 +1,8 @@
 package vista;
 
 import controlador.Controlador;
+import vista._10_PerfilUsuario.RoundedButton;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -64,13 +66,10 @@ public class _09_Notificaciones extends JFrame {
         getContentPane().add(scrollPane);
 
         // ✅ Botón de ayuda flotante
-        JButton btnAyuda = new JButton("?");
-        btnAyuda.setBounds(1120, 740, 50, 50);
-        btnAyuda.setBackground(new Color(128, 0, 0));
-        btnAyuda.setForeground(Color.WHITE);
-        btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
-        btnAyuda.setFocusPainted(false);
-        btnAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        RoundedButton btnAyuda = new RoundedButton("?", 50, new Color(128, 0, 0)); // Rojo vino
+		btnAyuda.setBounds(1120, 750, 50, 50);
+		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
+		getContentPane().add(btnAyuda);
         btnAyuda.addActionListener(e -> {
             if (controlador != null)
                 controlador.abrirAyuda();

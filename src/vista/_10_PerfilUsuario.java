@@ -1,13 +1,12 @@
-//@autor chen
 package vista;
 
 import controlador.Controlador;
 import modelo.Modelo;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.awt.image.BufferedImage;
@@ -18,6 +17,69 @@ public class _10_PerfilUsuario extends JFrame {
 	private byte[] imagenBytes = null;
 	private JLabel lblFoto;
 
+	// Clase para botones redondeados
+	static class RoundedButton extends JButton {
+		private final int radius;
+		private Color bgColor;
+
+		public RoundedButton(String text, int radius, Color bgColor) {
+			super(text);
+			this.radius = radius;
+			this.bgColor = bgColor;
+			setContentAreaFilled(false);
+			setFocusPainted(false);
+			setBorder(new EmptyBorder(5, 15, 5, 15));
+			setForeground(Color.WHITE);
+			setFont(new Font("Tahoma", Font.BOLD, 14));
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setColor(bgColor);
+			g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+			super.paintComponent(g2);
+		}
+
+		@Override
+		protected void paintBorder(Graphics g) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setColor(bgColor.darker());
+			g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+		}
+	}
+
+	// Clase para campos de texto redondeados
+	static class RoundedTextField extends JTextField {
+		private final int radius;
+
+		public RoundedTextField(int radius) {
+			super();
+			this.radius = radius;
+			setOpaque(false);
+			setBorder(new EmptyBorder(5, 15, 5, 15));
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setColor(getBackground());
+			g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+			super.paintComponent(g2);
+		}
+
+		@Override
+		protected void paintBorder(Graphics g) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setColor(Color.GRAY);
+			g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+		}
+	}
+
 	public _10_PerfilUsuario() {
 		setTitle("10 . Perfil de Usuario");
 		setSize(1200, 900);
@@ -26,31 +88,56 @@ public class _10_PerfilUsuario extends JFrame {
 		getContentPane().setLayout(null);
 		getContentPane().setBackground(new Color(255, 255, 252));
 
-		// ✅ Barra de navegación
+		// Barra de navegación (sin cambios)
 		BarraNavegacion barra = new BarraNavegacion();
 		barra.setUsuarioLogueado(true);
 		barra.setBounds(0, 0, 1200, 59);
 		getContentPane().add(barra);
 
-		// 📋 Título
+		// Título
 		JLabel lblTitulo = new JLabel("Perfil de usuario", SwingConstants.CENTER);
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
 		lblTitulo.setBounds(0, 80, 1200, 30);
 		getContentPane().add(lblTitulo);
 
-		JPanel panel = new JPanel(null);
+		// Panel principal con sombra sutil
+		JPanel panel = new JPanel(null) {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Graphics2D g2 = (Graphics2D) g.create();
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(new Color(230, 230, 230));
+				g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+				g2.setColor(new Color(200, 200, 200));
+				g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 25, 25);
+				g2.dispose();
+			}
+		};
 		panel.setBounds(150, 140, 900, 500);
-		panel.setBackground(new Color(245, 245, 245));
-		panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+		panel.setOpaque(false);
 		getContentPane().add(panel);
 
-		lblFoto = new JLabel("Foto");
+		// Foto de perfil con borde redondeado
+		lblFoto = new JLabel("Foto") {
+			@Override
+			protected void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g.create();
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(Color.WHITE);
+				g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+				super.paintComponent(g2);
+				g2.setColor(Color.GRAY);
+				g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+				g2.dispose();
+			}
+		};
 		lblFoto.setBounds(40, 40, 182, 181);
-		lblFoto.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.add(lblFoto);
 
-		JButton btnEditarFoto = new JButton("Editar Foto");
+		// Botón Editar Foto redondeado
+		RoundedButton btnEditarFoto = new RoundedButton("Editar Foto", 15, new Color(128, 0, 0));
 		btnEditarFoto.setBounds(60, 232, 140, 30);
 		panel.add(btnEditarFoto);
 
@@ -63,7 +150,8 @@ public class _10_PerfilUsuario extends JFrame {
 					imagenBytes = java.nio.file.Files.readAllBytes(archivo.toPath());
 					BufferedImage imagen = ImageIO.read(archivo);
 					if (imagen != null) {
-						Image imagenEscalada = imagen.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(), Image.SCALE_SMOOTH);
+						Image imagenEscalada = imagen.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(),
+								Image.SCALE_SMOOTH);
 						lblFoto.setText("");
 						lblFoto.setIcon(new ImageIcon(imagenEscalada));
 					} else {
@@ -78,12 +166,14 @@ public class _10_PerfilUsuario extends JFrame {
 
 		int labelX = 250, fieldX = 370, rowHeight = 40, y = 40;
 
+		// Campos de texto redondeados
 		JLabel lblNombre = new JLabel("Correo electrónico:");
 		lblNombre.setBounds(labelX, y, 150, 30);
 		panel.add(lblNombre);
 
-		txtNombre = new JTextField();
+		txtNombre = new RoundedTextField(15);
 		txtNombre.setBounds(fieldX, y, 300, 30);
+		txtNombre.setBackground(Color.WHITE);
 		txtNombre.setEditable(false);
 		panel.add(txtNombre);
 
@@ -92,8 +182,9 @@ public class _10_PerfilUsuario extends JFrame {
 		lblfecha.setBounds(labelX, y, 150, 30);
 		panel.add(lblfecha);
 
-		txtfecha = new JTextField();
+		txtfecha = new RoundedTextField(15);
 		txtfecha.setBounds(fieldX, y, 300, 30);
+		txtfecha.setBackground(Color.WHITE);
 		panel.add(txtfecha);
 
 		y += rowHeight;
@@ -101,45 +192,46 @@ public class _10_PerfilUsuario extends JFrame {
 		lblCampus.setBounds(labelX, y, 150, 30);
 		panel.add(lblCampus);
 
-		txtCampus = new JTextField();
+		txtCampus = new RoundedTextField(15);
 		txtCampus.setBounds(fieldX, y, 300, 30);
+		txtCampus.setBackground(Color.WHITE);
 		panel.add(txtCampus);
 
-		JButton btnGuardar = new JButton("Guardar Cambios");
+		// Botones principales con estilo redondeado
+		RoundedButton btnGuardar = new RoundedButton("Guardar Cambios", 20, new Color(0, 100, 0)); // Verde oscuro
 		btnGuardar.setBounds(590, 449, 300, 40);
-		btnGuardar.setBackground(new Color(34, 139, 34));
-		btnGuardar.setForeground(Color.WHITE);
-		btnGuardar.setFont(new Font("Tahoma", Font.BOLD, 14));
 		panel.add(btnGuardar);
 
+		RoundedButton btnCambiarContrasena = new RoundedButton("Cambiar Contraseña", 20, new Color(128, 0, 0)); // Rojo
+																												// vino
+		btnCambiarContrasena.setBounds(10, 449, 300, 40);
+		panel.add(btnCambiarContrasena);
+
+		RoundedButton btnCerrarSesion = new RoundedButton("Cerrar Sesión", 20, new Color(128, 0, 0)); // Rojo más claro
+		btnCerrarSesion.setBounds(590, 398, 300, 40);
+		panel.add(btnCerrarSesion);
+
+		RoundedButton btnAyuda = new RoundedButton("?", 50, new Color(128, 0, 0)); // Rojo vino
+		btnAyuda.setBounds(1120, 750, 50, 50);
+		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
+		getContentPane().add(btnAyuda);
+
+		// Listeners (mantenidos exactamente igual)
 		btnGuardar.addActionListener(e -> {
 			if (controlador != null) {
 				String fecha = txtfecha.getText();
 				String campus = txtCampus.getText();
-				controlador.actualizarPerfilUsuario(fecha, campus, imagenBytes); // 👈 pasa imagenBytes
+				controlador.actualizarPerfilUsuario(fecha, campus, imagenBytes);
 				JOptionPane.showMessageDialog(this, "Perfil actualizado correctamente.");
 			}
 		});
 
-		JButton btnCambiarContrasena = new JButton("Cambiar Contraseña");
-		btnCambiarContrasena.setBounds(10, 449, 300, 40);
-		btnCambiarContrasena.setBackground(Color.GRAY);
-		btnCambiarContrasena.setForeground(Color.WHITE);
-		btnCambiarContrasena.setFont(new Font("Tahoma", Font.BOLD, 14));
-		panel.add(btnCambiarContrasena);
 		btnCambiarContrasena.addActionListener(e -> {
 			if (controlador != null) {
 				controlador.abrirRestContrasena("perfil");
 			}
 			dispose();
 		});
-
-		JButton btnCerrarSesion = new JButton("Cerrar Sesión");
-		btnCerrarSesion.setBounds(590, 398, 300, 40);
-		btnCerrarSesion.setBackground(new Color(178, 34, 34));
-		btnCerrarSesion.setForeground(Color.WHITE);
-		btnCerrarSesion.setFont(new Font("Tahoma", Font.BOLD, 14));
-		panel.add(btnCerrarSesion);
 
 		btnCerrarSesion.addActionListener(e -> {
 			int confirm = JOptionPane.showConfirmDialog(this, "¿Seguro que deseas cerrar sesión?",
@@ -152,13 +244,6 @@ public class _10_PerfilUsuario extends JFrame {
 			}
 		});
 
-		JButton btnAyuda = new JButton("?");
-		btnAyuda.setBounds(1120, 750, 50, 50);
-		btnAyuda.setBackground(new Color(128, 0, 0));
-		btnAyuda.setForeground(Color.WHITE);
-		btnAyuda.setFont(new Font("Arial", Font.BOLD, 20));
-		btnAyuda.setFocusPainted(false);
-		getContentPane().add(btnAyuda);
 		btnAyuda.addActionListener(e -> {
 			if (controlador != null)
 				controlador.abrirAyuda();
@@ -181,14 +266,14 @@ public class _10_PerfilUsuario extends JFrame {
 			txtCampus.setText(datos[1]);
 			txtNombre.setText(datos[2]);
 
-			// ✅ Cargar y mostrar foto del usuario
 			imagenBytes = Modelo.obtenerFotoUsuario();
 			if (imagenBytes != null && imagenBytes.length > 0) {
 				try {
 					ByteArrayInputStream bis = new ByteArrayInputStream(imagenBytes);
 					BufferedImage img = ImageIO.read(bis);
 					if (img != null) {
-						Image imagenEscalada = img.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(), Image.SCALE_SMOOTH);
+						Image imagenEscalada = img.getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(),
+								Image.SCALE_SMOOTH);
 						lblFoto.setText("");
 						lblFoto.setIcon(new ImageIcon(imagenEscalada));
 					}
