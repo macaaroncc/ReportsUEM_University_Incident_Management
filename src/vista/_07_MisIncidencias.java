@@ -64,6 +64,7 @@ public class _07_MisIncidencias extends JFrame {
 		table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
 
+		table.getTableHeader().setReorderingAllowed(false);
 		table.getColumnModel().getColumn(0).setPreferredWidth(40); // ID
 		table.getColumnModel().getColumn(1).setPreferredWidth(400); // Descripción
 		table.getColumnModel().getColumn(2).setPreferredWidth(100); // Estado

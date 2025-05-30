@@ -225,6 +225,7 @@ public class _01_PGSinLogin extends JFrame {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setShowGrid(false);
 		table.setIntercellSpacing(new Dimension(0, 0));
+		table.getTableHeader().setReorderingAllowed(false);
 		table.getColumnModel().getColumn(4).setPreferredWidth(250);
 		table.getColumnModel().getColumn(6).setPreferredWidth(200);
 

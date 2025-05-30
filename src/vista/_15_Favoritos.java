@@ -64,6 +64,7 @@ public class _15_Favoritos extends JFrame {
 		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
 
 		// Ocultar columna ID
+		table.getTableHeader().setReorderingAllowed(false);
 		table.getColumnModel().getColumn(0).setMinWidth(0);
 		table.getColumnModel().getColumn(0).setMaxWidth(0);
 		table.getColumnModel().getColumn(0).setWidth(0);

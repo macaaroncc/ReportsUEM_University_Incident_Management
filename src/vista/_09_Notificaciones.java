@@ -57,6 +57,7 @@ public class _09_Notificaciones extends JFrame {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
         // Ajustar anchos de columnas
+        table.getTableHeader().setReorderingAllowed(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(150); // Estado
         table.getColumnModel().getColumn(1).setPreferredWidth(600); // Descripción
         table.getColumnModel().getColumn(2).setPreferredWidth(360); // Justificación

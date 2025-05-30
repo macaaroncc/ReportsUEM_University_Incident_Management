@@ -133,6 +133,7 @@ public class _06_PaginaPrincipal extends JFrame {
 		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.getTableHeader().setReorderingAllowed(false);
 		table.getColumnModel().getColumn(4).setPreferredWidth(250);
 		table.getColumnModel().getColumn(6).setPreferredWidth(200);
 
