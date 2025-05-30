@@ -82,9 +82,9 @@ public class _17_DetalleIncidencia extends JFrame {
 		getContentPane().add(panelBotones);
 
 		String[] iconPaths = {
-			"/img/check2.png",
-			"/img/favorite.png",
-			"/img/estrella.png"
+			"/img/comprobado.png",
+			"/img/favorito.png",
+			"/img/precioso.png"
 		};
 		String[] tooltips = { "Marcar como resuelta", "Añadir a Favoritos", "Dar Me gusta" };
 
