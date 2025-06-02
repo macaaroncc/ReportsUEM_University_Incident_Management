@@ -1,7 +1,7 @@
-# UrbanFixer - Sistema de Gestión de Incidencias Universitarias
+# ReportsUem - Sistema de Gestión de Incidencias Universitarias
 
 ## 📄 Descripción breve
-**UrbanFixer** es una aplicación desarrollada para la gestión, reporte y seguimiento de incidencias en los campus de la Universidad Europea. Permite a los usuarios registrar nuevas incidencias, consultar el estado de las existentes, marcarlas como favoritas y gestionar su cuenta de manera eficiente. Está orientada tanto a estudiantes como al personal de mantenimiento.
+**ReportsUEM** es una aplicación desarrollada para la gestión, reporte y seguimiento de incidencias en los campus de la Universidad Europea. Permite a los usuarios registrar nuevas incidencias, consultar el estado de las existentes, marcarlas como favoritas y gestionar su cuenta de manera eficiente. Está orientada tanto a estudiantes como al personal de mantenimiento.
 
 ## 🛠 Tecnologías utilizadas
 - Java (Swing)
