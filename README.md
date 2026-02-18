@@ -31,12 +31,13 @@ Built with a focus on UX and efficiency, the system allows students and maintena
 ### Installation and Execution
 
 1. Clone the Repository:
-git clone [https://github.com/DAM-UEM-2425/ud13-pi-final-purpurina.git](https://www.google.com/search?q=https://github.com/DAM-UEM-2425/ud13-pi-final-purpurina.git)
+git clone .(https://github.com/macaaroncc/ReportsUEM_University_Incident_Management.git)
+
 cd ud13-pi-final-purpurina
-2. Database Setup:
+3. Database Setup:
 Import the estructura.sql file into your MySQL Server.
 Configure your database credentials in modelo/ConexionBD.java.
-3. Run the App:
+4. Run the App:
 Open the project in IntelliJ IDEA or Eclipse.
 Run the main entry point: controlador.Main.java.
 
@@ -50,7 +51,7 @@ estructura.sql # SQL Database Schema
 
 ### Development Team
 
-Haowen, Aaron, Chen, Bea
+Aaron, Bea, Haowen, Chen
 
 ### Academic Context
 
