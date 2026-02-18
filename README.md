@@ -1,76 +1,64 @@
-# ReportsUem - Sistema de Gestión de Incidencias Universitarias
+# ReportsUEM - University Incident Management System
 
-## 📄 Descripción breve
-**ReportsUEM** es una aplicación desarrollada para la gestión, reporte y seguimiento de incidencias en los campus de la Universidad Europea. Permite a los usuarios registrar nuevas incidencias, consultar el estado de las existentes, marcarlas como favoritas y gestionar su cuenta de manera eficiente. Está orientada tanto a estudiantes como al personal de mantenimiento.
+### Overview
 
-## 🛠 Tecnologías utilizadas
-- Java (Swing)
-- MySQL
-- JDBC
-- Patrón de diseño MVC (Modelo-Vista-Controlador)
+ReportsUEM is a desktop application designed to streamline the reporting, tracking, and management of infrastructure incidents across the Universidad Europea campuses.
 
-## 💻 Requisitos previos
-- Sistema operativo: Windows 10 o superior
-- JDK 17 o superior
-- RAM mínima: 4 GB
-- Espacio en disco: 500 MB libres
-- Resolución mínima: 1280x720
-- Servidor MySQL 8.0
-- IDE recomendado: IntelliJ IDEA o Eclipse
+Built with a focus on UX and efficiency, the system allows students and maintenance staff to register new issues, monitor real-time status updates, and manage personal accounts. This project was developed as the Final Capstone for the Higher National Diploma (HND) in Software Development (DAM).
 
-## 🧰 Instrucciones de instalación y ejecución
+### Tech Stack
 
-### 🔁 Clonar el repositorio
-```bash
-git clone https://github.com/DAM-UEM-2425/ud13-pi-final-purpurina.git
+* Language: Java 17+
+* GUI Framework: Java Swing
+* Database: MySQL 8.0
+* Architecture: MVC (Model-View-Controller) pattern
+* Persistence: JDBC (Java Database Connectivity)
+
+### Key Features
+
+* Incident Lifecycle Management: Create, filter (by status/date/relevance), and track maintenance tickets.
+* Personalized Dashboard: My Incidents section and a Favorites system for quick access to critical reports.
+* Secure Authentication: User registration and a password recovery workflow.
+* Optimized Performance: Lightweight desktop client with efficient SQL querying.
+
+### System Requirements
+
+* OS: Windows 10/11
+* Java: JDK 17 or higher
+* Hardware: 4GB RAM | 500MB Disk Space
+* Database: Local or remote MySQL 8.0 server
+
+### Installation and Execution
+
+1. Clone the Repository:
+git clone [https://github.com/DAM-UEM-2425/ud13-pi-final-purpurina.git](https://www.google.com/search?q=https://github.com/DAM-UEM-2425/ud13-pi-final-purpurina.git)
 cd ud13-pi-final-purpurina
-```
+2. Database Setup:
+Import the estructura.sql file into your MySQL Server.
+Configure your database credentials in modelo/ConexionBD.java.
+3. Run the App:
+Open the project in IntelliJ IDEA or Eclipse.
+Run the main entry point: controlador.Main.java.
 
-### ⚙️ Compilar y ejecutar
-1. Abre el proyecto en tu IDE Java favorito.
-2. Asegúrate de tener la base de datos configurada en MySQL según el archivo `estructura.sql`.
-3. Ajusta la conexión en `modelo/ConexionBD.java` con tus credenciales.
-4. Ejecuta la clase `controlador.Main.java`.
+### Project Structure
 
-## 🗂 Estructura del proyecto
+controlador/  # Navigation logic and event handling
+modelo/       # DB Connection and Data Access Objects (DAO)
+vista/        # GUI Components (Java Swing)
+recursos/     # Assets, icons, and UI styling
+estructura.sql # SQL Database Schema
 
-```
-├── controlador/         # Lógica de navegación y control
-├── modelo/              # Conexión a la base de datos y modelo de usuario
-├── vista/               # Interfaces gráficas del sistema (Java Swing)
-├── recursos/            # Imágenes y fondos
-├── estructura.sql       # Script de creación de base de datos
-└── README.md            # Documentación del proyecto
-```
+### Development Team
 
-## 🚀 Ejemplo de uso básico
+Haowen, Aaron, Chen, Bea
 
-1. Accede a la aplicación como usuario registrado.
-2. Desde la pantalla principal puedes:
-   - Buscar incidencias por estado, fecha o relevancia.
-   - Crear una nueva incidencia.
-   - Consultar tus incidencias personales.
-   - Añadir incidencias a favoritos.
-   - Recuperar tu contraseña si la olvidas.
+### Academic Context
 
+* Institution: Universidad Europea de Madrid (UEM)
+* Degree: Higher National Diploma (HND) in Multi-platform Application Development (DAM)
+* Course: 2024 / 2025
+* Supervisors: Pedro Camacho & Irene del Rincón
 
+---
 
-## 👥 Autores
-
-- **Haowen**
-- **Aaron**
-- **Chen**
-- **Bea**
-
-## 👩‍🏫 Tutores del proyecto
-- Pedro Camacho  
-- Irene del Rincón
-
-## 🏫 Universidad
-**Universidad Europea de Madrid**
-
-## 🎓 Ciclo
-Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)
-
-## 📆 Curso
-2024 / 2025
+¿Quieres que te redacte también un pequeño mensaje en inglés para enviarlo a empresas de Edimburgo o Glasgow presentando este proyecto?
